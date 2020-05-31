@@ -4,7 +4,7 @@ local addonName, addonNamespace = ...
 addonNamespace.Core = {}  
 
 local View = addonNamespace.View
-local Core = addonNamespace.Core
+local DAL = addonNamespace.DAL
 
 
 -------------------------------------------------------
@@ -54,19 +54,8 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
     end
 
     if(event == "ADDON_LOADED") then
-
-	    ------------------------------------
-	    --	Import SavedVariables
-	    ------------------------------------
-	    -- saved variables starts as nil. we want a empty table
-        if not ThirtyDKP_Database_DKPTable then ThirtyDKP_Database_DKPTable = {} end;
-        Core.DKPTableCopy 		= ThirtyDKP_Database_DKPTable;	
-        Core.DKPTableNumRows    = 0;
-        if #ThirtyDKP_Database_DKPTable > 0 then Core.DKPTableNumRows = #ThirtyDKP_Database_DKPTable end;
-
-		table.sort(ThirtyDKP_Database_DKPTable, function(a, b)
-			return a["player"] < b["player"]
-		end)
+        -- initialize data access
+	    DAL:Initialize()
 		
 	end
 end

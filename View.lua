@@ -1,8 +1,8 @@
-local addonName, addonNamespace = ...
+local addonName, ThirtyDKP = ...
 
 -- Initializing the view
-addonNamespace.View = {}
-local View = addonNamespace.View;
+ThirtyDKP.View = {}
+local View = ThirtyDKP.View;
 
 -- Main addon window
 View.ThirtyDKP_MainFrame = nil;
@@ -16,6 +16,7 @@ local TOP_POINT = "TOP"
 local TOP_LEFT_POINT = "TOPLEFT"
 local TOP_RIGHT_POINT = "TOPRIGHT"
 local LEFT_POINT = "LEFT"
+local RIGHT_POINT = "RIGHT"
 local BOTTOMRIGHT_POINT = "BOTTOMRIGHT"
 local BOTTOMLEFT_POINT = "BOTTOMLEFT"
 
@@ -42,39 +43,34 @@ local function Create_DKPTableRow(parent, id)
 	b:SetNormalTexture("Interface\\COMMON\\talent-blue-glow")
 	b:GetNormalTexture():SetAlpha(0.5)
 	b:GetNormalTexture():SetAllPoints(true)
-	--b.bg = b:CreateTexture(nil, "BACKGROUND")
-	--b.bg:SetAllPoints(true)
-	--b.bg:SetColorTexture(0.2, 0.4, 0.8, 0.2)
-    --b:SetText("TestTesT");
-    --b:SetNormalFontObject("GameFontNormal");
-	--b:SetHighlightFontObject("GameFontHighlight");
+
 	b.DKPInfo = {}
 	b.DKPInfo.PlayerName = b:CreateFontString(nil, OVERLAY_LAYER)
 	b.DKPInfo.PlayerName:SetFontObject("GameFontHighlight")
-	b.DKPInfo.PlayerName:SetText(tostring(addonNamespace.Core.DKPTableCopy[id].player));
-	b.DKPInfo.PlayerName:SetPoint("LEFT", 30, 0)
+	b.DKPInfo.PlayerName:SetText(tostring(ThirtyDKP.DAL.DKPTableCopy[id].player));
+	b.DKPInfo.PlayerName:SetPoint(LEFT_POINT, 30, 0)
 
 	b.DKPInfo.PlayerClass = b:CreateFontString(nil, OVERLAY_LAYER)
 	b.DKPInfo.PlayerClass:SetFontObject("GameFontHighlight")
-	b.DKPInfo.PlayerClass:SetText(tostring(addonNamespace.Core.DKPTableCopy[id].class));
-	b.DKPInfo.PlayerClass:SetPoint("CENTER")
+	b.DKPInfo.PlayerClass:SetText(tostring(ThirtyDKP.DAL.DKPTableCopy[id].class));
+	b.DKPInfo.PlayerClass:SetPoint(CENTER_POINT)
 
 	b.DKPInfo.CurrentDKP = b:CreateFontString(nil, OVERLAY_LAYER)
 	b.DKPInfo.CurrentDKP:SetFontObject("GameFontHighlight")
-	b.DKPInfo.CurrentDKP:SetText(tostring(addonNamespace.Core.DKPTableCopy[id].dkp));
-	b.DKPInfo.CurrentDKP:SetPoint("RIGHT", -80, 0)
+	b.DKPInfo.CurrentDKP:SetText(tostring(ThirtyDKP.DAL.DKPTableCopy[id].dkp));
+	b.DKPInfo.CurrentDKP:SetPoint(RIGHT_POINT, -80, 0)
 	return b
 end
 
 
 local function Populate_DKPTable()
 	MainFrame.scrollChild.Rows = {}
-	for i = 1, addonNamespace.Core.DKPTableNumRows do
+	for i = 1, ThirtyDKP.DAL.DKPTableNumRows do
 		MainFrame.scrollChild.Rows[i] = Create_DKPTableRow(MainFrame.scrollChild, i)
 		if i==1 then
-			MainFrame.scrollChild.Rows[i]:SetPoint("TOPLEFT", MainFrame.scrollChild, "TOPLEFT", 0, -2)
-		else  
-			MainFrame.scrollChild.Rows[i]:SetPoint("TOPLEFT", MainFrame.scrollChild.Rows[i-1], "BOTTOMLEFT")
+			MainFrame.scrollChild.Rows[i]:SetPoint(TOP_LEFT_POINT, MainFrame.scrollChild, TOP_LEFT_POINT, 0, -2)
+		else
+			MainFrame.scrollChild.Rows[i]:SetPoint(TOP_LEFT_POINT, MainFrame.scrollChild.Rows[i-1], BOTTOMLEFT_POINT)
 		end
 	end
 end
@@ -84,17 +80,17 @@ local function Create_DKPTable()
 	-- "Container" frame that clips out its child frame "excess" content.
 	MainFrame.DKPTable = CreateFrame("ScrollFrame", 'DKPTableScrollFrame', MainFrame, "UIPanelScrollFrameTemplate");
 	local scrollFrame = MainFrame.DKPTable
-	scrollFrame:SetSize(DKPTableWidth, addonNamespace.Core.DKPTableNumRows*12);	
-	scrollFrame.scrollBar = _G["DKPTableScrollFrameScrollBar"]; --fuckin xml -> lua glue magic 
+	scrollFrame:SetSize(DKPTableWidth, ThirtyDKP.DAL.DKPTableNumRows*12);
+	scrollFrame.scrollBar = _G["DKPTableScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 	scrollFrame:SetPoint( TOP_LEFT_POINT, 10, -30 );
 	scrollFrame:SetPoint( BOTTOMRIGHT_POINT, -120, 10 );
-	
+
 	-- Child frame which holds all the content being scrolled through.
     MainFrame.scrollChild = CreateFrame( "Frame", "$parent_ScrollChild", scrollFrame );
-	MainFrame.scrollChild:SetHeight( DKPTableRowHeight*addonNamespace.Core.DKPTableNumRows+3 );
+	MainFrame.scrollChild:SetHeight( DKPTableRowHeight*ThirtyDKP.DAL.DKPTableNumRows+3 );
     MainFrame.scrollChild:SetWidth( scrollFrame:GetWidth() );
 	MainFrame.scrollChild:SetAllPoints( scrollFrame );
-	MainFrame.scrollChild.bg = MainFrame.scrollChild:CreateTexture(nil, "BACKGROUND")
+	MainFrame.scrollChild.bg = MainFrame.scrollChild:CreateTexture(nil, BACKGROUND_LAYER)
 	MainFrame.scrollChild.bg:SetAllPoints(true)
 	MainFrame.scrollChild.bg:SetColorTexture(0, 0, 0, 1)
 
@@ -158,11 +154,11 @@ local function Create_MainFrame()
 	end);
 
     -- title
-    ThirtyDKP_UI_MainFrameTitleBG = MainFrame:CreateFontString(nil, OVERLAY_LAYER);
-	ThirtyDKP_UI_MainFrameTitleBG:SetFontObject("GameFontNormal");
-	ThirtyDKP_UI_MainFrameTitleBG:ClearAllPoints();
-    ThirtyDKP_UI_MainFrameTitleBG:SetPoint(TOP_LEFT_POINT, ThirtyDKP_MainFrame, TOP_LEFT_POINT, 15, -10);
-    ThirtyDKP_UI_MainFrameTitleBG:SetText(MAIN_FRAME_TITLE);
+    ThirtyDKP_MainFrameTitleBG = MainFrame:CreateFontString(nil, OVERLAY_LAYER);
+	ThirtyDKP_MainFrameTitleBG:SetFontObject("GameFontNormal");
+	ThirtyDKP_MainFrameTitleBG:ClearAllPoints();
+    ThirtyDKP_MainFrameTitleBG:SetPoint(TOP_LEFT_POINT, ThirtyDKP_MainFrame, TOP_LEFT_POINT, 15, -10);
+    ThirtyDKP_MainFrameTitleBG:SetText(MAIN_FRAME_TITLE);
 
     -- Buttons
     MainFrame.optionsButton = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");

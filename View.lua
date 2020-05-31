@@ -5,7 +5,7 @@ addonNamespace.View = {}
 local View = addonNamespace.View;
 
 -- Main addon window
-View.ThirtyDKP_MainFrame = {}
+View.ThirtyDKP_MainFrame = nil;
 local MainFrame = View.ThirtyDKP_MainFrame
 
 -- UI anchor point constants (blizz should have these somewhere??)
@@ -99,9 +99,19 @@ local function Create_DKPTable()
 end
 
 function View:Create_MainFrame()
+	if MainFrame then
+		MainFrame:SetShown(true);
+		return
+	 end
+
     MainFrame = CreateFrame('Frame', 'ThirtyDKP_MainFrame', UIParent, "UIPanelDialogTemplate");
     MainFrame:SetSize(DKPTableWidth + 30, DKPTableRowHeight*15); -- width, height
 	MainFrame:SetPoint(CENTER_POINT, UIParent, CENTER_POINT, 0, 60); -- point, relative frame, relative point on relative frame
+	MainFrame:SetMovable(true);
+	MainFrame:EnableMouse(true);
+	MainFrame:RegisterForDrag("LeftButton");
+	MainFrame:SetScript("OnDragStart", MainFrame.StartMoving);
+	MainFrame:SetScript("OnDragStop", MainFrame.StopMovingOrSizing);
 
     -- title
     ThirtyDKP_UI_MainFrameTitleBG = MainFrame:CreateFontString(nil, OVERLAY_LAYER);

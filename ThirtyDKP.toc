@@ -7,4 +7,5 @@
 ## SavedVariables: ThirtyDKP_Database_DKPTable
 
 View.lua
+DAL.lua
 Core.lua

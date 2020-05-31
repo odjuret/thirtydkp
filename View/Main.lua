@@ -5,10 +5,9 @@ ThirtyDKP.View = {}
 local View = ThirtyDKP.View;
 
 -- Main addon window
-View.ThirtyDKP_MainFrame = nil;
-View.ThirtyDKP_OptionsFrame = nil;
-View.ThirtyDKP_UIInitialized = false;
-local MainFrame = View.ThirtyDKP_MainFrame
+local OptionsFrame = nil;
+local Initialized = false;
+local MainFrame = nil;
 
 -- UI anchor point constants (blizz should have these somewhere??)
 local CENTER_POINT = "CENTER"
@@ -35,8 +34,7 @@ local OPTIONS_FRAME_TITLE = "Options"
 -- Sizes
 local DKPTableWidth, DKPTableRowHeight = 500, 18;
 
-
-local function Create_DKPTableRow(parent, id)
+local function CreateDKPTableRow(parent, id)
 	local b = CreateFrame("Button", nil, MainFrame.scrollChild);
 	b:SetSize(DKPTableWidth-100, DKPTableRowHeight);
 	b:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square");
@@ -63,10 +61,10 @@ local function Create_DKPTableRow(parent, id)
 end
 
 
-local function Populate_DKPTable()
+local function PopulateDKPTable()
 	MainFrame.scrollChild.Rows = {}
 	for i = 1, ThirtyDKP.DAL.DKPTableNumRows do
-		MainFrame.scrollChild.Rows[i] = Create_DKPTableRow(MainFrame.scrollChild, i)
+		MainFrame.scrollChild.Rows[i] = CreateDKPTableRow(MainFrame.scrollChild, i)
 		if i==1 then
 			MainFrame.scrollChild.Rows[i]:SetPoint(TOP_LEFT_POINT, MainFrame.scrollChild, TOP_LEFT_POINT, 0, -2)
 		else
@@ -76,7 +74,7 @@ local function Populate_DKPTable()
 end
 
 
-local function Create_DKPTable()
+local function CreateDKPTable()
 	-- "Container" frame that clips out its child frame "excess" content.
 	MainFrame.DKPTable = CreateFrame("ScrollFrame", 'DKPTableScrollFrame', MainFrame, "UIPanelScrollFrameTemplate");
 	local scrollFrame = MainFrame.DKPTable
@@ -96,34 +94,17 @@ local function Create_DKPTable()
 
 	scrollFrame:SetScrollChild( MainFrame.scrollChild );
 
-	Populate_DKPTable()
+	PopulateDKPTable()
 end
 
-local function Create_OptionsFrame()
+local function CreateOptionsFrame()
 	OptionsFrame = CreateFrame('Frame', 'ThirtyDKP_OptionsFrame', UIParent, "UIPanelDialogTemplate");
 	OptionsFrame:SetShown(false);
 	OptionsFrame:SetSize(500, 500);
 	OptionsFrame:SetFrameStrata("HIGH");
+	OptionsFrame:SetClampedToScreen(true);
 	OptionsFrame:SetPoint(TOP_LEFT_POINT, MainFrame, TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
 	OptionsFrame:EnableMouse(true);
-	OptionsFrame:SetMovable(true);
-	OptionsFrame:RegisterForDrag("LeftButton");
-	OptionsFrame:SetScript("OnDragStart", function()
-		MainFrame:StartMoving();
-		OptionsFrame:StartMoving();
-	end);
-	OptionsFrame:SetScript("OnDragStop", function()
-		MainFrame:StopMovingOrSizing();
-		OptionsFrame:StopMovingOrSizing();
-	end);
-	OptionsFrame:SetScript("OnShow", function()
-		local point, relativeTo, relativePoint, xOffset, yOffset = MainFrame:GetPoint();
-		MainFrame:SetPoint(point, relativeTo, relativePoint, xOffset - MainFrame:GetWidth()/2, yOffset);
-	end);
-	OptionsFrame:SetScript("OnHide", function()
-		local point, relativeTo, relativePoint, xOffset, yOffset = MainFrame:GetPoint();
-		MainFrame:SetPoint(point, relativeTo, relativePoint, xOffset + MainFrame:GetWidth()/2, yOffset);
-	end);
 
 	 -- title
 	 local title = OptionsFrame:CreateFontString(nil, OVERLAY_LAYER);
@@ -134,23 +115,20 @@ local function Create_OptionsFrame()
 end
 
 
-local function Create_MainFrame()
-	View.ThirtyDKP_MainFrame = CreateFrame('Frame', 'ThirtyDKP_MainFrame', UIParent, "UIPanelDialogTemplate");
-	MainFrame = View.ThirtyDKP_MainFrame;
-
+local function CreateMainFrame()
+	MainFrame = CreateFrame('Frame', 'ThirtyDKP_MainFrame', UIParent, "UIPanelDialogTemplate");
 	MainFrame:SetShown(false);
     MainFrame:SetSize(DKPTableWidth + 30, DKPTableRowHeight*15); -- width, height
 	MainFrame:SetPoint(CENTER_POINT, UIParent, CENTER_POINT, 0, 60); -- point, relative frame, relative point on relative frame
 	MainFrame:SetFrameStrata("HIGH");
+	MainFrame:SetClampedToScreen(true);
 	MainFrame:SetMovable(true);
 	MainFrame:EnableMouse(true);
 	MainFrame:RegisterForDrag("LeftButton");
 	MainFrame:SetScript("OnDragStart", MainFrame.StartMoving);
 	MainFrame:SetScript("OnDragStop", MainFrame.StopMovingOrSizing);
 	MainFrame:SetScript("OnHide", function(self)
-		if OptionsFrame then
-			OptionsFrame:SetShown(false);
-		end
+		OptionsFrame:SetShown(false);
 	end);
 
     -- title
@@ -173,11 +151,22 @@ local function Create_MainFrame()
 	end);
 
 	-- Create other frames
-	Create_DKPTable();
+	CreateDKPTable();
 end
 
-function View:InitUI()
-	Create_MainFrame();
-	Create_OptionsFrame();
-	View.ThirtyDKP_UIInitialized = true;
+
+function View:OpenMainFrame()
+	MainFrame:SetShown(true);
+end
+
+function View:IsInitialized()
+	return Initialized;
+end
+
+function View:Initialize()
+	if Initialized then return end
+
+	CreateMainFrame();
+	CreateOptionsFrame();
+	Initialized = true;
 end

@@ -1,9 +1,9 @@
-local addonName, addonNamespace = ... 
+local addonName, ThirtyDKP = ... 
 
 -- Initializing the core global variables
-addonNamespace.DAL = {}  
+ThirtyDKP.DAL = {}  
 
-local DAL = addonNamespace.DAL
+local DAL = ThirtyDKP.DAL
 
 function DAL:Initialize()
     ------------------------------------

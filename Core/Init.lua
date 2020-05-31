@@ -1,10 +1,10 @@
-local addonName, addonNamespace = ... 
+local addonName, ThirtyDKP = ... 
 
 -- Initializing the core global variables
-addonNamespace.Core = {}  
+ThirtyDKP.Core = {}  
 
-local View = addonNamespace.View
-local DAL = addonNamespace.DAL
+local View = ThirtyDKP.View
+local DAL = ThirtyDKP.DAL
 
 
 -------------------------------------------------------

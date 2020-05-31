@@ -1,17 +1,20 @@
-local addonName, addonNamespace = ... 
+local addonName, addonNamespace = ...
 
 -- Initializing the view
-addonNamespace.View = {}  
+addonNamespace.View = {}
 local View = addonNamespace.View;
 
 -- Main addon window
 View.ThirtyDKP_MainFrame = nil;
+View.ThirtyDKP_OptionsFrame = nil;
+View.ThirtyDKP_UIInitialized = false;
 local MainFrame = View.ThirtyDKP_MainFrame
 
 -- UI anchor point constants (blizz should have these somewhere??)
 local CENTER_POINT = "CENTER"
 local TOP_POINT = "TOP"
 local TOP_LEFT_POINT = "TOPLEFT"
+local TOP_RIGHT_POINT = "TOPRIGHT"
 local LEFT_POINT = "LEFT"
 local BOTTOMRIGHT_POINT = "BOTTOMRIGHT"
 local BOTTOMLEFT_POINT = "BOTTOMLEFT"
@@ -25,6 +28,8 @@ local HIGHLIGHT_LAYER = "HIGHLIGHT"     -- Level 4. Place your text, objects, an
 
 -- Titles related constants
 local MAIN_FRAME_TITLE = "Thirty DKP"
+local OPTIONS_FRAME_TITLE = "Options"
+
 
 -- Sizes
 local DKPTableWidth, DKPTableRowHeight = 500, 18;
@@ -94,24 +99,63 @@ local function Create_DKPTable()
 	MainFrame.scrollChild.bg:SetColorTexture(0, 0, 0, 1)
 
 	scrollFrame:SetScrollChild( MainFrame.scrollChild );
-	
+
 	Populate_DKPTable()
 end
 
-function View:Create_MainFrame()
-	if MainFrame then
-		MainFrame:SetShown(true);
-		return
-	 end
+local function Create_OptionsFrame()
+	OptionsFrame = CreateFrame('Frame', 'ThirtyDKP_OptionsFrame', UIParent, "UIPanelDialogTemplate");
+	OptionsFrame:SetShown(false);
+	OptionsFrame:SetSize(500, 500);
+	OptionsFrame:SetFrameStrata("HIGH");
+	OptionsFrame:SetPoint(TOP_LEFT_POINT, MainFrame, TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
+	OptionsFrame:EnableMouse(true);
+	OptionsFrame:SetMovable(true);
+	OptionsFrame:RegisterForDrag("LeftButton");
+	OptionsFrame:SetScript("OnDragStart", function()
+		MainFrame:StartMoving();
+		OptionsFrame:StartMoving();
+	end);
+	OptionsFrame:SetScript("OnDragStop", function()
+		MainFrame:StopMovingOrSizing();
+		OptionsFrame:StopMovingOrSizing();
+	end);
+	OptionsFrame:SetScript("OnShow", function()
+		local point, relativeTo, relativePoint, xOffset, yOffset = MainFrame:GetPoint();
+		MainFrame:SetPoint(point, relativeTo, relativePoint, xOffset - MainFrame:GetWidth()/2, yOffset);
+	end);
+	OptionsFrame:SetScript("OnHide", function()
+		local point, relativeTo, relativePoint, xOffset, yOffset = MainFrame:GetPoint();
+		MainFrame:SetPoint(point, relativeTo, relativePoint, xOffset + MainFrame:GetWidth()/2, yOffset);
+	end);
 
-    MainFrame = CreateFrame('Frame', 'ThirtyDKP_MainFrame', UIParent, "UIPanelDialogTemplate");
+	 -- title
+	 local title = OptionsFrame:CreateFontString(nil, OVERLAY_LAYER);
+	 title:SetFontObject("GameFontNormal");
+	 title:ClearAllPoints();
+	 title:SetPoint(TOP_LEFT_POINT, OptionsFrame, TOP_LEFT_POINT, 15, -10);
+	 title:SetText(OPTIONS_FRAME_TITLE);
+end
+
+
+local function Create_MainFrame()
+	View.ThirtyDKP_MainFrame = CreateFrame('Frame', 'ThirtyDKP_MainFrame', UIParent, "UIPanelDialogTemplate");
+	MainFrame = View.ThirtyDKP_MainFrame;
+
+	MainFrame:SetShown(false);
     MainFrame:SetSize(DKPTableWidth + 30, DKPTableRowHeight*15); -- width, height
 	MainFrame:SetPoint(CENTER_POINT, UIParent, CENTER_POINT, 0, 60); -- point, relative frame, relative point on relative frame
+	MainFrame:SetFrameStrata("HIGH");
 	MainFrame:SetMovable(true);
 	MainFrame:EnableMouse(true);
 	MainFrame:RegisterForDrag("LeftButton");
 	MainFrame:SetScript("OnDragStart", MainFrame.StartMoving);
 	MainFrame:SetScript("OnDragStop", MainFrame.StopMovingOrSizing);
+	MainFrame:SetScript("OnHide", function(self)
+		if OptionsFrame then
+			OptionsFrame:SetShown(false);
+		end
+	end);
 
     -- title
     ThirtyDKP_UI_MainFrameTitleBG = MainFrame:CreateFontString(nil, OVERLAY_LAYER);
@@ -127,7 +171,17 @@ function View:Create_MainFrame()
     MainFrame.optionsButton:SetText("Options");
     MainFrame.optionsButton:SetNormalFontObject("GameFontNormal");
 	MainFrame.optionsButton:SetHighlightFontObject("GameFontHighlight");
-	
+	MainFrame.optionsButton:RegisterForClicks("AnyUp");
+	MainFrame.optionsButton:SetScript("OnClick", function (self, button, down)
+		OptionsFrame:SetShown(not OptionsFrame:IsShown());
+	end);
+
 	-- Create other frames
 	Create_DKPTable();
+end
+
+function View:InitUI()
+	Create_MainFrame();
+	Create_OptionsFrame();
+	View.ThirtyDKP_UIInitialized = true;
 end

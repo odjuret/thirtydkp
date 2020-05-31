@@ -33,7 +33,11 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
     SLASH_ThirtyDKP1 = "/tdkp";
     SLASH_ThirtyDKP2 = "/thirtydkp";
     SlashCmdList.ThirtyDKP = function()
-        View.Create_MainFrame()
+        if not View.ThirtyDKP_UIInitialized then
+            View:InitUI();
+        end
+
+        View.ThirtyDKP_MainFrame:SetShown(true);
     end
 
 

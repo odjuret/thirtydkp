@@ -112,6 +112,17 @@ local function CreateOptionsFrame()
 	 title:ClearAllPoints();
 	 title:SetPoint(TOP_LEFT_POINT, OptionsFrame, TOP_LEFT_POINT, 15, -10);
 	 title:SetText(OPTIONS_FRAME_TITLE);
+
+	 -- Buttons
+	 OptionsFrame.addRaidToTableBtn = CreateFrame("Button", nil, OptionsFrame, "GameMenuButtonTemplate");
+	 OptionsFrame.addRaidToTableBtn:SetPoint(BOTTOMLEFT_POINT, OptionsFrame, BOTTOMLEFT_POINT, 10, 10);
+	 OptionsFrame.addRaidToTableBtn:SetSize(80, 30);
+	 OptionsFrame.addRaidToTableBtn:SetText("Add Raid");
+	 OptionsFrame.addRaidToTableBtn:SetNormalFontObject("GameFontNormal");
+	 OptionsFrame.addRaidToTableBtn:SetHighlightFontObject("GameFontHighlight");
+	 OptionsFrame.addRaidToTableBtn:RegisterForClicks("AnyUp");
+	 
+	 View:AttachAddRaidToTableScripts(OptionsFrame.addRaidToTableBtn)
 end
 
 

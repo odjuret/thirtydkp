@@ -9,3 +9,6 @@
 View\Main.lua
 DAL\Init.lua
 Core\Init.lua
+
+Core\ManageDKPTableEntries.lua
+View\ManageDKPTableEntries.lua

@@ -1,11 +1,8 @@
 local addonName, ThirtyDKP = ... 
 
--- Initializing the core global variables
-ThirtyDKP.DAL = {}  
-
 local DAL = ThirtyDKP.DAL
 
-function DAL:Initialize()
+function DAL:InitializeDKPTable()
     ------------------------------------
     --	Import SavedVariables
     ------------------------------------
@@ -20,3 +17,14 @@ function DAL:Initialize()
     end)
     
 end
+
+function DAL:AddToDKPTable(playerName, playerClass)
+    -- TODO: Sök igenom funktion och returnera false om player redan finns
+    tinsert(ThirtyDKP_Database_DKPTable, {
+        player=playerName,
+        class=playerClass,
+        dkp=0,
+    });
+    return true
+end
+

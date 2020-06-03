@@ -1,7 +1,4 @@
-local addonName, ThirtyDKP = ... 
-
--- Initializing the core global variables
-ThirtyDKP.Core = {}  
+local addonName, ThirtyDKP = ...   
 
 local View = ThirtyDKP.View
 local DAL = ThirtyDKP.DAL
@@ -55,7 +52,7 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
 
     if(event == "ADDON_LOADED") then
         -- initialize data access
-	    DAL:Initialize()
+	    DAL:InitializeDKPTable()
 		
 	end
 end

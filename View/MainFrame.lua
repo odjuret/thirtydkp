@@ -1,7 +1,5 @@
 local addonName, ThirtyDKP = ...
 
--- Initializing the view
-ThirtyDKP.View = {}
 local View = ThirtyDKP.View;
 
 -- Main addon window
@@ -10,6 +8,7 @@ local Initialized = false;
 local MainFrame = nil;
 
 -- UI anchor point constants (blizz should have these somewhere??)
+-- Or maybe move these to some addon scope?
 local CENTER_POINT = "CENTER"
 local TOP_POINT = "TOP"
 local TOP_LEFT_POINT = "TOPLEFT"

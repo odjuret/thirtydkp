@@ -6,9 +6,12 @@
 ## DefaultState: enabled
 ## SavedVariables: ThirtyDKP_Database_DKPTable
 
-View\Main.lua
-DAL\Init.lua
-Core\Init.lua
+Init.lua
 
+View\MainFrame.lua
+View\DKPTableFrame.lua
+
+DAL\DKPTable.lua
+
+Core\Main.lua
 Core\ManageDKPTableEntries.lua
-View\ManageDKPTableEntries.lua

@@ -3,96 +3,72 @@ local addonName, ThirtyDKP = ...
 -- Initializing the view
 local View = ThirtyDKP.View;
 local Core = ThirtyDKP.Core;
+local Const = ThirtyDKP.View.Constants;
+
+
+local function CreateDKPTableRow(parent, id)
+	local b = CreateFrame("Button", nil, parent);
+	b:SetSize(Const.DKPTableWidth-100, Const.DKPTableRowHeight);
+	b:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square");
+	b:SetNormalTexture("Interface\\COMMON\\talent-blue-glow")
+	b:GetNormalTexture():SetAlpha(0.5)
+	b:GetNormalTexture():SetAllPoints(true)
+
+	b.DKPInfo = {}
+	b.DKPInfo.PlayerName = b:CreateFontString(nil, Const.OVERLAY_LAYER)
+	b.DKPInfo.PlayerName:SetFontObject("GameFontHighlight")
+	b.DKPInfo.PlayerName:SetText(tostring(ThirtyDKP.DAL.DKPTableCopy[id].player));
+	b.DKPInfo.PlayerName:SetPoint(Const.LEFT_POINT, 30, 0)
+
+	b.DKPInfo.PlayerClass = b:CreateFontString(nil, Const.OVERLAY_LAYER)
+	b.DKPInfo.PlayerClass:SetFontObject("GameFontHighlight")
+	b.DKPInfo.PlayerClass:SetText(tostring(ThirtyDKP.DAL.DKPTableCopy[id].class));
+	b.DKPInfo.PlayerClass:SetPoint(Const.CENTER_POINT)
+
+	b.DKPInfo.CurrentDKP = b:CreateFontString(nil, Const.OVERLAY_LAYER)
+	b.DKPInfo.CurrentDKP:SetFontObject("GameFontHighlight")
+	b.DKPInfo.CurrentDKP:SetText(tostring(ThirtyDKP.DAL.DKPTableCopy[id].dkp));
+	b.DKPInfo.CurrentDKP:SetPoint(Const.RIGHT_POINT, -80, 0)
+	return b
+end
+
+
+local function PopulateDKPTable(parentFrame)
+	parentFrame.scrollChild.Rows = {}
+	for i = 1, ThirtyDKP.DAL.DKPTableNumRows do
+		parentFrame.scrollChild.Rows[i] = CreateDKPTableRow(parentFrame.scrollChild, i)
+		if i==1 then
+			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild, Const.TOP_LEFT_POINT, 0, -2)
+		else
+			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild.Rows[i-1], Const.BOTTOMLEFT_POINT)
+		end
+	end
+end
+
+
+function View:CreateDKPTable(parentFrame)
+	-- "Container" frame that clips out its child frame "excess" content.
+	parentFrame.DKPTable = CreateFrame("ScrollFrame", 'DKPTableScrollFrame', parentFrame, "UIPanelScrollFrameTemplate");
+	local scrollFrame = parentFrame.DKPTable
+	scrollFrame:SetSize( Const.DKPTableWidth, ThirtyDKP.DAL.DKPTableNumRows*12);
+	scrollFrame.scrollBar = _G["DKPTableScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
+	scrollFrame:SetPoint( Const.TOP_LEFT_POINT, 10, -30 );
+	scrollFrame:SetPoint( Const.BOTTOMRIGHT_POINT, -120, 10 );
+
+	-- Child frame which holds all the content being scrolled through.
+    parentFrame.scrollChild = CreateFrame( "Frame", "$parent_ScrollChild", scrollFrame );
+	parentFrame.scrollChild:SetHeight( Const.DKPTableRowHeight*ThirtyDKP.DAL.DKPTableNumRows+3 );
+    parentFrame.scrollChild:SetWidth( scrollFrame:GetWidth() );
+	parentFrame.scrollChild:SetAllPoints( scrollFrame );
+	parentFrame.scrollChild.bg = parentFrame.scrollChild:CreateTexture(nil, Const.BACKGROUND_LAYER)
+	parentFrame.scrollChild.bg:SetAllPoints(true)
+	parentFrame.scrollChild.bg:SetColorTexture(0, 0, 0, 1)
+
+	scrollFrame:SetScrollChild( parentFrame.scrollChild );
+
+	PopulateDKPTable(parentFrame)
+end
 
 function View:UpdateDKPTable()
     --todo clean and repopulate dkptable frame
-end
-
-function View:AttachAddRaidToTableScripts(frame)
-    -- add raid to dkp table if they don't exist
-	
-	frame:SetScript("OnEnter", function(self)
-		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-		GameTooltip:SetText("Add raid members to DKP table", 0.25, 0.75, 0.90, 1, true);
-		GameTooltip:AddLine("Given that theyre in the guild obviously", 1.0, 1.0, 1.0, true);
-		GameTooltip:Show();
-	end)
-	frame:SetScript("OnLeave", function(self)
-		GameTooltip:Hide()
-	end)
-    frame:SetScript("OnClick", function ()
-        -- If you aint in raid	
-        if not IsInRaid() then
-            StaticPopupDialogs["NOT_IN_RAID"] = {
-                text = "Well you gotta be in a raid to add raid members to DKP table...",
-                button1 = "Oh right...",
-                timeout = 0,
-                whileDead = true,
-                hideOnEscape = true,
-                preferredIndex = 3,
-              }
-              StaticPopup_Show ("NOT_IN_RAID")
-        else
-            -- confirmation dialog to remove user(s)
-            local selected = "Sure you want to add the entire raid to the DKP table?";
-            StaticPopupDialogs["ADD_RAID_ENTRIES"] = {
-            text = selected,
-            button1 = "Yes",
-            button2 = "No",
-            OnAccept = function()
-                Core:AddRaidToDKPTable()
-            end,
-            timeout = 0,
-            whileDead = true,
-            hideOnEscape = true,
-            preferredIndex = 3,
-            }
-            StaticPopup_Show ("ADD_RAID_ENTRIES")
-        end
-	end);
-end
-
-function View:AttachAddGuildToTableScript(frame)
-    -- add guild to dkp table if entry doesn't exist
-
-    frame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-        GameTooltip:SetText("Add guild members to DKP table", 0.25, 0.75, 0.90, 1, true);
-        GameTooltip:AddLine("Adds guild members that aren't in the dkp table", 1.0, 1.0, 1.0, true);
-        GameTooltip:Show();
-    end);
-
-    frame:SetScript("OnLeave", function(self)
-        GameTooltip:Hide()
-    end);
-
-    frame:SetScript("OnClick", function ()
-        -- If not in guild
-        if not IsInGuild() then
-            StaticPopupDialogs["NOT_IN_GUILD"] = {
-                text = "You need to be in a guild to be able to add guild members to dkp table",
-                button1 = "OK",
-                timeout = 0,
-                whileDead = true,
-                hideOnEscape = true,
-                preferredIndex = 3,
-            }
-            StaticPopup_Show ("NOT_IN_GUILD")
-        else
-            local selected = "Do you want to add guild members to dkp table?"
-            StaticPopupDialogs["ADD_GUILD_ENTRIES"] = {
-                text = selected,
-                button1 = "Yes",
-                button2 = "No",
-                OnAccept = function()
-                    Core:AddGuildToDKPTable()
-                end,
-                timeout = 0,
-                whileDead = true,
-                hideOnEscape = true,
-                preferredIndex = 3,
-            }
-            StaticPopup_Show("ADD_GUILD_ENTRIES")
-        end
-    end);
 end

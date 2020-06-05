@@ -8,7 +8,9 @@
 
 Init.lua
 
+View\Constants.lua
 View\MainFrame.lua
+View\OptionsFrame.lua
 View\DKPTableFrame.lua
 
 DAL\DKPTable.lua

@@ -18,10 +18,11 @@ function DAL:InitializeDKPTable()
     
 end
 
-function DAL:AddToDKPTable(playerName, playerClass)
+function DAL:AddToDKPTable(playerName, playerGuid, playerClass)
     -- TODO: Sök igenom funktion och returnera false om player redan finns
     tinsert(ThirtyDKP_Database_DKPTable, {
         player=playerName,
+        guid=playerGuid,
         class=playerClass,
         dkp=0,
     });

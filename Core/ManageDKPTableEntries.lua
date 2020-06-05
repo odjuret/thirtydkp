@@ -7,6 +7,7 @@ function Core:AddRaidToDKPTable()
     local nameFromRaid, tempClass;
     local guildSize = GetNumGuildMembers();
     local nameFromGuild, rank, rankIndex;
+    local playerGuid;
     local InGuild = false; -- Only adds player to list if the player is found in the guild roster.
 
 
@@ -14,6 +15,7 @@ function Core:AddRaidToDKPTable()
     for i=1, GetNumGroupMembers() do
         nameFromRaid,_,_,_,_,tempClass = GetRaidRosterInfo(i)
         
+        -- see if they exist in guild
         for j=1, guildSize do
             nameFromGuild, rank, rankIndex = GetGuildRosterInfo(j)
             nameFromGuild = strsub(nameFromGuild, 1, string.find(nameFromGuild, "-")-1) -- required to remove server name from player (can remove in classic if this is not an issue)
@@ -22,7 +24,8 @@ function Core:AddRaidToDKPTable()
             end
         end
         if nameFromRaid and InGuild then
-            if DAL:AddToDKPTable(nameFromRaid, tempClass) then
+            playerGuid = UnitGUID("raid"..i)
+            if DAL:AddToDKPTable(nameFromRaid, playerGuid, tempClass) then
                 print("ThirtyDKP: added "..nameFromRaid.." successfully to table.")
             end
         end

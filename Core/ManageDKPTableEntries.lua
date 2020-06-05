@@ -29,3 +29,18 @@ function Core:AddRaidToDKPTable()
         InGuild = false;
     end
 end
+
+function Core:AddGuildToDKPTable()
+    local guildSize = GetNumGuildMembers();
+    local nameFromGuild, rank, rankIndex, tempClass;
+    
+    -- for every person in the guild
+    for i=1, guildSize do
+        nameFromGuild, rank, rankIndex, _, tempClass = GetGuildRosterInfo(i)
+        nameFromGuild = strsub(nameFromGuild, 1, string.find(nameFromGuild, "-")-1) -- required to remove server name from player (can remove in classic if this is not an issue)
+        
+        if DAL:AddToDKPTable(nameFromGuild, tempClass) then
+            print("ThirtyDKP: added "..nameFromGuild.." successfully to table.")
+        end
+    end
+end

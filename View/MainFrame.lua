@@ -122,6 +122,17 @@ local function CreateOptionsFrame()
 	 OptionsFrame.addRaidToTableBtn:RegisterForClicks("AnyUp");
 	 
 	 View:AttachAddRaidToTableScripts(OptionsFrame.addRaidToTableBtn)
+
+	 -- Add
+	OptionsFrame.addGuildToTableBtn = CreateFrame("Button", nil, OptionsFrame, "GameMenuButtonTemplate");
+	OptionsFrame.addGuildToTableBtn:SetPoint(BOTTOMLEFT_POINT, OptionsFrame, BOTTOMLEFT_POINT, 90, 10);
+	OptionsFrame.addGuildToTableBtn:SetSize(80, 30);
+	OptionsFrame.addGuildToTableBtn:SetText("Add Guild");
+	OptionsFrame.addGuildToTableBtn:SetNormalFontObject("GameFontNormal");
+	OptionsFrame.addGuildToTableBtn:SetHighlightFontObject("GameFontHighlight");
+	OptionsFrame.addGuildToTableBtn:RegisterForClicks("AnyUp");
+
+	View:AttachAddGuildToTableScript(OptionsFrame.addGuildToTableBtn);
 end
 
 

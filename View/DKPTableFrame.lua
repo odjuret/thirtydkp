@@ -5,6 +5,7 @@ local View = ThirtyDKP.View;
 local Core = ThirtyDKP.Core;
 local Const = ThirtyDKP.View.Constants;
 
+TDKP_MainFrame_DKP = nil;
 
 local function CreateDKPTableRow(parent, id)
 	local b = CreateFrame("Button", nil, parent);
@@ -66,9 +67,17 @@ function View:CreateDKPTable(parentFrame)
 
 	scrollFrame:SetScrollChild( parentFrame.scrollChild );
 
+	TDKP_MainFrame_DKP = parentFrame;
+
 	PopulateDKPTable(parentFrame)
+
 end
 
 function View:UpdateDKPTable()
-    --todo clean and repopulate dkptable frame
+
+	TDKP_MainFrame_DKP.DKPTable:Hide()
+	TDKP_MainFrame_DKP.DKPTable:SetParent(nil)
+
+	View:CreateDKPTable(TDKP_MainFrame_DKP)
+
 end

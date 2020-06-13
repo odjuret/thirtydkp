@@ -41,6 +41,7 @@ local function AttachAddRaidToTableScripts(frame)
             button2 = "No",
             OnAccept = function()
                 Core:AddRaidToDKPTable()
+                View:UpdateDKPTable()
             end,
             timeout = 0,
             whileDead = true,
@@ -86,6 +87,7 @@ local function AttachAddGuildToTableScript(frame)
                 button2 = "No",
                 OnAccept = function()
                     Core:AddGuildToDKPTable()
+                    View:UpdateDKPTable()
                 end,
                 timeout = 0,
                 whileDead = true,

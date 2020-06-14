@@ -3,14 +3,8 @@ local addonName, ThirtyDKP = ...
 local DAL = ThirtyDKP.DAL
 
 function DAL:InitializeDKPTable()
-    ------------------------------------
-    --	Import SavedVariables
-    ------------------------------------
-    -- saved variables starts as nil. we want a empty table
+    -- saved variables starts as nil. we want a empty tables
     if not ThirtyDKP_Database_DKPTable then ThirtyDKP_Database_DKPTable = {} end;
-    DAL.DKPTableCopy 		= ThirtyDKP_Database_DKPTable;	
-    DAL.DKPTableNumRows     = 0;
-    if #ThirtyDKP_Database_DKPTable > 0 then DAL.DKPTableNumRows = #ThirtyDKP_Database_DKPTable end;
 
     table.sort(ThirtyDKP_Database_DKPTable, function(a, b)
         return a["player"] < b["player"]
@@ -19,8 +13,6 @@ function DAL:InitializeDKPTable()
 end
 
 function DAL:GetDKPTable()
-    if not ThirtyDKP_Database_DKPTable then ThirtyDKP_Database_DKPTable = {} end;
-
     table.sort(ThirtyDKP_Database_DKPTable, function(a, b)
         return a["player"] < b["player"]
 	end)
@@ -29,11 +21,11 @@ function DAL:GetDKPTable()
 end
 
 function DAL:GetNumberOfRowsInDKPTable()
-	if not ThirtyDKP_Database_DKPTable then ThirtyDKP_Database_DKPTable = {} end;
 	
     return #ThirtyDKP_Database_DKPTable;
 end
 
+-- TODO: why do we need this?
 -- returns index if found
 -- else false
 function DAL:Table_Search(tar, val, field)

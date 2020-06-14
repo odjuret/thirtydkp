@@ -2,6 +2,11 @@ local addonName, ThirtyDKP = ...
 
 local View = ThirtyDKP.View
 local DAL = ThirtyDKP.DAL
+local Core = ThirtyDKP.Core
+
+function Core:Print(args)
+    print("|cffa30f2dThirtyDKP:|r |cffDC143C"..args.."|r")
+end
 
 
 -------------------------------------------------------
@@ -12,7 +17,6 @@ function ThirtyDKP_OnEvent(self, event, arg1, ...)
     -- TODO: handle all other events, boss kill, bid command, etc 
 
     if event == "ADDON_LOADED" then
-        print("ThirtyDKP: event:"..event.." arg1:"..arg1)
 
 		ThirtyDKP_OnInitialize(event, arg1)
         self:UnregisterEvent("ADDON_LOADED")
@@ -23,7 +27,6 @@ end
 function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to run on load triggered registered events at bottom of file
 	if (name ~= "ThirtyDKP") then return end     -- if its not this addon, return.
 
-	
 	----------------------------------
     -- Register Slash Commands
     ----------------------------------
@@ -37,7 +40,6 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
         View:OpenMainFrame();
     end
 
-
     --[[
     Debugging shit thats nice to have during development
     --]]
@@ -50,11 +52,7 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
         FrameStackTooltip_Toggle()
     end
 
-    if(event == "ADDON_LOADED") then
-        -- initialize data access
-	    DAL:InitializeDKPTable()
-		
-	end
+    DAL:InitializeDKPTable()
 end
 
 ----------------------------------

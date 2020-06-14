@@ -26,7 +26,7 @@ function Core:AddRaidToDKPTable()
         end
         if nameFromRaid and InGuild then
             if DAL:AddToDKPTable(nameFromGuild, classFromGuild) then
-                print("ThirtyDKP: added "..nameFromGuild.." successfully to table.")
+                Core:Print("added "..nameFromGuild.." successfully to table.")
             end
         end
         InGuild = false;
@@ -45,7 +45,7 @@ function Core:AddGuildToDKPTable()
         -- TODO: user be able to choose rank
         if rankIndex < 2 then
             if DAL:AddToDKPTable(nameFromGuild, tempClass) then
-                print("ThirtyDKP: added "..nameFromGuild.." successfully to table.")
+                Core:Print("added "..nameFromGuild.." successfully to table.")
             end
         end
     end

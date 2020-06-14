@@ -99,6 +99,36 @@ local function AttachAddGuildToTableScript(frame)
     end);
 end
 
+local function AttachBroadcastDKPTableScript(frame)
+    frame:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+        GameTooltip:SetText("Broadcast DKP table", 0.25, 0.75, 0.90, 1, true);
+        GameTooltip:AddLine("Attempts to broadcast out the latest DKP table to other online members", 1.0, 1.0, 1.0, true);
+        GameTooltip:Show();
+    end);
+
+    frame:SetScript("OnLeave", function(self)
+        GameTooltip:Hide()
+    end);
+
+    frame:SetScript("OnClick", function ()
+        StaticPopupDialogs["BROADCAST_DKPTABLE"] = {
+            text = "Are you sure you want to broadcast your DKP table?",
+            button1 = "Yes",
+            button2 = "No",
+            OnAccept = function()
+                Core:BroadcastDKPTable()
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+        }
+        StaticPopup_Show("BROADCAST_DKPTABLE")
+    end);
+end
+
+
 local function CreateInputFrame(text, parent)
     local wrapper = CreateFrame("Frame", nil, parent, nil);
     wrapper:SetSize(150, 30);
@@ -186,7 +216,8 @@ function View:CreateOptionsFrame(parentFrame)
     local trinketCostInput = CreateAndAttachInputFrame("Trinket Cost:", itemCostSectionRight, ringCostInput);
 
 
-    -- Buttons
+    -- Buttons 
+    --  add raid to dkp table button
     OptionsFrame.addRaidToTableBtn = CreateFrame("Button", nil, OptionsFrame, "GameMenuButtonTemplate");
     OptionsFrame.addRaidToTableBtn:SetPoint(Const.BOTTOMLEFT_POINT, OptionsFrame, Const.BOTTOMLEFT_POINT, 10, 10);
     OptionsFrame.addRaidToTableBtn:SetSize(80, 30);
@@ -197,7 +228,7 @@ function View:CreateOptionsFrame(parentFrame)
     
     AttachAddRaidToTableScripts(OptionsFrame.addRaidToTableBtn)
 
-	 -- Add
+	--  add guild to dkp table button
 	OptionsFrame.addGuildToTableBtn = CreateFrame("Button", nil, OptionsFrame, "GameMenuButtonTemplate");
 	OptionsFrame.addGuildToTableBtn:SetPoint(Const.BOTTOMLEFT_POINT, OptionsFrame, Const.BOTTOMLEFT_POINT, 90, 10);
 	OptionsFrame.addGuildToTableBtn:SetSize(80, 30);
@@ -206,7 +237,18 @@ function View:CreateOptionsFrame(parentFrame)
 	OptionsFrame.addGuildToTableBtn:SetHighlightFontObject("GameFontHighlight");
 	OptionsFrame.addGuildToTableBtn:RegisterForClicks("AnyUp");
 
-	AttachAddGuildToTableScript(OptionsFrame.addGuildToTableBtn);
+    AttachAddGuildToTableScript(OptionsFrame.addGuildToTableBtn);
+    
+    --  broadcast dkp table to online members button
+    OptionsFrame.broadcastBtn = CreateFrame("Button", nil, OptionsFrame, "GameMenuButtonTemplate");
+	OptionsFrame.broadcastBtn:SetPoint(Const.BOTTOMLEFT_POINT, OptionsFrame, Const.BOTTOMLEFT_POINT, 170, 10);
+	OptionsFrame.broadcastBtn:SetSize(80, 30);
+	OptionsFrame.broadcastBtn:SetText("Broadcast");
+	OptionsFrame.broadcastBtn:SetNormalFontObject("GameFontNormal");
+	OptionsFrame.broadcastBtn:SetHighlightFontObject("GameFontHighlight");
+    OptionsFrame.broadcastBtn:RegisterForClicks("AnyUp");
+    
+    AttachBroadcastDKPTableScript(OptionsFrame.broadcastBtn);
 end
 
 function View:ToggleOptionsFrame()

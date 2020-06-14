@@ -15,5 +15,6 @@ View\DKPTableFrame.lua
 
 DAL\DKPTable.lua
 
+Core\Communication.lua
 Core\Main.lua
 Core\ManageDKPTableEntries.lua

@@ -49,6 +49,9 @@ local function CreateMainFrame()
 
 end
 
+function View:GetMainFrame()
+	return MainFrame;
+end
 
 function View:OpenMainFrame()
 	MainFrame:SetShown(true);

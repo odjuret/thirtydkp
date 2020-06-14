@@ -18,6 +18,22 @@ function DAL:InitializeDKPTable()
     
 end
 
+function DAL:GetDKPTable()
+    if not ThirtyDKP_Database_DKPTable then ThirtyDKP_Database_DKPTable = {} end;
+
+    table.sort(ThirtyDKP_Database_DKPTable, function(a, b)
+        return a["player"] < b["player"]
+	end)
+	
+    return ThirtyDKP_Database_DKPTable;
+end
+
+function DAL:GetNumberOfRowsInDKPTable()
+	if not ThirtyDKP_Database_DKPTable then ThirtyDKP_Database_DKPTable = {} end;
+	
+    return #ThirtyDKP_Database_DKPTable;
+end
+
 -- returns index if found
 -- else false
 function DAL:Table_Search(tar, val, field)
@@ -83,7 +99,7 @@ function DAL:Table_Search(tar, val, field)
 	end
 end
 
-function DAL:AddToDKPTable(playerName, playerGuid, playerClass)
+function DAL:AddToDKPTable(playerName, playerClass)
 
     --Will either contain index of player or false if not found
     local playerExists = DAL:Table_Search(ThirtyDKP_Database_DKPTable, playerName)
@@ -91,7 +107,6 @@ function DAL:AddToDKPTable(playerName, playerGuid, playerClass)
     if playerExists == false then
         tinsert(ThirtyDKP_Database_DKPTable, {
             player=playerName,
-            guid=playerGuid,
             class=playerClass,
             dkp=0,
         });
@@ -103,7 +118,7 @@ function DAL:AddToDKPTable(playerName, playerGuid, playerClass)
     
 end
 
-function DAL:RemoveFromDKPTable(playerGuid)
+function DAL:RemoveFromDKPTable()
 end
 
 

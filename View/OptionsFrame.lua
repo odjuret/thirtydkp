@@ -137,7 +137,7 @@ function View:CreateOptionsFrame(parentFrame)
 	OptionsFrame:SetShown(false);
 	OptionsFrame:SetSize(500, 500);
 	OptionsFrame:SetFrameStrata("HIGH");
-	OptionsFrame:SetClampedToScreen(true);
+	--OptionsFrame:SetClampedToScreen(true);
 	OptionsFrame:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
 	OptionsFrame:EnableMouse(true);
 

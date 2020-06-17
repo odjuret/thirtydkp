@@ -1,4 +1,5 @@
 local addonName, ThirtyDKP = ...
+local DAL = ThirtyDKP.DAL;
 local View = ThirtyDKP.View;
 local Core = ThirtyDKP.Core;
 local Const = ThirtyDKP.View.Constants;
@@ -129,7 +130,7 @@ local function AttachBroadcastDKPTableScript(frame)
 end
 
 
-local function CreateInputFrame(text, parent)
+local function CreateInputFrame(parent, text, value, valueChangedCallback)
     local wrapper = CreateFrame("Frame", nil, parent, nil);
     wrapper:SetSize(150, 30);
 
@@ -144,10 +145,13 @@ local function CreateInputFrame(text, parent)
     wrapper.input:SetSize(30, 20);
     wrapper.input:SetAutoFocus(false);
     wrapper.input:SetNumeric(true);
-    wrapper.input:SetNumber(0);
+    wrapper.input:SetNumber(value);
     wrapper.input:SetJustifyH("CENTER");
     wrapper.input:SetPoint(Const.TOP_RIGHT_POINT, wrapper, Const.TOP_RIGHT_POINT, 0, 0);
-    wrapper.input:SetScript("OnEnterPressed", wrapper.input.ClearFocus);
+    wrapper.input:SetScript("OnEnterPressed", function(self)
+        valueChangedCallback(self);
+        self:ClearFocus();
+    end);
 
     local tex = wrapper.input:CreateTexture(nil, "BACKGROUND");
     tex:SetAllPoints();
@@ -156,18 +160,26 @@ local function CreateInputFrame(text, parent)
     return wrapper;
 end
 
-local function CreateAndAttachInputFrame(text, parent, attachTarget)
-    local frame = CreateInputFrame(text, parent);
+local function CreateDkpCostInputFrame(text, itemName, parent)
+    local options = DAL:GetOptions();
+    local frame = CreateInputFrame(parent, text, options.itemCosts[itemName], function(input)
+        options.itemCosts[itemName] = input:GetNumber();
+    end);
+
+    return frame;
+end
+
+local function CreateAndAttachDkpCostFrame(text, itemName, parent, attachTarget)
+    local frame = CreateDkpCostInputFrame(text, itemName, parent);
     frame:SetPoint(Const.TOP_LEFT_POINT, attachTarget, Const.BOTTOMLEFT_POINT, 0, 0);
     return frame;
 end
 
-function View:CreateOptionsFrame(parentFrame)
-	OptionsFrame = CreateFrame('Frame', 'ThirtyDKP_OptionsFrame', UIParent, "UIPanelDialogTemplate"); -- Todo: make mainframe owner??
+function View:CreateOptionsFrame(parentFrame, savedOptions)
+	OptionsFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", UIParent, "UIPanelDialogTemplate"); -- Todo: make mainframe owner??
 	OptionsFrame:SetShown(false);
 	OptionsFrame:SetSize(500, 500);
 	OptionsFrame:SetFrameStrata("HIGH");
-	--OptionsFrame:SetClampedToScreen(true);
 	OptionsFrame:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
 	OptionsFrame:EnableMouse(true);
 
@@ -178,9 +190,12 @@ function View:CreateOptionsFrame(parentFrame)
     title:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 15, -10);
     title:SetText(OPTIONS_FRAME_TITLE);
 
+    local options = DAL:GetOptions();
 
     -- Misc
-    local dkpGainPerKill = CreateInputFrame("DKP Per Kill:", OptionsFrame);
+    local dkpGainPerKill = CreateInputFrame(OptionsFrame, "DKP Per Kill:", options.dkpGainPerKill, function(input)
+        options.dkpGainPerKill = input:GetNumber();
+    end);
     dkpGainPerKill:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 30, -50);
 
 
@@ -194,26 +209,26 @@ function View:CreateOptionsFrame(parentFrame)
     itemCostSectionRight:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionLeft, Const.TOP_RIGHT_POINT, 0, 0);
 
     -- Left section
-    local headCostInput = CreateInputFrame("Head Cost:", itemCostSectionLeft, itemCostSectionLeft);
+    local headCostInput = CreateDkpCostInputFrame("Head Cost:", "head", itemCostSectionLeft);
     headCostInput:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionLeft, Const.TOP_LEFT_POINT, 0, 0);
 
-    local neckCostInput = CreateAndAttachInputFrame("Neck Cost:", itemCostSectionLeft, headCostInput);
-    local shouldersCostInput = CreateAndAttachInputFrame("Shoulders Cost:", itemCostSectionLeft, neckCostInput);
-    local chestCostInput = CreateAndAttachInputFrame("Chest Cost:", itemCostSectionLeft, shouldersCostInput);
-    local bracersCostInput = CreateAndAttachInputFrame("Bracers Cost:", itemCostSectionLeft, chestCostInput);
-    local glovesCostInput = CreateAndAttachInputFrame("Gloves Cost:", itemCostSectionLeft, bracersCostInput);
-    local oneHandedWeaponCostInput = CreateAndAttachInputFrame("1h Weapon Cost:", itemCostSectionLeft, glovesCostInput);
-    local twoHandedWeaponCostInput = CreateAndAttachInputFrame("2h Weapon Cost:", itemCostSectionLeft, oneHandedWeaponCostInput);
-    local rangedWeaponCostInput = CreateAndAttachInputFrame("Ranged Cost:", itemCostSectionLeft, twoHandedWeaponCostInput);
+    local neckCostInput = CreateAndAttachDkpCostFrame("Neck Cost:", "neck", itemCostSectionLeft, headCostInput);
+    local shouldersCostInput = CreateAndAttachDkpCostFrame("Shoulders Cost:", "shoulders", itemCostSectionLeft, neckCostInput);
+    local chestCostInput = CreateAndAttachDkpCostFrame("Chest Cost:", "chest", itemCostSectionLeft, shouldersCostInput);
+    local bracersCostInput = CreateAndAttachDkpCostFrame("Bracers Cost:", "bracers", itemCostSectionLeft, chestCostInput);
+    local glovesCostInput = CreateAndAttachDkpCostFrame("Gloves Cost:", "gloves", itemCostSectionLeft, bracersCostInput);
+    local oneHandedWeaponCostInput = CreateAndAttachDkpCostFrame("1h Weapon Cost:", "oneHandedWeapon", itemCostSectionLeft, glovesCostInput);
+    local twoHandedWeaponCostInput = CreateAndAttachDkpCostFrame("2h Weapon Cost:", "twoHandedWeapon", itemCostSectionLeft, oneHandedWeaponCostInput);
+    local rangedWeaponCostInput = CreateAndAttachDkpCostFrame("Ranged Cost:", "rangedWeapon", itemCostSectionLeft, twoHandedWeaponCostInput);
 
     -- Right section
-    local beltCostInput = CreateInputFrame("Belt Cost:", itemCostSectionRight, itemCostSectionRight);
+    local beltCostInput = CreateDkpCostInputFrame("Belt Cost:", "belt", itemCostSectionRight, itemCostSectionRight);
     beltCostInput:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionRight, Const.TOP_LEFT_POINT, 0, 0);
 
-    local legsCostInput = CreateAndAttachInputFrame("Legs Cost:", itemCostSectionRight, beltCostInput);
-    local bootsCostInput = CreateAndAttachInputFrame("Boots Cost:", itemCostSectionRight, legsCostInput);
-    local ringCostInput = CreateAndAttachInputFrame("Ring Cost:", itemCostSectionRight, bootsCostInput);
-    local trinketCostInput = CreateAndAttachInputFrame("Trinket Cost:", itemCostSectionRight, ringCostInput);
+    local legsCostInput = CreateAndAttachDkpCostFrame("Legs Cost:", "legs", itemCostSectionRight, beltCostInput);
+    local bootsCostInput = CreateAndAttachDkpCostFrame("Boots Cost:", "boots", itemCostSectionRight, legsCostInput);
+    local ringCostInput = CreateAndAttachDkpCostFrame("Ring Cost:", "ring", itemCostSectionRight, bootsCostInput);
+    local trinketCostInput = CreateAndAttachDkpCostFrame("Trinket Cost:", "trinket", itemCostSectionRight, ringCostInput);
 
 
     -- Buttons 

@@ -2,20 +2,22 @@ local addonName, ThirtyDKP = ...
 
 local DAL = ThirtyDKP.DAL
 
+local function SortTable()
+	table.sort(ThirtyDKP_Database_DKPTable, function(a, b)
+        return a["player"] < b["player"]
+    end)
+end
+
+
 function DAL:InitializeDKPTable()
     -- saved variables starts as nil. we want a empty tables
     if not ThirtyDKP_Database_DKPTable then ThirtyDKP_Database_DKPTable = {} end;
 
-    table.sort(ThirtyDKP_Database_DKPTable, function(a, b)
-        return a["player"] < b["player"]
-    end)
-    
+	SortTable()
 end
 
 function DAL:GetDKPTable()
-    table.sort(ThirtyDKP_Database_DKPTable, function(a, b)
-        return a["player"] < b["player"]
-	end)
+    SortTable()
 	
     return ThirtyDKP_Database_DKPTable;
 end
@@ -25,7 +27,13 @@ function DAL:GetNumberOfRowsInDKPTable()
     return #ThirtyDKP_Database_DKPTable;
 end
 
--- TODO: why do we need this?
+function DAL:WipeAndSetNewDKPTable(newTable)
+	ThirtyDKP_Database_DKPTable = {}
+	ThirtyDKP_Database_DKPTable = newTable
+
+end
+
+
 -- returns index if found
 -- else false
 function DAL:Table_Search(tar, val, field)
@@ -94,7 +102,7 @@ end
 function DAL:AddToDKPTable(playerName, playerClass)
 
     --Will either contain index of player or false if not found
-    local playerExists = DAL:Table_Search(ThirtyDKP_Database_DKPTable, playerName)
+    local playerExists = DAL:Table_Search(ThirtyDKP_Database_DKPTable, playerName, 'player')
   
     if playerExists == false then
         tinsert(ThirtyDKP_Database_DKPTable, {

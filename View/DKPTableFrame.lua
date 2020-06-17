@@ -76,7 +76,7 @@ function View:CreateDKPTable(parentFrame)
 end
 
 function View:UpdateDKPTable()
-	print("ThirtyDKP: Attempting to update table")
+	Core:Print("Attempting to update table")
 	local mainFrame = View:GetMainFrame()
 
 	DKPTableFrame:Hide()

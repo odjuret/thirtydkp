@@ -12,7 +12,7 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 
 	local b = CreateFrame("Button", nil, parent);
 	b:SetSize(Const.DKPTableWidth-100, Const.DKPTableRowHeight);
-	b:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square");
+	b:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
 	b:SetNormalTexture("Interface\\COMMON\\talent-blue-glow")
 	b:GetNormalTexture():SetAlpha(0.5)
 	b:GetNormalTexture():SetAllPoints(true)
@@ -55,6 +55,8 @@ function View:CreateDKPTable(parentFrame)
 	local numberOfRowsInDKPTable = DAL:GetNumberOfRowsInDKPTable()
 	-- "Container" frame that clips out its child frame "excess" content.
 	DKPTableFrame = CreateFrame("ScrollFrame", 'DKPTableScrollFrame', parentFrame, "UIPanelScrollFrameTemplate");
+	DKPTableFrame:SetFrameStrata("HIGH");
+	DKPTableFrame:SetFrameLevel(9);
 
 	DKPTableFrame:SetSize( Const.DKPTableWidth, numberOfRowsInDKPTable*12);
 	DKPTableFrame.scrollBar = _G["DKPTableScrollFrameScrollBar"]; --fuckin xml -> lua glue magic

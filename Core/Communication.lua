@@ -11,7 +11,11 @@ local LibDeflate = LibStub:GetLibrary("LibDeflate")
 
 -- Channel prefixes have a max length of 16 character
 local DKPTABLE_BROADCAST_CHANNEL_PREFIX = "TDKPBroadcast";
+local PRINT_MSG_CHANNEL_PREFIX = "TDKPPrintMsg";
+local START_BIDDING_CHANNEL_PREFIX = "TDKPStartBid";
+local SUBMIT_BIDDING_CHANNEL_PREFIX = "TDKPSubmitBid";
 
+local biddingInProgress = false
 
 -------------------------------------------------
 -- Callback used by communicator when transmitting 
@@ -29,6 +33,7 @@ function BroadcastingCallback(arg1, arg2, arg3)
 		bytesTotal = 0
 	end
 end
+
 
 local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sender)
     if (sender ~= UnitName("player")) then
@@ -58,6 +63,33 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
     end
 end
 
+local function HandleStartBiddingMessage(prefix, message, distribution, sender)
+    View:CreateBiddingFrame(message);
+    Core:Print("Bidding started for: "..message.."") 
+    -- todo: include timer in message
+    C_Timer.After(15, function()
+        View:HideBiddingFrame()
+    end)   
+end
+
+local function HandlePrintMsgMessage(prefix, message, distribution, sender)
+    Core:Print(""..message.."") 
+end
+
+local function HandleSubmitBidMessage(prefix, message, distribution, sender)
+    if biddingInProgress then
+        Core:Print("Incoming bid from "..sender.."") 
+        local player = DAL:GetFromDKPTable(sender)
+        View:AddBidder(player)
+    end
+end
+
+function Core:SubmitBid()
+    Communicator:SendCommMessage(SUBMIT_BIDDING_CHANNEL_PREFIX, "amessagejusttokeepfromdisconnecting", "RAID")
+end
+
+
+
 function Core:BroadcastDKPTable()
     local serialized = nil;
     local packet = nil;
@@ -75,14 +107,42 @@ function Core:BroadcastDKPTable()
     Communicator:SendCommMessage(DKPTABLE_BROADCAST_CHANNEL_PREFIX, packet, "GUILD", nil, "NORMAL", BroadcastingCallback, nil)
 end
 
+function Core:StartBidding(item, timer)
+    if IsInRaid() then
+        biddingInProgress = true
+        Communicator:SendCommMessage(START_BIDDING_CHANNEL_PREFIX, tostring(item), "RAID")
+
+        -- todo: add countdown during bidding 15,10,5,4,3,2,1 seconds left to bid... 
+
+        C_Timer.After(timer, function()
+            biddingInProgress = false
+            Communicator:SendCommMessage(PRINT_MSG_CHANNEL_PREFIX, "Bidding closed for: "..tostring(item), "RAID");
+            View:HideBiddingFrame()
+        end)
+    else
+        Core:Print("You need to be in a raid to start bidding.")
+    end
+end
+
+
 -------------------------------------------------
 -- Message Controller
 -------------------------------------------------
 function Communicator:OnCommReceived(prefix, message, distribution, sender)
+    -- todo: switch case
     if prefix == DKPTABLE_BROADCAST_CHANNEL_PREFIX then
         HandleDKPTableBroadcastMessage(prefix, message, distribution, sender)
+
+    elseif prefix == START_BIDDING_CHANNEL_PREFIX then
+        HandleStartBiddingMessage(prefix, message, distribution, sender)
+
+    elseif prefix == PRINT_MSG_CHANNEL_PREFIX then
+        HandlePrintMsgMessage(prefix, message, distribution, sender)
+    
+    elseif prefix == SUBMIT_BIDDING_CHANNEL_PREFIX then
+        HandleSubmitBidMessage(prefix, message, distribution, sender)
     end
-    -- TODO: delegate all other messages by prefix here
+
 end
 
 -------------------------------------------------
@@ -91,5 +151,9 @@ end
 function Core:InitializeComms()
     if not Communicator then Communicator = LibStub("AceAddon-3.0"):NewAddon("ThirtyDKP", "AceComm-3.0") end;
 
-    Communicator:RegisterComm(DKPTABLE_BROADCAST_CHANNEL_PREFIX, Communicator:OnCommReceived())
+    Communicator:RegisterComm(DKPTABLE_BROADCAST_CHANNEL_PREFIX, Communicator:OnCommReceived());
+    Communicator:RegisterComm(START_BIDDING_CHANNEL_PREFIX, Communicator:OnCommReceived());
+    Communicator:RegisterComm(PRINT_MSG_CHANNEL_PREFIX, Communicator:OnCommReceived());
+    Communicator:RegisterComm(SUBMIT_BIDDING_CHANNEL_PREFIX, Communicator:OnCommReceived());
+
 end

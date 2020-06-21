@@ -18,6 +18,9 @@ local function CreateMainFrame()
     MainFrame:SetSize(Const.DKPTableWidth + 30, Const.DKPTableRowHeight*15); -- width, height
 	MainFrame:SetPoint(Const.CENTER_POINT, UIParent, Const.CENTER_POINT, 0, 60); -- point, relative frame, relative point on relative frame
 	MainFrame:SetFrameStrata("HIGH");
+	MainFrame:SetFrameLevel(8);
+	tinsert(UISpecialFrames, MainFrame:GetName()); -- Sets frame to close on "Escape"
+
 	MainFrame:SetClampedToScreen(true);
 	MainFrame:SetMovable(true);
 	MainFrame:EnableMouse(true);
@@ -67,5 +70,7 @@ function View:Initialize()
 	CreateMainFrame();
 	View:CreateDKPTable(MainFrame);
 	View:CreateOptionsFrame(MainFrame);
+	View:CreateBidAnnounceFrame();
+	View:ToggleBidAnnounceFrame()
 	Initialized = true;
 end

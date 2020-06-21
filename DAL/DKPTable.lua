@@ -33,7 +33,7 @@ function DAL:WipeAndSetNewDKPTable(newTable)
 
 end
 
-
+-- todo: move table search out of this file
 -- returns index if found
 -- else false
 function DAL:Table_Search(tar, val, field)
@@ -98,6 +98,15 @@ function DAL:Table_Search(tar, val, field)
 		return false;
 	end
 end
+
+function DAL:GetFromDKPTable(playerName)
+	--Will either contain index of player or false if not found
+	local playerExists = DAL:Table_Search(ThirtyDKP_Database_DKPTable, playerName, 'player')
+
+	-- todo: if player doesnt exists, get class info and insert into dkp table
+	return ThirtyDKP_Database_DKPTable[playerExists[1][1]]
+end
+
 
 function DAL:AddToDKPTable(playerName, playerClass)
 

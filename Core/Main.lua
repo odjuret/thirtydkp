@@ -5,7 +5,7 @@ local DAL = ThirtyDKP.DAL
 local Core = ThirtyDKP.Core
 
 function Core:Print(args)
-    print("|cffa30f2dThirtyDKP:|r |cffDC143C"..args.."|r")
+    print("|cffffcc00[ThirtyDKP]:|r |cffa30f2d"..args.."|r")
 end
 
 
@@ -53,6 +53,7 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
     end
 
     DAL:InitializeDKPTable()
+    DAL:InitializeCurrentLootTable()
     Core:InitializeComms()
 
     Core:Print("loaded. Type /tdkp to view dkp table and options.")

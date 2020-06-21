@@ -54,6 +54,7 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
 
     DAL:InitializeDKPTable()
     DAL:InitializeCurrentLootTable()
+    DAL:InitializeOptions();
     Core:InitializeComms()
 
     Core:Print("loaded. Type /tdkp to view dkp table and options.")

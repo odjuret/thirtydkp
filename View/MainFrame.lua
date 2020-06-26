@@ -71,6 +71,6 @@ function View:Initialize()
 	View:CreateDKPTable(MainFrame);
 	View:CreateOptionsFrame(MainFrame);
 	View:CreateBidAnnounceFrame();
-	View:ToggleBidAnnounceFrame()
+	
 	Initialized = true;
 end

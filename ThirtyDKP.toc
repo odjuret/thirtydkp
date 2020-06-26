@@ -22,3 +22,4 @@ DAL\Options.lua
 Core\Communication.lua
 Core\Main.lua
 Core\ManageDKPTableEntries.lua
+Core\ManageLootTableEntries.lua

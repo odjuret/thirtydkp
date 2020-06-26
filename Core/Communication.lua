@@ -89,7 +89,6 @@ function Core:SubmitBid()
 end
 
 
-
 function Core:BroadcastDKPTable()
     local serialized = nil;
     local packet = nil;
@@ -112,13 +111,18 @@ function Core:StartBidding(item, timer)
         biddingInProgress = true
         Communicator:SendCommMessage(START_BIDDING_CHANNEL_PREFIX, tostring(item), "RAID")
 
-        -- todo: add countdown during bidding 15,10,5,4,3,2,1 seconds left to bid... 
-
-        C_Timer.After(timer, function()
-            biddingInProgress = false
-            Communicator:SendCommMessage(PRINT_MSG_CHANNEL_PREFIX, "Bidding closed for: "..tostring(item), "RAID");
-            View:HideBiddingFrame()
-        end)
+        local secondsLeft = timer
+        local bidTimer = C_Timer.NewTicker(1, function() 
+            if (secondsLeft % 5 == 0) or secondsLeft < 6 then
+                Communicator:SendCommMessage(PRINT_MSG_CHANNEL_PREFIX, "Seconds left to bid: "..tostring(secondsLeft), "RAID");
+            end
+            secondsLeft = secondsLeft-1
+            if secondsLeft == 0 then
+                biddingInProgress = false
+                Communicator:SendCommMessage(PRINT_MSG_CHANNEL_PREFIX, "Bidding closed for: "..tostring(item), "RAID");
+                View:HideBiddingFrame()
+            end
+        end, timer)
     else
         Core:Print("You need to be in a raid to start bidding.")
     end

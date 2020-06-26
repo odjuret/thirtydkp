@@ -8,6 +8,18 @@ function Core:Print(args)
     print("|cffffcc00[ThirtyDKP]:|r |cffa30f2d"..args.."|r")
 end
 
+function Core:IsPlayerMasterLooter()
+    local _, _, masterlooterRaidID = GetLootMethod();
+    if masterlooterRaidID ~= nil then
+        local nameFromRaid = GetRaidRosterInfo(masterlooterRaidID)
+        if nameFromRaid == UnitName("player") then
+            return true
+        end
+    end
+
+    return false
+end
+
 
 -------------------------------------------------------
 -- Main event handler. Processing all incoming events
@@ -17,10 +29,14 @@ function ThirtyDKP_OnEvent(self, event, arg1, ...)
     -- TODO: handle all other events, boss kill, bid command, etc 
 
     if event == "ADDON_LOADED" then
-
 		ThirtyDKP_OnInitialize(event, arg1)
         self:UnregisterEvent("ADDON_LOADED")
     end
+
+    if event == "LOOT_OPENED" then
+        Core:HandleLootWindow()
+    end
+    
 end 
 
 
@@ -32,12 +48,21 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
     ----------------------------------
     SLASH_ThirtyDKP1 = "/tdkp";
     SLASH_ThirtyDKP2 = "/thirtydkp";
-    SlashCmdList.ThirtyDKP = function()
+    SlashCmdList.ThirtyDKP = function(argsAsString)
         if not View:IsInitialized() then
             View:Initialize();
         end
 
-        View:OpenMainFrame();
+        if #argsAsString == 0 then
+            View:OpenMainFrame();
+        else
+            local arg1 = strsub(argsAsString, 1,3);
+            local arg2 = strsub(argsAsString, 5);
+
+            if arg1 == 'bid' then
+                Core:ManualAddToLootTable(arg2)
+            end
+        end
     end
 
     --[[
@@ -55,7 +80,11 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
     DAL:InitializeDKPTable()
     DAL:InitializeCurrentLootTable()
     DAL:InitializeOptions();
-    Core:InitializeComms()
+    Core:InitializeComms();
+
+    if not View:IsInitialized() then
+        View:Initialize();
+    end
 
     Core:Print("loaded. Type /tdkp to view dkp table and options.")
 end
@@ -64,7 +93,8 @@ end
 -- Register Events and Initialise AddOn, this should be done in a Init.lua file
 ----------------------------------
 
-local events = CreateFrame("Frame", "EventsFrame");
+local events = CreateFrame("Frame", "TDKPEventsFrame");
 events:RegisterEvent("ADDON_LOADED");
+events:RegisterEvent("LOOT_OPENED");
 --events:RegisterEvent("BOSS_KILL");
 events:SetScript("OnEvent", ThirtyDKP_OnEvent);

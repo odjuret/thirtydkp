@@ -7,7 +7,6 @@ local Const = ThirtyDKP.View.Constants;
 local BidAnnounceFrame = nil;
 local IncomingBidsFrame = nil;
 
-local itemTooltip = nil;
 local selectedRow = nil;
 -- todo: move this logic outside the view folder
 local incomingBids = {};
@@ -174,13 +173,12 @@ local function CreateLootTableRow(parent, id, lootTable)
     row.item = lootTable[id]
     
     row:SetScript("OnEnter", function(self)
-        itemTooltip:SetOwner(self, "ANCHOR_RIGHT", 15, 0)
-        itemTooltip:SetHyperlink(lootTable[id].loot)
-        itemTooltip:Show();
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 15, 0);
+        GameTooltip:SetHyperlink(lootTable[id].loot);
     end)
 
     row:SetScript("OnLeave", function()
-        itemTooltip:Hide()
+        GameTooltip:Hide()
     end)
     
     row:SetScript("OnClick", function(self, button)
@@ -236,7 +234,7 @@ local function CreateLootTableFrame()
 end
 
 -----------------------------
--- Main frame and functions
+-- Bid announce frame and functions
 -----------------------------
 function View:CreateBidAnnounceFrame()
 	BidAnnounceFrame = CreateFrame('Frame', 'ThirtyDKP_BidAnnounceFrame', UIParent, "ShadowOverlaySmallTemplate"); 
@@ -261,7 +259,6 @@ function View:CreateBidAnnounceFrame()
 	BidAnnounceFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, BidAnnounceFrame, Const.TOP_RIGHT_POINT, 5, 5)
     tinsert(UISpecialFrames, BidAnnounceFrame:GetName()); -- Sets frame to close on "Escape"
     
-    itemTooltip = CreateFrame('GameTooltip', "nil", UIParent, 'GameTooltipTemplate');
     
     -- Buttons
     -- Todo: input frame so user can choose bid timer
@@ -287,6 +284,12 @@ function View:CreateBidAnnounceFrame()
 end
 
 function View:ToggleBidAnnounceFrame()
+    if not BidAnnounceFrame then
+        View:CreateBidAnnounceFrame()
+    else
+        View:UpdateLootTableFrame();
+    end
+    
     BidAnnounceFrame:SetShown(not BidAnnounceFrame:IsShown());
 end
 
@@ -301,4 +304,13 @@ function View:UpdateItemForBidFrame()
 
 	CreateCurrentItemForBidFrame()
 	BidAnnounceFrame.CurrentItemForBidFrame:Show()
+end
+
+function View:UpdateLootTableFrame()
+	BidAnnounceFrame.LootTable:Hide()
+	BidAnnounceFrame.LootTable:SetParent(nil)
+	BidAnnounceFrame.LootTable = nil;
+
+	CreateLootTableFrame()
+	BidAnnounceFrame.LootTable:Show()
 end

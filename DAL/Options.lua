@@ -22,6 +22,7 @@ function DAL:InitializeOptions()
 				oneHandedWeapon = 0,
 				twoHandedWeapon = 0,
 				rangedWeapon = 0,
+				default = 10,
 			}
 		};
 	end

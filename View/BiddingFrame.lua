@@ -10,7 +10,7 @@ function View:CreateBiddingFrame(item)
 
 	BiddingFrame = CreateFrame('Frame', 'ThirtyDKP_BiddingFrame', UIParent, "ShadowOverlaySmallTemplate"); 
 	BiddingFrame:SetShown(false);
-	BiddingFrame:SetSize(200, 100);
+	BiddingFrame:SetSize(200, 80);
     BiddingFrame:SetFrameStrata("HIGH");
     BiddingFrame:SetFrameLevel(10);
     BiddingFrame:SetBackdrop({

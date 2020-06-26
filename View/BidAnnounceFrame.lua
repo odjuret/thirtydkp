@@ -7,11 +7,24 @@ local Const = ThirtyDKP.View.Constants;
 local BidAnnounceFrame = nil;
 local IncomingBidsFrame = nil;
 
-local selectedRow = nil;
+local selectedItem = nil;
+local selectedBidder = nil;
 -- todo: move this logic outside the view folder
 local incomingBids = {};
 
 
+local function UpdateIncomingBidsRowsTextures()
+    for i,row in ipairs(IncomingBidsFrame.scrollChild.Rows) do 
+        if selectedBidder and row.bidder.player == selectedBidder.bidder.player then
+            row:SetNormalTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
+            row:GetNormalTexture():SetAlpha(1)
+        else
+            row:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
+            row:SetNormalTexture("Interface\\COMMON\\talent-blue-glow")
+            row:GetNormalTexture():SetAlpha(0.2)
+        end
+    end
+end
 
 local function CreateIncomingBidsTableRow(parent, id, incomingBidsTable)
 
@@ -31,7 +44,17 @@ local function CreateIncomingBidsTableRow(parent, id, incomingBidsTable)
 	b.DKPInfo.CurrentDKP = b:CreateFontString(nil, Const.OVERLAY_LAYER)
 	b.DKPInfo.CurrentDKP:SetFontObject("GameFontHighlight")
 	b.DKPInfo.CurrentDKP:SetText(tostring(incomingBidsTable[id].dkp));
-	b.DKPInfo.CurrentDKP:SetPoint(Const.RIGHT_POINT, -30, 0)
+    b.DKPInfo.CurrentDKP:SetPoint(Const.RIGHT_POINT, -30, 0)
+
+    b.bidder = incomingBidsTable[id]
+    
+    b:SetScript("OnClick", function(self, button)
+        if button == "LeftButton" then
+            selectedBidder = self
+            UpdateIncomingBidsRowsTextures()
+        end
+    end)
+
 	return b
 end
 
@@ -95,11 +118,11 @@ local function CreateCurrentItemForBidFrame()
 	f.itemName:SetFontObject("GameFontHighlight");
     f.itemName:SetPoint(Const.LEFT_POINT, f.itemIcon, Const.RIGHT_POINT, 10, 0);
 
-    if selectedRow then
-        itemName,_,_,_,_,_,_,_,_,itemIcon = GetItemInfo(selectedRow.item.loot)
+    if selectedItem then
+        itemName,_,_,_,_,_,_,_,_,itemIcon = GetItemInfo(selectedItem.item.loot)
         if itemIcon then
             f.itemIcon:SetTexture(itemIcon)
-            f.itemName:SetText(selectedRow.item.loot);
+            f.itemName:SetText(selectedItem.item.loot);
         end
     else
         f.itemName:SetText("Select an item to auction...");
@@ -112,6 +135,17 @@ local function CreateCurrentItemForBidFrame()
     f.AwardItemBtn:SetNormalFontObject("GameFontNormal");
     f.AwardItemBtn:SetHighlightFontObject("GameFontHighlight");
     f.AwardItemBtn:RegisterForClicks("AnyUp");
+    f.AwardItemBtn:SetScript("OnClick", function(self, button)
+        if button == "LeftButton" then
+            if selectedBidder ~= nil then
+                Core:AwardItem(selectedBidder.bidder, selectedItem.item.loot);
+                selectedBidder = nil
+                View:UpdateIncomingBidsFrame();
+            else
+                Core:Print("You need to select a bidder to award an item.")
+            end
+        end
+    end)
 
     if not IncomingBidsFrame then
         CreateIncomingBidsFrame()
@@ -126,7 +160,8 @@ function View:UpdateIncomingBidsFrame()
 	IncomingBidsFrame = nil;
 
 	CreateIncomingBidsFrame()
-	IncomingBidsFrame:Show()
+    IncomingBidsFrame:Show()
+    UpdateIncomingBidsRowsTextures()
 end
 
 function View:AddBidder(bidder)
@@ -145,7 +180,7 @@ end
 ----------------------
 local function UpdateLootTableRowsTextures()
     for i,row in ipairs(BidAnnounceFrame.LootTable.scrollChild.Rows) do 
-        if selectedRow and row.item.index == selectedRow.item.index then
+        if selectedItem and row.item.index == selectedItem.item.index then
             row:SetNormalTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
             row:GetNormalTexture():SetAlpha(1)
         else
@@ -183,7 +218,7 @@ local function CreateLootTableRow(parent, id, lootTable)
     
     row:SetScript("OnClick", function(self, button)
         if button == "LeftButton" then
-            selectedRow = self
+            selectedItem = self
             UpdateLootTableRowsTextures()
             View:UpdateItemForBidFrame()
         end
@@ -271,8 +306,8 @@ function View:CreateBidAnnounceFrame()
     BidAnnounceFrame.StartAndStopBiddingBtn:SetHighlightFontObject("GameFontHighlight");
     BidAnnounceFrame.StartAndStopBiddingBtn:RegisterForClicks("AnyUp");
     BidAnnounceFrame.StartAndStopBiddingBtn:SetScript("OnClick", function(self, button)
-        if selectedRow then
-            Core:StartBidding(selectedRow.item.loot, 15)
+        if selectedItem then
+            Core:StartBidding(selectedItem.item.loot, 15)
         else
             Core:Print("Please select an item to start bidding for.")
         end

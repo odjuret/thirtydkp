@@ -11,8 +11,6 @@ function Core:HandleLootWindow()
   for i = 1, GetNumLootItems() do
     local itemLink = GetLootSlotLink(i)
     if itemLink ~= nil then
-      itemLink = removeSpecId(itemLink)
-
       local _, _, itemRarity = GetItemInfo(itemLink);
       if itemRarity > 3 then
         foundEpaxx = true

@@ -80,6 +80,26 @@ local function HandleSubmitBidMessage(prefix, message, distribution, sender)
     if biddingInProgress then
         Core:Print("Incoming bid from "..sender.."") 
         local player = DAL:GetFromDKPTable(sender)
+
+        if player == false then
+            local nameFromRaid, classFromRaid;
+
+            -- for every person in the raid
+            for i=1, GetNumGroupMembers() do
+                nameFromRaid, _, _, _, classFromRaid = GetRaidRosterInfo(i)
+                
+                if nameFromRaid == sender then
+                    if DAL:AddToDKPTable(sender, classFromRaid) then
+                        Core:Print("added "..sender.." successfully to dkp table.")
+                        player = DAL:GetFromDKPTable(sender)
+                    else
+                        Core:Print("could not add "..sender.." to dkp table...")
+                        return
+                    end
+                end
+            end
+        end
+        
         View:AddBidder(player)
     end
 end
@@ -105,6 +125,11 @@ function Core:BroadcastDKPTable()
 
     Communicator:SendCommMessage(DKPTABLE_BROADCAST_CHANNEL_PREFIX, packet, "GUILD", nil, "NORMAL", BroadcastingCallback, nil)
 end
+
+function Core:Announce(message)
+    Communicator:SendCommMessage(PRINT_MSG_CHANNEL_PREFIX, message, "RAID");
+end
+
 
 function Core:StartBidding(item, timer)
     if IsInRaid() then

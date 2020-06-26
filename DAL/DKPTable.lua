@@ -103,13 +103,15 @@ function DAL:GetFromDKPTable(playerName)
 	--Will either contain index of player or false if not found
 	local playerExists = DAL:Table_Search(ThirtyDKP_Database_DKPTable, playerName, 'player')
 
-	-- todo: if player doesnt exists, get class info and insert into dkp table
-	return ThirtyDKP_Database_DKPTable[playerExists[1][1]]
+	if playerExists == false then
+		return false 
+	else
+		return ThirtyDKP_Database_DKPTable[playerExists[1][1]]
+	end
 end
 
 
 function DAL:AddToDKPTable(playerName, playerClass)
-
     --Will either contain index of player or false if not found
     local playerExists = DAL:Table_Search(ThirtyDKP_Database_DKPTable, playerName, 'player')
   
@@ -130,4 +132,14 @@ end
 function DAL:RemoveFromDKPTable()
 end
 
+function DAL:AdjustPlayerDKP(dkpTableEntry, adjustment)
+	local playerExists = DAL:Table_Search(ThirtyDKP_Database_DKPTable, dkpTableEntry.player, 'player')
 
+	if playerExists == false then
+        return false;
+	else
+		local currentDKP = ThirtyDKP_Database_DKPTable[playerExists[1][1]].dkp
+		ThirtyDKP_Database_DKPTable[playerExists[1][1]].dkp = currentDKP + adjustment 
+        return true;
+    end
+end

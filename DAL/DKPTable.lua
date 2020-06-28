@@ -3,9 +3,18 @@ local addonName, ThirtyDKP = ...
 local DAL = ThirtyDKP.DAL
 
 local function SortTable()
-	table.sort(ThirtyDKP_Database_DKPTable, function(a, b)
-        return a["player"] < b["player"]
-    end)
+	local sortMode = DAL:GetDKPTableSorting().mode
+	local sortColumn = DAL:GetDKPTableSorting().column
+
+	if sortMode == "Ascending" then
+		table.sort(ThirtyDKP_Database_DKPTable, function(a, b)
+			return a[sortColumn] < b[sortColumn]
+		end)
+	else
+		table.sort(ThirtyDKP_Database_DKPTable, function(a, b)
+			return a[sortColumn] > b[sortColumn]
+		end)
+	end
 end
 
 
@@ -100,7 +109,6 @@ function DAL:Table_Search(tar, val, field)
 end
 
 function DAL:GetFromDKPTable(playerName)
-	--Will either contain index of player or false if not found
 	local playerExists = DAL:Table_Search(ThirtyDKP_Database_DKPTable, playerName, 'player')
 
 	if playerExists == false then
@@ -110,9 +118,9 @@ function DAL:GetFromDKPTable(playerName)
 	end
 end
 
-
+-- returns true if successfully adds player to dkp table
+-- returns false if player already exists in dkp table
 function DAL:AddToDKPTable(playerName, playerClass)
-    --Will either contain index of player or false if not found
     local playerExists = DAL:Table_Search(ThirtyDKP_Database_DKPTable, playerName, 'player')
   
     if playerExists == false then
@@ -132,8 +140,8 @@ end
 function DAL:RemoveFromDKPTable()
 end
 
-function DAL:AdjustPlayerDKP(dkpTableEntry, adjustment)
-	local playerExists = DAL:Table_Search(ThirtyDKP_Database_DKPTable, dkpTableEntry.player, 'player')
+function DAL:AdjustPlayerDKP(playerName, adjustment)
+	local playerExists = DAL:Table_Search(ThirtyDKP_Database_DKPTable, playerName, 'player')
 
 	if playerExists == false then
         return false;

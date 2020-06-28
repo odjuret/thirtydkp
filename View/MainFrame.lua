@@ -13,12 +13,17 @@ local MAIN_FRAME_TITLE = "Thirty DKP"
 
 
 local function CreateMainFrame()
-	MainFrame = CreateFrame('Frame', 'ThirtyDKP_MainFrame', UIParent, "UIPanelDialogTemplate");
+	MainFrame = CreateFrame('Frame', 'ThirtyDKP_MainFrame', UIParent, "ShadowOverlaySmallTemplate");
 	MainFrame:SetShown(false);
     MainFrame:SetSize(Const.DKPTableWidth + 30, Const.DKPTableRowHeight*15); -- width, height
 	MainFrame:SetPoint(Const.CENTER_POINT, UIParent, Const.CENTER_POINT, 0, 60); -- point, relative frame, relative point on relative frame
 	MainFrame:SetFrameStrata("HIGH");
 	MainFrame:SetFrameLevel(8);
+	MainFrame:SetBackdrop({
+        bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
+        tile = true, 
+    });
+	MainFrame:SetBackdropColor(0,0,0,0.8);
 	tinsert(UISpecialFrames, MainFrame:GetName()); -- Sets frame to close on "Escape"
 
 	MainFrame:SetClampedToScreen(true);
@@ -32,13 +37,15 @@ local function CreateMainFrame()
 	end);
 
     -- title
-    ThirtyDKP_MainFrameTitleBG = MainFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
-	ThirtyDKP_MainFrameTitleBG:SetFontObject("GameFontNormal");
-	ThirtyDKP_MainFrameTitleBG:ClearAllPoints();
-    ThirtyDKP_MainFrameTitleBG:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 15, -10);
-    ThirtyDKP_MainFrameTitleBG:SetText(MAIN_FRAME_TITLE);
+    MainFrame.Title = MainFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
+	MainFrame.Title:SetFontObject("GameFontNormal");
+    MainFrame.Title:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 15, -10);
+    MainFrame.Title:SetText(MAIN_FRAME_TITLE);
 
-    -- Buttons
+	-- Buttons
+	MainFrame.closeBtn = CreateFrame("Button", nil, MainFrame, "UIPanelCloseButton")
+	MainFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, MainFrame, Const.TOP_RIGHT_POINT, 5, 5)
+
     MainFrame.optionsButton = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
     MainFrame.optionsButton:SetPoint(Const.BOTTOMRIGHT_POINT, MainFrame, Const.BOTTOMRIGHT_POINT, -10, 10);
     MainFrame.optionsButton:SetSize(80, 30);

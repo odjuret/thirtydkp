@@ -3,6 +3,34 @@ local addonName, ThirtyDKP = ...
 local Core = ThirtyDKP.Core
 local DAL = ThirtyDKP.DAL
 
+local bossEventIds = {  
+        -- MC 
+        663, 664, 665,
+        666, 668, 667, 669, 
+        670, 671, 672,
+        -- BWL
+        610, 611, 612,
+        613, 614, 615, 616, 
+        617,
+        -- AQ
+        709, 711, 712,
+        714, 715, 717, 
+        710, 713, 716,
+        -- Naxx
+        1107, 1110, 1116,
+        1117, 1112, 1115, 
+        1113, 1109, 1121,
+        1118, 1111, 1108, 1120,
+        1119, 1114,
+        -- ZG
+        787, 790, 793, 789, 784, 791,
+        785, 792, 786, 788,
+        -- AQ20
+        722, 721, 719, 718, 720, 723,
+        -- Onyxia
+        1084
+}
+
 local function GetDKPCostByEquipLocation(itemEquipLoc)
     local thirtyDkpOptions = DAL:GetOptions();
     if itemEquipLoc == "INVTYPE_HEAD" then
@@ -48,11 +76,46 @@ function Core:AwardItem(dkpTableEntry, itemLink)
     local _, _, _, _, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink);
     local itemDKPCost = GetDKPCostByEquipLocation(itemEquipLoc);
 
-    if DAL:AdjustPlayerDKP(dkpTableEntry, tonumber("-"..itemDKPCost)) then
+    if DAL:AdjustPlayerDKP(dkpTableEntry.player, tonumber("-"..itemDKPCost)) then
         Core:Announce(dkpTableEntry.player.." won "..itemLink.." ")
     else
         Core:Announce("Could not award "..dkpTableEntry.player.." with "..itemLink.." ")
     end 
+end
+
+function Core:HandleBossKill(eventId, ...)
+    if not Core:IsPlayerMasterLooter() then return end
+    
+    local bossName = ...;
+    local shouldAwardDKP = false;
+    for _, bossEventId in ipairs(bossEventIds) do
+        if bossEventId == eventId then
+            shouldAwardDKP = true
+            break;
+        end
+    end
+    if not shouldAwardDKP then return end
+    -- todo: add options check if raid zone should award dkp
+
+    local bossKillDKPAward = DAL:GetOptions().dkpGainPerKill;
+    local playerName, playerClass;
+    local listOfAwardedPlayers = "";
+    -- for every person in the raid
+    for i=1, GetNumGroupMembers() do
+        playerName, _, _, _, playerClass  = GetRaidRosterInfo(i)
+        
+        if DAL:AdjustPlayerDKP(playerName, tonumber(bossKillDKPAward)) then
+            listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName
+        else
+            -- could not adjust player dkp, add player to dkp table first
+            DAL:AddToDKPTable(playerName, playerClass)
+            if DAL:AdjustPlayerDKP(playerName, tonumber(bossKillDKPAward)) then
+                listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName
+            else
+                Core:Print("Could not award "..playerName.." boss kill DKP. Contact authors.")
+            end
+        end 
+    end
 end
 
 

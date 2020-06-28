@@ -4,10 +4,23 @@ local View = ThirtyDKP.View
 local DAL = ThirtyDKP.DAL
 local Core = ThirtyDKP.Core
 
+local classColors = {
+	["Druid"] = "FF7D0A",
+	["Hunter"] =  "ABD473",
+	["Mage"] = "40C7EB",
+	["Priest"] = "FFFFFF",
+	["Rogue"] = "FFF569",
+	["Shaman"] = "F58CBA",
+	["Paladin"] = "F58CBA",
+	["Warlock"] = "8787ED",
+	["Warrior"] = "C79C6E"
+}
+
 function Core:Print(args)
     print("|cffffcc00[ThirtyDKP]:|r |cffa30f2d"..args.."|r")
 end
 
+-- This also returns false if not in raid
 function Core:IsPlayerMasterLooter()
     local _, _, masterlooterRaidID = GetLootMethod();
     if masterlooterRaidID ~= nil then
@@ -20,12 +33,18 @@ function Core:IsPlayerMasterLooter()
     return false
 end
 
+function Core:AddClassColor(stringToColorize, class)
+    local classColor = classColors[class]
+    
+    return "|cff"..classColor..stringToColorize.."|r"
+end
+
+
 
 -------------------------------------------------------
--- Main event handler. Processing all incoming events
+-- Main event controller. Delegates all incoming events
 --------------------------------------------------------
 function ThirtyDKP_OnEvent(self, event, arg1, ...)
-
     -- TODO: handle all other events, boss kill, bid command, etc 
 
     if event == "ADDON_LOADED" then
@@ -36,6 +55,11 @@ function ThirtyDKP_OnEvent(self, event, arg1, ...)
     if event == "LOOT_OPENED" then
         Core:HandleLootWindow()
     end
+
+    if event == "BOSS_KILL" then
+        Core:HandleBossKill(arg1, ...)
+    end
+    
     
 end 
 
@@ -56,8 +80,8 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
         if #argsAsString == 0 then
             View:OpenMainFrame();
         else
-            local arg1 = strsub(argsAsString, 1,3);
-            local arg2 = strsub(argsAsString, 5);
+            local arg1 = strsub(argsAsString, 1,3); -- todo: this smells
+            local arg2 = strsub(argsAsString, 5); 
 
             if arg1 == 'bid' then
                 Core:ManualAddToLootTable(arg2)
@@ -96,5 +120,5 @@ end
 local events = CreateFrame("Frame", "TDKPEventsFrame");
 events:RegisterEvent("ADDON_LOADED");
 events:RegisterEvent("LOOT_OPENED");
---events:RegisterEvent("BOSS_KILL");
+events:RegisterEvent("BOSS_KILL");
 events:SetScript("OnEvent", ThirtyDKP_OnEvent);

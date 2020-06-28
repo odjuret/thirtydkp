@@ -89,13 +89,9 @@ local function HandleSubmitBidMessage(prefix, message, distribution, sender)
                 nameFromRaid, _, _, _, classFromRaid = GetRaidRosterInfo(i)
                 
                 if nameFromRaid == sender then
-                    if DAL:AddToDKPTable(sender, classFromRaid) then
-                        Core:Print("added "..sender.." successfully to dkp table.")
-                        player = DAL:GetFromDKPTable(sender)
-                    else
-                        Core:Print("could not add "..sender.." to dkp table...")
-                        return
-                    end
+                    DAL:AddToDKPTable(sender, classFromRaid) 
+                    Core:Print("added "..sender.." successfully to dkp table.")
+                    player = DAL:GetFromDKPTable(sender)
                 end
             end
         end
@@ -158,7 +154,6 @@ end
 -- Message Controller
 -------------------------------------------------
 function Communicator:OnCommReceived(prefix, message, distribution, sender)
-    -- todo: switch case
     if prefix == DKPTABLE_BROADCAST_CHANNEL_PREFIX then
         HandleDKPTableBroadcastMessage(prefix, message, distribution, sender)
 

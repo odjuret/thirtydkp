@@ -47,7 +47,7 @@ local function CreateMainFrame()
 	MainFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, MainFrame, Const.TOP_RIGHT_POINT, 5, 5)
 
     MainFrame.optionsButton = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-    MainFrame.optionsButton:SetPoint(Const.BOTTOMRIGHT_POINT, MainFrame, Const.BOTTOMRIGHT_POINT, -10, 10);
+    MainFrame.optionsButton:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame, Const.BOTTOM_RIGHT_POINT, -10, 10);
     MainFrame.optionsButton:SetSize(80, 30);
     MainFrame.optionsButton:SetText("Options");
     MainFrame.optionsButton:SetNormalFontObject("GameFontNormal");

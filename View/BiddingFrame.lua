@@ -27,23 +27,23 @@ function View:CreateBiddingFrame(item)
     BiddingFrame.closeBtn = CreateFrame("Button", nil, BiddingFrame, "UIPanelCloseButton")
 	BiddingFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, BiddingFrame, Const.TOP_RIGHT_POINT, 5, 5)
     tinsert(UISpecialFrames, BiddingFrame:GetName()); -- Sets frame to close on "Escape"
-    
+
     BiddingFrame.itemIconTexture = BiddingFrame:CreateTexture(nil, Const.OVERLAY_LAYER, nil);
     BiddingFrame.itemIconTexture:SetPoint(Const.TOP_LEFT_POINT, 5, -5)
     BiddingFrame.itemIconTexture:SetColorTexture(0, 0, 0, 1)
     BiddingFrame.itemIconTexture:SetSize(28, 28);
     BiddingFrame.itemIconTexture:SetTexture(itemIcon)
-    
+
 	BiddingFrame.itemName = BiddingFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
 	BiddingFrame.itemName:SetFontObject("GameFontHighlight");
     BiddingFrame.itemName:SetPoint(Const.LEFT_POINT, BiddingFrame.itemIconTexture, Const.RIGHT_POINT, 10, 0);
     BiddingFrame.itemName:SetText(item);
-    
+
     -- Buttons
     -- Todo: input frame so user can choose bid timer
 
     BiddingFrame.BiddingBtn = CreateFrame("Button", nil, BiddingFrame, "GameMenuButtonTemplate");
-    BiddingFrame.BiddingBtn:SetPoint(Const.BOTTOMLEFT_POINT, BiddingFrame, Const.BOTTOMLEFT_POINT, 5, 5);
+    BiddingFrame.BiddingBtn:SetPoint(Const.BOTTOM_LEFT_POINT, BiddingFrame, Const.BOTTOM_LEFT_POINT, 5, 5);
     BiddingFrame.BiddingBtn:SetSize(100, 22);
     BiddingFrame.BiddingBtn:SetText("Bid");
     BiddingFrame.BiddingBtn:SetNormalFontObject("GameFontNormal");
@@ -63,5 +63,5 @@ end
 function View:HideBiddingFrame()
     if BiddingFrame then
         BiddingFrame:SetShown(false);
-    end 
+    end
 end

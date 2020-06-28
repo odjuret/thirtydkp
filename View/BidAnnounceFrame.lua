@@ -66,7 +66,7 @@ local function PopulateIncomingBidsTable(parentFrame, numberOfRows)
 		if i==1 then
 			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild, Const.TOP_LEFT_POINT, 0, -2)
 		else
-			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild.Rows[i-1], Const.BOTTOMLEFT_POINT)
+			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild.Rows[i-1], Const.BOTTOM_LEFT_POINT)
 		end
 	end
 end
@@ -76,10 +76,10 @@ local function CreateIncomingBidsFrame()
 
     -- "Container" frame that clips out its child frame "excess" content.
     IncomingBidsFrame = CreateFrame("ScrollFrame", 'IncomingBidsFrameScrollFrame', BidAnnounceFrame.CurrentItemForBidFrame, "UIPanelScrollFrameTemplate");
-    
+
     IncomingBidsFrame:SetSize( Const.LootTableWidth-12, Const.DKPTableRowHeight*8);
 	IncomingBidsFrame:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame.CurrentItemForBidFrame, Const.TOP_LEFT_POINT, 0, -30 );
-	--IncomingBidsFrame:SetPoint( Const.BOTTOMRIGHT_POINT, BidAnnounceFrame.CurrentItemForBidFrame, Const.BOTTOMRIGHT_POINT, -22, 40 );
+	--IncomingBidsFrame:SetPoint( Const.BOTTOM_RIGHT_POINT, BidAnnounceFrame.CurrentItemForBidFrame, Const.BOTTOM_RIGHT_POINT, -22, 40 );
 	IncomingBidsFrame.scrollBar = _G["IncomingBidsFrameScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 
 	-- Child frame which holds all the content being scrolled through.
@@ -96,24 +96,24 @@ local function CreateIncomingBidsFrame()
 	IncomingBidsFrame.scrollChild.bg:SetColorTexture(0, 0, 0, 1)
 
     IncomingBidsFrame:SetScrollChild( IncomingBidsFrame.scrollChild );
-    
+
     PopulateIncomingBidsTable(IncomingBidsFrame, numberOfIncomingBids)
 end
 
 
 local function CreateCurrentItemForBidFrame()
-    BidAnnounceFrame.CurrentItemForBidFrame = CreateFrame('Frame', nil, BidAnnounceFrame, nil); 
+    BidAnnounceFrame.CurrentItemForBidFrame = CreateFrame('Frame', nil, BidAnnounceFrame, nil);
     local f = BidAnnounceFrame.CurrentItemForBidFrame;
     local itemName, itemIcon = "", nil
 
     f:SetSize( Const.LootTableWidth+10, BidAnnounceFrame:GetHeight()/2);
 	f:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame, Const.TOP_LEFT_POINT, 5, -15 );
-    
+
     f.itemIcon = f:CreateTexture(nil, Const.OVERLAY_LAYER, nil);
     f.itemIcon:SetPoint(Const.TOP_LEFT_POINT, 5, 5)
     f.itemIcon:SetColorTexture(0, 0, 0, 1)
     f.itemIcon:SetSize(28, 28);
-    
+
 	f.itemName = f:CreateFontString(nil, Const.OVERLAY_LAYER);
 	f.itemName:SetFontObject("GameFontHighlight");
     f.itemName:SetPoint(Const.LEFT_POINT, f.itemIcon, Const.RIGHT_POINT, 10, 0);
@@ -129,7 +129,7 @@ local function CreateCurrentItemForBidFrame()
     end
 
     f.AwardItemBtn = CreateFrame("Button", nil, f, "GameMenuButtonTemplate");
-    f.AwardItemBtn:SetPoint(Const.BOTTOMRIGHT_POINT, f, Const.BOTTOMRIGHT_POINT, 0, 0);
+    f.AwardItemBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, f, Const.BOTTOM_RIGHT_POINT, 0, 0);
     f.AwardItemBtn:SetSize(100, 22);
     f.AwardItemBtn:SetText("Award Item");
     f.AwardItemBtn:SetNormalFontObject("GameFontNormal");
@@ -236,7 +236,7 @@ local function PopulateLootTable(parentFrame, numberOfRows)
 		if i==1 then
 			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild, Const.TOP_LEFT_POINT, 0, -2)
 		else
-			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild.Rows[i-1], Const.BOTTOMLEFT_POINT)
+			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild.Rows[i-1], Const.BOTTOM_LEFT_POINT)
 		end
 	end
 end
@@ -244,14 +244,14 @@ end
 
 local function CreateLootTableFrame()
     local numberOfRowsInLootTable = #DAL:GetCurrentLootTable()
-    
+
     -- "Container" frame that clips out its child frame "excess" content.
     BidAnnounceFrame.LootTable = CreateFrame("ScrollFrame", 'BidAnnounceFrameScrollFrame', BidAnnounceFrame, "UIPanelScrollFrameTemplate");
     local lootTable = BidAnnounceFrame.LootTable
 
 	lootTable:SetSize( Const.LootTableWidth, numberOfRowsInLootTable*7);
 	lootTable:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame, Const.TOP_LEFT_POINT, 5, -Const.LootTableWidth );
-	lootTable:SetPoint( Const.BOTTOMRIGHT_POINT, BidAnnounceFrame, Const.BOTTOMRIGHT_POINT, -27, 5 );
+	lootTable:SetPoint( Const.BOTTOM_RIGHT_POINT, BidAnnounceFrame, Const.BOTTOM_RIGHT_POINT, -27, 5 );
 	lootTable.scrollBar = _G["BidAnnounceFrameScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 
 	-- Child frame which holds all the content being scrolled through.

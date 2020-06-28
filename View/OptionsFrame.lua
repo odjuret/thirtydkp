@@ -11,7 +11,7 @@ local OPTIONS_FRAME_TITLE = "Options"
 
 local function AttachAddRaidToTableScripts(frame)
     -- add raid to dkp table if they don't exist
-	
+
 	frame:SetScript("OnEnter", function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 		GameTooltip:SetText("Add raid members to DKP table", 0.25, 0.75, 0.90, 1, true);
@@ -22,7 +22,7 @@ local function AttachAddRaidToTableScripts(frame)
 		GameTooltip:Hide()
 	end)
     frame:SetScript("OnClick", function ()
-        -- If you aint in raid	
+        -- If you aint in raid
         if not IsInRaid() then
             StaticPopupDialogs["NOT_IN_RAID"] = {
                 text = "Well you gotta be in a raid to add raid members to DKP table...",
@@ -133,7 +133,7 @@ end
 
 local function CreateInputFrame(parent, text, value, valueChangedCallback)
     local wrapper = CreateFrame("Frame", nil, parent, nil);
-    wrapper:SetSize(150, 30);
+    wrapper:SetSize(parent:GetWidth(), 30);
 
     wrapper.label = wrapper:CreateFontString(nil, Const.OVERLAY_LAYER);
     wrapper.label:SetFontObject("GameFontNormal");
@@ -172,7 +172,7 @@ end
 
 local function CreateAndAttachDkpCostFrame(text, itemName, parent, attachTarget)
     local frame = CreateDkpCostInputFrame(text, itemName, parent);
-    frame:SetPoint(Const.TOP_LEFT_POINT, attachTarget, Const.BOTTOMLEFT_POINT, 0, 0);
+    frame:SetPoint(Const.TOP_LEFT_POINT, attachTarget, Const.BOTTOM_LEFT_POINT, 0, 0);
     return frame;
 end
 
@@ -184,8 +184,8 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
 	OptionsFrame:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
     OptionsFrame:EnableMouse(true);
     OptionsFrame:SetBackdrop({
-        bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-        tile = true, 
+        bgFile = "Interface/Tooltips/UI-Tooltip-Background",
+        tile = true,
     });
 	OptionsFrame:SetBackdropColor(0,0,0,0.9);
 
@@ -197,21 +197,44 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
 
     local options = DAL:GetOptions();
 
-    -- Misc
-    local dkpGainPerKill = CreateInputFrame(OptionsFrame, "DKP Per Kill:", options.dkpGainPerKill, function(input)
+    -- Misc settings, two sections
+    local miscSectionLeft = CreateFrame("Frame", nil, OptionsFrame, nil);
+    miscSectionLeft:SetSize(150, 70);
+    miscSectionLeft:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 30, -50);
+
+    local miscSectionRight = CreateFrame("Frame", nil, OptionsFrame, nil);
+    miscSectionRight:SetSize(180, 70);
+    miscSectionRight:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.TOP_RIGHT_POINT, 20, 0);
+
+	local dkpGainPerKill = CreateInputFrame(miscSectionLeft, "DKP Per Kill:", options.dkpGainPerKill, function(input)
         options.dkpGainPerKill = input:GetNumber();
     end);
-    dkpGainPerKill:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 30, -50);
+    dkpGainPerKill:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.TOP_LEFT_POINT, 0, 0);
+
+    local onTimeBonus = CreateInputFrame(miscSectionLeft, "On Time Bonus:", options.onTimeBonus, function(input)
+        options.onTimeBonus = input:GetNumber();
+    end);
+	onTimeBonus:SetPoint(Const.TOP_LEFT_POINT, dkpGainPerKill, Const.BOTTOM_LEFT_POINT, 0, 0);
+
+	local raidCompletionBonus = CreateInputFrame(miscSectionRight, "Raid Completion Bonus:", options.raidCompletionBonus, function(input)
+        options.raidCompletionBonus = input:GetNumber();
+    end);
+	raidCompletionBonus:SetPoint(Const.TOP_LEFT_POINT, miscSectionRight, Const.TOP_LEFT_POINT, 0, 0);
+
+	local decay = CreateInputFrame(miscSectionRight, "Decay Percent:", options.decay, function(input)
+        options.decay = input:GetNumber();
+    end);
+	decay:SetPoint(Const.TOP_LEFT_POINT, raidCompletionBonus, Const.BOTTOM_LEFT_POINT, 0, 0);
 
 
     -- Item cost setting, two sections
     local itemCostSectionLeft = CreateFrame("Frame", nil, OptionsFrame, nil);
-    itemCostSectionLeft:SetSize(180, 150);
-    itemCostSectionLeft:SetPoint(Const.TOP_LEFT_POINT, dkpGainPerKill, Const.BOTTOMLEFT_POINT, 0, -25);
+    itemCostSectionLeft:SetSize(150, 150);
+    itemCostSectionLeft:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.BOTTOM_LEFT_POINT, 0, -25);
 
     local itemCostSectionRight = CreateFrame("Frame", nil, OptionsFrame, nil);
-    itemCostSectionRight:SetSize(180, 150);
-    itemCostSectionRight:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionLeft, Const.TOP_RIGHT_POINT, 0, 0);
+    itemCostSectionRight:SetSize(130, 150);
+    itemCostSectionRight:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionLeft, Const.TOP_RIGHT_POINT, 20, 0);
 
     -- Left section
     local headCostInput = CreateDkpCostInputFrame("Head Cost:", "head", itemCostSectionLeft);
@@ -236,24 +259,24 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
     local trinketCostInput = CreateAndAttachDkpCostFrame("Trinket Cost:", "trinket", itemCostSectionRight, ringCostInput);
 
 
-    -- Buttons 
+    -- Buttons
     OptionsFrame.closeBtn = CreateFrame("Button", nil, OptionsFrame, "UIPanelCloseButton")
 	OptionsFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, OptionsFrame, Const.TOP_RIGHT_POINT, 5, 5)
 
     --  add raid to dkp table button
     OptionsFrame.addRaidToTableBtn = CreateFrame("Button", nil, OptionsFrame, "GameMenuButtonTemplate");
-    OptionsFrame.addRaidToTableBtn:SetPoint(Const.BOTTOMLEFT_POINT, OptionsFrame, Const.BOTTOMLEFT_POINT, 10, 10);
+    OptionsFrame.addRaidToTableBtn:SetPoint(Const.BOTTOM_LEFT_POINT, OptionsFrame, Const.BOTTOM_LEFT_POINT, 10, 10);
     OptionsFrame.addRaidToTableBtn:SetSize(80, 30);
     OptionsFrame.addRaidToTableBtn:SetText("Add Raid");
     OptionsFrame.addRaidToTableBtn:SetNormalFontObject("GameFontNormal");
     OptionsFrame.addRaidToTableBtn:SetHighlightFontObject("GameFontHighlight");
     OptionsFrame.addRaidToTableBtn:RegisterForClicks("AnyUp");
-    
+
     AttachAddRaidToTableScripts(OptionsFrame.addRaidToTableBtn)
 
 	--  add guild to dkp table button
 	OptionsFrame.addGuildToTableBtn = CreateFrame("Button", nil, OptionsFrame, "GameMenuButtonTemplate");
-	OptionsFrame.addGuildToTableBtn:SetPoint(Const.BOTTOMLEFT_POINT, OptionsFrame, Const.BOTTOMLEFT_POINT, 90, 10);
+	OptionsFrame.addGuildToTableBtn:SetPoint(Const.BOTTOM_LEFT_POINT, OptionsFrame, Const.BOTTOM_LEFT_POINT, 90, 10);
 	OptionsFrame.addGuildToTableBtn:SetSize(80, 30);
 	OptionsFrame.addGuildToTableBtn:SetText("Add Guild");
 	OptionsFrame.addGuildToTableBtn:SetNormalFontObject("GameFontNormal");
@@ -261,16 +284,16 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
 	OptionsFrame.addGuildToTableBtn:RegisterForClicks("AnyUp");
 
     AttachAddGuildToTableScript(OptionsFrame.addGuildToTableBtn);
-    
+
     --  broadcast dkp table to online members button
     OptionsFrame.broadcastBtn = CreateFrame("Button", nil, OptionsFrame, "GameMenuButtonTemplate");
-	OptionsFrame.broadcastBtn:SetPoint(Const.BOTTOMLEFT_POINT, OptionsFrame, Const.BOTTOMLEFT_POINT, 170, 10);
+	OptionsFrame.broadcastBtn:SetPoint(Const.BOTTOM_LEFT_POINT, OptionsFrame, Const.BOTTOM_LEFT_POINT, 170, 10);
 	OptionsFrame.broadcastBtn:SetSize(80, 30);
 	OptionsFrame.broadcastBtn:SetText("Broadcast");
 	OptionsFrame.broadcastBtn:SetNormalFontObject("GameFontNormal");
 	OptionsFrame.broadcastBtn:SetHighlightFontObject("GameFontHighlight");
     OptionsFrame.broadcastBtn:RegisterForClicks("AnyUp");
-    
+
     AttachBroadcastDKPTableScript(OptionsFrame.broadcastBtn);
 end
 

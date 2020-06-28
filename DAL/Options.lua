@@ -10,6 +10,9 @@ function DAL:InitializeOptions()
 	if not ThirtyDKP_Database_Options then
 		ThirtyDKP_Database_Options = {
 			dkpGainPerKill = 0,
+			onTimeBonus = 0,
+			raidCompletionBonus = 0,
+			decay = 0,
 			itemCosts = {
 				head = 0,
 				neck = 0,

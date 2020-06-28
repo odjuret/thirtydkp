@@ -6,7 +6,7 @@ local Core = ThirtyDKP.Core;
 local DAL = ThirtyDKP.DAL;
 local Const = ThirtyDKP.View.Constants;
 
--- Even though its not a "standalone" frame by itself, 
+-- Even though its not a "standalone" frame by itself,
 -- it deserves its own file since it will grow large as development progresses
 local DKPTableFrame = nil;
 
@@ -96,9 +96,9 @@ local function PopulateDKPTable(parentFrame, numberOfRows)
 	for i = 1, numberOfRows do
 		parentFrame.scrollChild.Rows[i] = CreateDKPTableRow(parentFrame.scrollChild, i, dkpTableCopy)
 		if i==1 then
-			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild.Headers, Const.BOTTOMLEFT_POINT)
+			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild.Headers, Const.BOTTOM_LEFT_POINT)
 		else
-			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild.Rows[i-1], Const.BOTTOMLEFT_POINT)
+			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild.Rows[i-1], Const.BOTTOM_LEFT_POINT)
 		end
 	end
 end
@@ -114,7 +114,7 @@ function View:CreateDKPTable(parentFrame)
 	DKPTableFrame:SetSize( Const.DKPTableWidth, numberOfRowsInDKPTable*12);
 	DKPTableFrame.scrollBar = _G["DKPTableScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 	DKPTableFrame:SetPoint( Const.TOP_LEFT_POINT, 10, -30 );
-	DKPTableFrame:SetPoint( Const.BOTTOMRIGHT_POINT, -120, 10 );
+	DKPTableFrame:SetPoint( Const.BOTTOM_RIGHT_POINT, -120, 10 );
 
 	-- Child frame which holds all the content being scrolled through.
     DKPTableFrame.scrollChild = CreateFrame( "Frame", "$parent_ScrollChild", DKPTableFrame );

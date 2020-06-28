@@ -9,8 +9,8 @@ ThirtyDKP.View.Constants.TOP_LEFT_POINT = "TOPLEFT"
 ThirtyDKP.View.Constants.TOP_RIGHT_POINT = "TOPRIGHT"
 ThirtyDKP.View.Constants.LEFT_POINT = "LEFT"
 ThirtyDKP.View.Constants.RIGHT_POINT = "RIGHT"
-ThirtyDKP.View.Constants.BOTTOMRIGHT_POINT = "BOTTOMRIGHT"
-ThirtyDKP.View.Constants.BOTTOMLEFT_POINT = "BOTTOMLEFT"
+ThirtyDKP.View.Constants.BOTTOM_RIGHT_POINT = "BOTTOMRIGHT"
+ThirtyDKP.View.Constants.BOTTOM_LEFT_POINT = "BOTTOMLEFT"
 
 -- Layer levels (blizz should have these somewhere??)
 ThirtyDKP.View.Constants.BACKGROUND_LAYER = "BACKGROUND"   -- Level 0. Place the background of your frame here.

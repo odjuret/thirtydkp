@@ -56,6 +56,7 @@ local function GetDKPCostByEquipLocation(itemEquipLoc)
     elseif itemEquipLoc == "INVTYPE_CLOAK" then
         return thirtyDkpOptions.itemCosts.back
     elseif itemEquipLoc == "INVTYPE_WEAPON" then
+        return thirtyDkpOptions.itemCosts.oneHandedWeapon
     elseif itemEquipLoc == "INVTYPE_SHIELD" then
     elseif itemEquipLoc == "INVTYPE_2HWEAPON" then
         return thirtyDkpOptions.itemCosts.twoHandedWeapon
@@ -75,11 +76,16 @@ end
 function Core:AwardItem(dkpTableEntry, itemLink)
     local _, _, _, _, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink);
     local itemDKPCost = GetDKPCostByEquipLocation(itemEquipLoc);
+    print(tostring(itemEquipLoc))
+    print(tostring(itemLink))
+    print(tostring(itemDKPCost))
 
     if DAL:AdjustPlayerDKP(dkpTableEntry.player, tonumber("-"..itemDKPCost)) then
-        Core:Announce(dkpTableEntry.player.." won "..itemLink.." ")
+        Core:Announce(dkpTableEntry.player.." won "..itemLink.." ");
+        -- add event to history
+        DAL:AddToHistory(dkpTableEntry.player, tonumber("-"..itemDKPCost), "Loot: "..itemLink)
     else
-        Core:Announce("Could not award "..dkpTableEntry.player.." with "..itemLink.." ")
+        Core:Announce("Could not award "..dkpTableEntry.player.." with "..itemLink.." ");
     end 
 end
 
@@ -110,12 +116,14 @@ function Core:HandleBossKill(eventId, ...)
             -- could not adjust player dkp, add player to dkp table first
             DAL:AddToDKPTable(playerName, playerClass)
             if DAL:AdjustPlayerDKP(playerName, tonumber(bossKillDKPAward)) then
-                listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName
+                listOfAwardedPlayers = listOfAwardedPlayers..playerName..","
             else
                 Core:Print("Could not award "..playerName.." boss kill DKP. Contact authors.")
             end
         end 
     end
+    -- add event to history
+    DAL:AddToHistory(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
 end
 
 

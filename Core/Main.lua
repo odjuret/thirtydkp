@@ -39,7 +39,9 @@ function Core:AddClassColor(stringToColorize, class)
     return "|cff"..classColor..stringToColorize.."|r"
 end
 
-
+function Core:RoundNumber(number, decimals)
+    return tonumber((("%%.%df"):format(decimals)):format(number))
+end
 
 -------------------------------------------------------
 -- Main event controller. Delegates all incoming events
@@ -101,9 +103,10 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
         FrameStackTooltip_Toggle()
     end
 
-    DAL:InitializeDKPTable()
-    DAL:InitializeCurrentLootTable()
     DAL:InitializeOptions();
+    DAL:InitializeDKPTable();
+    DAL:InitializeCurrentLootTable();
+    DAL:InitializeDKPHistory();
     Core:InitializeComms();
 
     if not View:IsInitialized() then

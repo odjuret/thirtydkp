@@ -17,23 +17,6 @@ local SUBMIT_BIDDING_CHANNEL_PREFIX = "TDKPSubmitBid";
 
 local biddingInProgress = false
 
--------------------------------------------------
--- Callback used by communicator when transmitting 
--- TODO: Move this into View/BroadcastStatusFrame.lua and use it to display progress
--------------------------------------------------
-local bytesSent = 0
-local bytesTotal = 0
-
-function BroadcastingCallback(arg1, arg2, arg3)
-	bytesSent = arg2
-	bytesTotal = arg3
-
-	if arg2 == arg3 then
-		bytesSent = 0
-		bytesTotal = 0
-	end
-end
-
 
 local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sender)
     if (sender ~= UnitName("player")) then
@@ -119,7 +102,7 @@ function Core:BroadcastDKPTable()
         packet = LibDeflate:EncodeForWoWAddonChannel(compressed)
     end
 
-    Communicator:SendCommMessage(DKPTABLE_BROADCAST_CHANNEL_PREFIX, packet, "GUILD", nil, "NORMAL", BroadcastingCallback, nil)
+    Communicator:SendCommMessage(DKPTABLE_BROADCAST_CHANNEL_PREFIX, packet, "GUILD", nil, "NORMAL", ThirtyDKP_BroadcastingCallback, nil)
 end
 
 function Core:Announce(message)

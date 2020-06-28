@@ -6,6 +6,8 @@ local Core = ThirtyDKP.Core;
 local DAL = ThirtyDKP.DAL;
 local Const = ThirtyDKP.View.Constants;
 
+-- Even though its not a "standalone" frame by itself, 
+-- it deserves its own file since it will grow large as development progresses
 local DKPTableFrame = nil;
 
 local function CreateDKPTableHeadersRow(parent)

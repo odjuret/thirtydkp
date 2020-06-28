@@ -1,7 +1,6 @@
 local addonName, ThirtyDKP = ...
 local View = ThirtyDKP.View;
 local Core = ThirtyDKP.Core;
-local DAL = ThirtyDKP.DAL;
 local Const = ThirtyDKP.View.Constants;
 
 

@@ -118,7 +118,8 @@ local function AttachBroadcastDKPTableScript(frame)
             button1 = "Yes",
             button2 = "No",
             OnAccept = function()
-                Core:BroadcastDKPTable()
+                Core:BroadcastDKPTable();
+                View:ShowBroadcastingStatusFrame()
             end,
             timeout = 0,
             whileDead = true,

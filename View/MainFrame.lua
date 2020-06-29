@@ -136,8 +136,7 @@ end
 
 
 
-local function CreateMainFrame()
-    local isOfficer = Core:IsOfficer();
+local function CreateMainFrame(isOfficer)
     local mainFrameWidth;
     if isOfficer then
         mainFrameWidth = Const.DKPTableWidth + 130
@@ -239,12 +238,16 @@ function View:IsInitialized()
 end
 
 function View:Initialize()
-	if Initialized then return end
+    if Initialized then return end
+    
+    local isOfficer = Core:IsOfficer();
 
-	CreateMainFrame();
-	View:CreateDKPTable(MainFrame);
-	View:CreateOptionsFrame(MainFrame);
-	View:CreateBidAnnounceFrame();
+	CreateMainFrame(isOfficer);
+    View:CreateDKPTable(MainFrame);
+    View:CreateBidAnnounceFrame();
+    if isOfficer then
+        View:CreateOptionsFrame(MainFrame);
+    end
 
 	Initialized = true;
 end

@@ -56,7 +56,7 @@ end
 function View:CreateOptionsFrame(parentFrame, savedOptions)
 	OptionsFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", UIParent, "TooltipBorderedFrameTemplate"); -- Todo: make mainframe owner??
 	OptionsFrame:SetShown(false);
-	OptionsFrame:SetSize(500, 500);
+	OptionsFrame:SetSize(370, 375);
 	OptionsFrame:SetFrameStrata("HIGH");
 	OptionsFrame:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
     OptionsFrame:EnableMouse(true);
@@ -69,10 +69,15 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
 
     local options = DAL:GetOptions();
 
+	local miscSectionHeader = OptionsFrame:CreateFontString(nil, OVERLAY_LAYER);
+	miscSectionHeader:SetFontObject("GameFontWhite");
+	miscSectionHeader:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 10, -35);
+	miscSectionHeader:SetText("Miscellaneous");
+
     -- Misc settings, two sections
     local miscSectionLeft = CreateFrame("Frame", nil, OptionsFrame, nil);
-    miscSectionLeft:SetSize(150, 70);
-    miscSectionLeft:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 30, -50);
+    miscSectionLeft:SetSize(135, 70);
+    miscSectionLeft:SetPoint(Const.TOP_LEFT_POINT, miscSectionHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
 
     local miscSectionRight = CreateFrame("Frame", nil, OptionsFrame, nil);
     miscSectionRight:SetSize(180, 70);
@@ -99,36 +104,40 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
 	decay:SetPoint(Const.TOP_LEFT_POINT, raidCompletionBonus, Const.BOTTOM_LEFT_POINT, 0, 0);
 
 
+	local itemCostHeader = OptionsFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
+	itemCostHeader:SetFontObject("GameFontWhite");
+	itemCostHeader:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.BOTTOM_LEFT_POINT, -10, -10);
+	itemCostHeader:SetText("Item Costs");
+
     -- Item cost setting, two sections
     local itemCostSectionLeft = CreateFrame("Frame", nil, OptionsFrame, nil);
-    itemCostSectionLeft:SetSize(150, 150);
-    itemCostSectionLeft:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.BOTTOM_LEFT_POINT, 0, -25);
+    itemCostSectionLeft:SetSize(105, 150);
+    itemCostSectionLeft:SetPoint(Const.TOP_LEFT_POINT, itemCostHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
 
     local itemCostSectionRight = CreateFrame("Frame", nil, OptionsFrame, nil);
-    itemCostSectionRight:SetSize(130, 150);
+    itemCostSectionRight:SetSize(115, 150);
     itemCostSectionRight:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionLeft, Const.TOP_RIGHT_POINT, 20, 0);
 
     -- Left section
-    local headCostInput = CreateDkpCostInputFrame("Head Cost:", "head", itemCostSectionLeft);
+    local headCostInput = CreateDkpCostInputFrame("Head:", "head", itemCostSectionLeft);
     headCostInput:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionLeft, Const.TOP_LEFT_POINT, 0, 0);
 
-    local neckCostInput = CreateAndAttachDkpCostFrame("Neck Cost:", "neck", itemCostSectionLeft, headCostInput);
-    local shouldersCostInput = CreateAndAttachDkpCostFrame("Shoulders Cost:", "shoulders", itemCostSectionLeft, neckCostInput);
-    local chestCostInput = CreateAndAttachDkpCostFrame("Chest Cost:", "chest", itemCostSectionLeft, shouldersCostInput);
-    local bracersCostInput = CreateAndAttachDkpCostFrame("Bracers Cost:", "bracers", itemCostSectionLeft, chestCostInput);
-    local glovesCostInput = CreateAndAttachDkpCostFrame("Gloves Cost:", "gloves", itemCostSectionLeft, bracersCostInput);
-    local oneHandedWeaponCostInput = CreateAndAttachDkpCostFrame("1h Weapon Cost:", "oneHandedWeapon", itemCostSectionLeft, glovesCostInput);
-    local twoHandedWeaponCostInput = CreateAndAttachDkpCostFrame("2h Weapon Cost:", "twoHandedWeapon", itemCostSectionLeft, oneHandedWeaponCostInput);
-    local rangedWeaponCostInput = CreateAndAttachDkpCostFrame("Ranged Cost:", "rangedWeapon", itemCostSectionLeft, twoHandedWeaponCostInput);
+    local neckCostInput = CreateAndAttachDkpCostFrame("Neck:", "neck", itemCostSectionLeft, headCostInput);
+    local shouldersCostInput = CreateAndAttachDkpCostFrame("Shoulders:", "shoulders", itemCostSectionLeft, neckCostInput);
+    local chestCostInput = CreateAndAttachDkpCostFrame("Chest:", "chest", itemCostSectionLeft, shouldersCostInput);
+    local bracersCostInput = CreateAndAttachDkpCostFrame("Bracers:", "bracers", itemCostSectionLeft, chestCostInput);
+    local glovesCostInput = CreateAndAttachDkpCostFrame("Gloves:", "gloves", itemCostSectionLeft, bracersCostInput);
+    local beltCostInput = CreateAndAttachDkpCostFrame("Belt:", "belt", itemCostSectionLeft, glovesCostInput);
 
     -- Right section
-    local beltCostInput = CreateDkpCostInputFrame("Belt Cost:", "belt", itemCostSectionRight, itemCostSectionRight);
-    beltCostInput:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionRight, Const.TOP_LEFT_POINT, 0, 0);
-
-    local legsCostInput = CreateAndAttachDkpCostFrame("Legs Cost:", "legs", itemCostSectionRight, beltCostInput);
-    local bootsCostInput = CreateAndAttachDkpCostFrame("Boots Cost:", "boots", itemCostSectionRight, legsCostInput);
-    local ringCostInput = CreateAndAttachDkpCostFrame("Ring Cost:", "ring", itemCostSectionRight, bootsCostInput);
-    local trinketCostInput = CreateAndAttachDkpCostFrame("Trinket Cost:", "trinket", itemCostSectionRight, ringCostInput);
+    local legsCostInput = CreateDkpCostInputFrame("Legs:", "legs", itemCostSectionRight, itemCostSectionRight);
+    legsCostInput:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionRight, Const.TOP_LEFT_POINT, 0, 0);
+    local bootsCostInput = CreateAndAttachDkpCostFrame("Boots:", "boots", itemCostSectionRight, legsCostInput);
+    local ringCostInput = CreateAndAttachDkpCostFrame("Ring:", "ring", itemCostSectionRight, bootsCostInput);
+    local trinketCostInput = CreateAndAttachDkpCostFrame("Trinket:", "trinket", itemCostSectionRight, ringCostInput);
+    local oneHandedWeaponCostInput = CreateAndAttachDkpCostFrame("1h Weapon:", "oneHandedWeapon", itemCostSectionRight, trinketCostInput);
+    local twoHandedWeaponCostInput = CreateAndAttachDkpCostFrame("2h Weapon:", "twoHandedWeapon", itemCostSectionRight, oneHandedWeaponCostInput);
+    local rangedWeaponCostInput = CreateAndAttachDkpCostFrame("Ranged:", "rangedWeapon", itemCostSectionRight, twoHandedWeaponCostInput);
 
 
     -- Buttons

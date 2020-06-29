@@ -31,7 +31,7 @@ function Core:ManualAddToLootTable(itemLink)
     Core:Print("You need to be in a raid and master looter to announce bids!")
     return 
   end
-  if itemLink ~= nil then
+  if itemLink ~= nil and itemLink ~= "" then
     -- pcall is lua try catch
     if pcall(function () 
       local _, _, itemRarity = GetItemInfo(itemLink);
@@ -39,10 +39,13 @@ function Core:ManualAddToLootTable(itemLink)
         DAL:AddToLootTable(itemLink);
       end
     end) then
+      -- todo: pass itemlink as parameter to ToggleBidAnnounceFrame
       Core:Print("Opening bid announcer for "..itemLink.."" );
       View:ToggleBidAnnounceFrame();
     else
       Core:Print("Invalid itemlink. Please use command like this: \"/tdkp bid itemlink\" ")
     end
+  else
+    View:ToggleBidAnnounceFrame();
   end
 end

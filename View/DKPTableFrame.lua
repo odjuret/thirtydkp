@@ -13,7 +13,7 @@ local DKPTableFrame = nil;
 local function CreateDKPTableHeadersRow(parent)
 
 	local headersFrame = CreateFrame("Frame", nil, parent);
-	headersFrame:SetSize(Const.DKPTableWidth-100, Const.DKPTableRowHeight);
+	headersFrame:SetSize(Const.DKPTableWidth, Const.DKPTableRowHeight);
 
 	headersFrame.playerHeaderBtn = CreateFrame("Button", nil, headersFrame);
     headersFrame.playerHeaderBtn:SetPoint(Const.LEFT_POINT)
@@ -21,7 +21,7 @@ local function CreateDKPTableHeadersRow(parent)
     headersFrame.playerHeaderBtn:SetText("Name");
     headersFrame.playerHeaderBtn:SetNormalFontObject("GameFontNormal");
 	headersFrame.playerHeaderBtn:SetHighlightFontObject("GameFontHighlight");
-    headersFrame.playerHeaderBtn:GetFontString():SetPoint(Const.LEFT_POINT, 30, 0)
+    headersFrame.playerHeaderBtn:GetFontString():SetPoint(Const.LEFT_POINT, Const.Margin, 0)
 	headersFrame.playerHeaderBtn:RegisterForClicks("AnyUp");
 	headersFrame.playerHeaderBtn:SetScript("OnClick", function ()
 		DAL:ToggleDKPTableSorting("player")
@@ -29,7 +29,7 @@ local function CreateDKPTableHeadersRow(parent)
 	end);
 
 	headersFrame.classHeaderBtn = CreateFrame("Button", nil, headersFrame);
-    headersFrame.classHeaderBtn:SetPoint(Const.CENTER_POINT)
+    headersFrame.classHeaderBtn:SetPoint(Const.CENTER_POINT, Const.Margin, 0)
     headersFrame.classHeaderBtn:SetSize(headersFrame:GetWidth()/3, Const.DKPTableRowHeight);
     headersFrame.classHeaderBtn:SetText("Class");
     headersFrame.classHeaderBtn:SetNormalFontObject("GameFontNormal");
@@ -46,7 +46,7 @@ local function CreateDKPTableHeadersRow(parent)
     headersFrame.dkpHeaderBtn:SetText("DKP");
     headersFrame.dkpHeaderBtn:SetNormalFontObject("GameFontNormal");
 	headersFrame.dkpHeaderBtn:SetHighlightFontObject("GameFontHighlight");
-	headersFrame.dkpHeaderBtn:GetFontString():SetPoint(Const.RIGHT_POINT, -80, 0)
+	headersFrame.dkpHeaderBtn:GetFontString():SetPoint(Const.RIGHT_POINT, -Const.Margin, 0)
 	headersFrame.dkpHeaderBtn:RegisterForClicks("AnyUp");
 	headersFrame.dkpHeaderBtn:SetScript("OnClick", function ()
 		DAL:ToggleDKPTableSorting("dkp")
@@ -59,7 +59,7 @@ end
 local function CreateDKPTableRow(parent, id, dkpTable)
 
 	local b = CreateFrame("Button", nil, parent);
-	b:SetSize(Const.DKPTableWidth-100, Const.DKPTableRowHeight);
+	b:SetSize(Const.DKPTableWidth, Const.DKPTableRowHeight);
 	b:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
 	b:SetNormalTexture("Interface\\COMMON\\talent-blue-glow")
 	b:GetNormalTexture():SetAlpha(0.5)
@@ -70,19 +70,19 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 	b.DKPInfo.PlayerName = b:CreateFontString(nil, Const.OVERLAY_LAYER)
 	b.DKPInfo.PlayerName:SetFontObject("GameFontHighlight")
 	b.DKPInfo.PlayerName:SetText(colorizedName);
-	b.DKPInfo.PlayerName:SetPoint(Const.LEFT_POINT, 30, 0)
+	b.DKPInfo.PlayerName:SetPoint(Const.LEFT_POINT, Const.Margin, 0)
 
 	local colorizedClass = Core:AddClassColor(tostring(dkpTable[id].class), tostring(dkpTable[id].class))
 	b.DKPInfo.PlayerClass = b:CreateFontString(nil, Const.OVERLAY_LAYER)
 	b.DKPInfo.PlayerClass:SetFontObject("GameFontHighlight")
 	b.DKPInfo.PlayerClass:SetText(colorizedClass);
-	b.DKPInfo.PlayerClass:SetPoint(Const.CENTER_POINT)
+	b.DKPInfo.PlayerClass:SetPoint(Const.CENTER_POINT, Const.Margin, 0);
 
 	local colorizedDKP = Core:AddClassColor(tostring(dkpTable[id].dkp), tostring(dkpTable[id].class))
 	b.DKPInfo.CurrentDKP = b:CreateFontString(nil, Const.OVERLAY_LAYER)
 	b.DKPInfo.CurrentDKP:SetFontObject("GameFontHighlight")
 	b.DKPInfo.CurrentDKP:SetText(colorizedDKP);
-	b.DKPInfo.CurrentDKP:SetPoint(Const.RIGHT_POINT, -80, 0)
+	b.DKPInfo.CurrentDKP:SetPoint(Const.RIGHT_POINT, -Const.Margin, 0)
 	return b
 end
 
@@ -111,15 +111,14 @@ function View:CreateDKPTable(parentFrame)
 	DKPTableFrame:SetFrameStrata("HIGH");
 	DKPTableFrame:SetFrameLevel(9);
 
-	DKPTableFrame:SetSize( Const.DKPTableWidth, numberOfRowsInDKPTable*12);
-	DKPTableFrame.scrollBar = _G["DKPTableScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
+	DKPTableFrame:SetSize( Const.DKPTableWidth, Const.DKPTableRowHeight*12);
 	DKPTableFrame:SetPoint( Const.TOP_LEFT_POINT, 10, -30 );
-	DKPTableFrame:SetPoint( Const.BOTTOM_RIGHT_POINT, -120, 10 );
+	DKPTableFrame.scrollBar = _G["DKPTableScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 
 	-- Child frame which holds all the content being scrolled through.
     DKPTableFrame.scrollChild = CreateFrame( "Frame", "$parent_ScrollChild", DKPTableFrame );
 	DKPTableFrame.scrollChild:SetHeight( Const.DKPTableRowHeight*(numberOfRowsInDKPTable+1)+3 );
-    DKPTableFrame.scrollChild:SetWidth( DKPTableFrame:GetWidth() );
+    DKPTableFrame.scrollChild:SetWidth( Const.DKPTableWidth );
 	DKPTableFrame.scrollChild:SetAllPoints( DKPTableFrame );
 	DKPTableFrame.scrollChild.bg = DKPTableFrame.scrollChild:CreateTexture(nil, Const.BACKGROUND_LAYER)
 	DKPTableFrame.scrollChild.bg:SetAllPoints(true)

@@ -17,6 +17,11 @@ local SUBMIT_BIDDING_CHANNEL_PREFIX = "TDKPSubmitBid";
 
 local biddingInProgress = false
 
+function Core:IsBiddingInProgress()
+    return biddingInProgress
+end
+
+
 
 local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sender)
     if (sender ~= UnitName("player")) then

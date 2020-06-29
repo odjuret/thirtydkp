@@ -272,16 +272,12 @@ end
 -- Bid announce frame and functions
 -----------------------------
 function View:CreateBidAnnounceFrame()
-	BidAnnounceFrame = CreateFrame('Frame', 'ThirtyDKP_BidAnnounceFrame', UIParent, "ShadowOverlaySmallTemplate"); 
+	BidAnnounceFrame = CreateFrame('Frame', 'ThirtyDKP_BidAnnounceFrame', UIParent, "TooltipBorderedFrameTemplate"); 
 	BidAnnounceFrame:SetShown(false);
 	BidAnnounceFrame:SetSize(Const.LootTableWidth+20, 400);
     BidAnnounceFrame:SetFrameStrata("HIGH");
     BidAnnounceFrame:SetFrameLevel(10);
-    BidAnnounceFrame:SetBackdrop({
-        bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-        tile = true, 
-    });
-    BidAnnounceFrame:SetBackdropColor(0,0,0,0.8);
+
     -- todo: attach to blizz LootFrame as a button maybe?
 	BidAnnounceFrame:SetPoint(Const.CENTER_POINT, UIParent, Const.CENTER_POINT, -200, 0); -- point, relative frame, relative point on relative frame
     BidAnnounceFrame:EnableMouse(true);
@@ -291,7 +287,7 @@ function View:CreateBidAnnounceFrame()
     BidAnnounceFrame:SetScript("OnDragStop", BidAnnounceFrame.StopMovingOrSizing);
 
     BidAnnounceFrame.closeBtn = CreateFrame("Button", nil, BidAnnounceFrame, "UIPanelCloseButton")
-	BidAnnounceFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, BidAnnounceFrame, Const.TOP_RIGHT_POINT, 5, 5)
+	BidAnnounceFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, BidAnnounceFrame, Const.TOP_RIGHT_POINT)
     tinsert(UISpecialFrames, BidAnnounceFrame:GetName()); -- Sets frame to close on "Escape"
     
     
@@ -307,7 +303,11 @@ function View:CreateBidAnnounceFrame()
     BidAnnounceFrame.StartAndStopBiddingBtn:RegisterForClicks("AnyUp");
     BidAnnounceFrame.StartAndStopBiddingBtn:SetScript("OnClick", function(self, button)
         if selectedItem then
-            Core:StartBidding(selectedItem.item.loot, 15)
+            if not Core:IsBiddingInProgress() then
+                Core:StartBidding(selectedItem.item.loot, 15)
+            else
+                Core:Print("An item is already out for bid, please wait.")
+            end
         else
             Core:Print("Please select an item to start bidding for.")
         end

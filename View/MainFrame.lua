@@ -1,6 +1,7 @@
 local addonName, ThirtyDKP = ...
 
 local View = ThirtyDKP.View;
+local Core = ThirtyDKP.Core;
 local Const = ThirtyDKP.View.Constants;
 
 -- Main addon window
@@ -136,17 +137,24 @@ end
 
 
 local function CreateMainFrame()
-	MainFrame = CreateFrame('Frame', 'ThirtyDKP_MainFrame', UIParent, "ShadowOverlaySmallTemplate");
+    local isOfficer = Core:IsOfficer();
+    local mainFrameWidth;
+    if isOfficer then
+        mainFrameWidth = Const.DKPTableWidth + 130
+    else
+        mainFrameWidth = Const.DKPTableWidth + 40
+    end
+    
+
+	MainFrame = CreateFrame('Frame', 'ThirtyDKP_MainFrame', UIParent, "TooltipBorderedFrameTemplate");
 	MainFrame:SetShown(false);
-    MainFrame:SetSize(Const.DKPTableWidth + 30, Const.DKPTableRowHeight*15); -- width, height
+    MainFrame:SetSize(mainFrameWidth, Const.DKPTableRowHeight*14); -- width, height
 	MainFrame:SetPoint(Const.CENTER_POINT, UIParent, Const.CENTER_POINT, 0, 60); -- point, relative frame, relative point on relative frame
 	MainFrame:SetFrameStrata("HIGH");
-	MainFrame:SetFrameLevel(8);
-	MainFrame:SetBackdrop({
-        bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-        tile = true,
-    });
-	MainFrame:SetBackdropColor(0,0,0,0.8);
+    MainFrame:SetFrameLevel(8);
+    MainFrame:SetBackdropColor(0,0,0,.1)
+    MainFrame:SetBackdropBorderColor(0,0,0,.1)
+
 	tinsert(UISpecialFrames, MainFrame:GetName()); -- Sets frame to close on "Escape"
 
 	MainFrame:SetClampedToScreen(true);
@@ -162,58 +170,60 @@ local function CreateMainFrame()
     -- title
     MainFrame.Title = MainFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
 	MainFrame.Title:SetFontObject("GameFontNormal");
-    MainFrame.Title:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 15, -10);
+    MainFrame.Title:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, Const.Margin, -10);
     MainFrame.Title:SetText(MAIN_FRAME_TITLE);
 
 	-- Buttons
 	MainFrame.closeBtn = CreateFrame("Button", nil, MainFrame, "UIPanelCloseButton")
-	MainFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, MainFrame, Const.TOP_RIGHT_POINT, 5, 5)
+	MainFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, MainFrame, Const.TOP_RIGHT_POINT)
 
 
-    MainFrame.optionsButton = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-    MainFrame.optionsButton:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame, Const.BOTTOM_RIGHT_POINT, -10, 10);
-    MainFrame.optionsButton:SetSize(80, 30);
-    MainFrame.optionsButton:SetText("Options");
-    MainFrame.optionsButton:SetNormalFontObject("GameFontNormal");
-	MainFrame.optionsButton:SetHighlightFontObject("GameFontHighlight");
-	MainFrame.optionsButton:RegisterForClicks("AnyUp");
-	MainFrame.optionsButton:SetScript("OnClick", function (self, button, down)
-		View:ToggleOptionsFrame()
-	end);
+    if isOfficer then
+        MainFrame.optionsButton = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
+        MainFrame.optionsButton:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame, Const.BOTTOM_RIGHT_POINT, -10, 10);
+        MainFrame.optionsButton:SetSize(80, Const.ButtonHeight);
+        MainFrame.optionsButton:SetText("Options");
+        MainFrame.optionsButton:SetNormalFontObject("GameFontNormal");
+        MainFrame.optionsButton:SetHighlightFontObject("GameFontHighlight");
+        MainFrame.optionsButton:RegisterForClicks("AnyUp");
+        MainFrame.optionsButton:SetScript("OnClick", function (self, button, down)
+            View:ToggleOptionsFrame()
+        end);
 
 
-    --  add raid to dkp table button
-    MainFrame.addRaidToTableBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-    MainFrame.addRaidToTableBtn:SetPoint(Const.BOTTOM_LEFT_POINT, MainFrame.optionsButton, Const.TOP_LEFT_POINT, 0, 0);
-    MainFrame.addRaidToTableBtn:SetSize(80, 30);
-    MainFrame.addRaidToTableBtn:SetText("Add Raid");
-    MainFrame.addRaidToTableBtn:SetNormalFontObject("GameFontNormal");
-    MainFrame.addRaidToTableBtn:SetHighlightFontObject("GameFontHighlight");
-    MainFrame.addRaidToTableBtn:RegisterForClicks("AnyUp");
+        --  add raid to dkp table button
+        MainFrame.addRaidToTableBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
+        MainFrame.addRaidToTableBtn:SetPoint(Const.BOTTOM_LEFT_POINT, MainFrame.optionsButton, Const.TOP_LEFT_POINT, 0, 0);
+        MainFrame.addRaidToTableBtn:SetSize(80, Const.ButtonHeight);
+        MainFrame.addRaidToTableBtn:SetText("Add Raid");
+        MainFrame.addRaidToTableBtn:SetNormalFontObject("GameFontNormal");
+        MainFrame.addRaidToTableBtn:SetHighlightFontObject("GameFontHighlight");
+        MainFrame.addRaidToTableBtn:RegisterForClicks("AnyUp");
 
-    AttachAddRaidToTableScripts(MainFrame.addRaidToTableBtn)
+        AttachAddRaidToTableScripts(MainFrame.addRaidToTableBtn)
 
-	--  add guild to dkp table button
-	MainFrame.addGuildToTableBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-	MainFrame.addGuildToTableBtn:SetPoint(Const.BOTTOM_LEFT_POINT, MainFrame.addRaidToTableBtn, Const.TOP_LEFT_POINT, 0, 0);
-	MainFrame.addGuildToTableBtn:SetSize(80, 30);
-	MainFrame.addGuildToTableBtn:SetText("Add Guild");
-	MainFrame.addGuildToTableBtn:SetNormalFontObject("GameFontNormal");
-	MainFrame.addGuildToTableBtn:SetHighlightFontObject("GameFontHighlight");
-	MainFrame.addGuildToTableBtn:RegisterForClicks("AnyUp");
+        --  add guild to dkp table button
+        MainFrame.addGuildToTableBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
+        MainFrame.addGuildToTableBtn:SetPoint(Const.BOTTOM_LEFT_POINT, MainFrame.addRaidToTableBtn, Const.TOP_LEFT_POINT, 0, 0);
+        MainFrame.addGuildToTableBtn:SetSize(80, Const.ButtonHeight);
+        MainFrame.addGuildToTableBtn:SetText("Add Guild");
+        MainFrame.addGuildToTableBtn:SetNormalFontObject("GameFontNormal");
+        MainFrame.addGuildToTableBtn:SetHighlightFontObject("GameFontHighlight");
+        MainFrame.addGuildToTableBtn:RegisterForClicks("AnyUp");
 
-    AttachAddGuildToTableScript(MainFrame.addGuildToTableBtn);
+        AttachAddGuildToTableScript(MainFrame.addGuildToTableBtn);
 
-    --  broadcast dkp table to online members button
-    MainFrame.broadcastBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-    MainFrame.broadcastBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame.addGuildToTableBtn, Const.TOP_RIGHT_POINT, 0, 0);
-	MainFrame.broadcastBtn:SetSize(80, 30);
-	MainFrame.broadcastBtn:SetText("Broadcast");
-	MainFrame.broadcastBtn:SetNormalFontObject("GameFontNormal");
-	MainFrame.broadcastBtn:SetHighlightFontObject("GameFontHighlight");
-    MainFrame.broadcastBtn:RegisterForClicks("AnyUp");
+        --  broadcast dkp table to online members button
+        MainFrame.broadcastBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
+        MainFrame.broadcastBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame.addGuildToTableBtn, Const.TOP_RIGHT_POINT, 0, 0);
+        MainFrame.broadcastBtn:SetSize(80, Const.ButtonHeight);
+        MainFrame.broadcastBtn:SetText("Broadcast");
+        MainFrame.broadcastBtn:SetNormalFontObject("GameFontNormal");
+        MainFrame.broadcastBtn:SetHighlightFontObject("GameFontHighlight");
+        MainFrame.broadcastBtn:RegisterForClicks("AnyUp");
 
-    AttachBroadcastDKPTableScript(MainFrame.broadcastBtn);
+        AttachBroadcastDKPTableScript(MainFrame.broadcastBtn);
+    end
 end
 
 function View:GetMainFrame()

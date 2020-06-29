@@ -54,17 +54,12 @@ local function CreateAndAttachDkpCostFrame(text, itemName, parent, attachTarget)
 end
 
 function View:CreateOptionsFrame(parentFrame, savedOptions)
-	OptionsFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", UIParent, "ShadowOverlaySmallTemplate"); -- Todo: make mainframe owner??
+	OptionsFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", UIParent, "TooltipBorderedFrameTemplate"); -- Todo: make mainframe owner??
 	OptionsFrame:SetShown(false);
 	OptionsFrame:SetSize(500, 500);
 	OptionsFrame:SetFrameStrata("HIGH");
 	OptionsFrame:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
     OptionsFrame:EnableMouse(true);
-    OptionsFrame:SetBackdrop({
-        bgFile = "Interface/Tooltips/UI-Tooltip-Background",
-        tile = true,
-    });
-	OptionsFrame:SetBackdropColor(0,0,0,0.9);
 
     -- title
     local title = OptionsFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
@@ -138,7 +133,7 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
 
     -- Buttons
     OptionsFrame.closeBtn = CreateFrame("Button", nil, OptionsFrame, "UIPanelCloseButton")
-	OptionsFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, OptionsFrame, Const.TOP_RIGHT_POINT, 5, 5)
+	OptionsFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, OptionsFrame, Const.TOP_RIGHT_POINT)
 
 end
 

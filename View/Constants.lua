@@ -21,8 +21,11 @@ ThirtyDKP.View.Constants.HIGHLIGHT_LAYER = "HIGHLIGHT"     -- Level 4. Place you
 
 
 -- Sizes
-ThirtyDKP.View.Constants.DKPTableWidth = 500; 
+ThirtyDKP.View.Constants.DKPTableWidth = 300; 
 ThirtyDKP.View.Constants.DKPTableRowHeight = 18;
 
 ThirtyDKP.View.Constants.LootTableWidth = 250; 
 ThirtyDKP.View.Constants.LootTableRowHeight = 18;
+
+ThirtyDKP.View.Constants.Margin = 15;
+ThirtyDKP.View.Constants.ButtonHeight = 20;

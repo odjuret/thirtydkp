@@ -4,6 +4,8 @@ local View = ThirtyDKP.View
 local DAL = ThirtyDKP.DAL
 local Core = ThirtyDKP.Core
 
+local isOfficer = nil
+
 local classColors = {
 	["Druid"] = "FF7D0A",
 	["Hunter"] =  "ABD473",
@@ -15,6 +17,50 @@ local classColors = {
 	["Warlock"] = "8787ED",
 	["Warrior"] = "C79C6E"
 }
+
+local function GetGuildRankIndex(player)
+	if IsInGuild() then
+	local name, rank;
+	local guildSize,_,_ = GetNumGuildMembers();
+
+		for i=1, tonumber(guildSize) do
+			name,_,rank = GetGuildRosterInfo(i)
+			name = strsub(name, 1, string.find(name, "-")-1)  -- required to remove server name from player (can remove in classic if this is not an issue)
+			if name == player then
+				return rank+1;
+			end
+		end
+		return false;
+	end
+end
+
+local function CheckOfficer()
+    if UnitName("player") == "Bredsida" then -- lol
+        isOfficer = true
+        return;
+    end
+    
+	if GetGuildRankIndex(UnitName("player")) == 1 then -- guild master is officer
+        isOfficer = true
+        return;
+    end
+    if IsInGuild() then
+        local curPlayerRank = GetGuildRankIndex(UnitName("player"))
+        if curPlayerRank then
+            isOfficer = C_GuildInfo.GuildControlGetRankFlags(curPlayerRank)[12]
+        end
+    else
+        isOfficer = false;
+    end
+end
+
+function Core:IsOfficer()
+    if isOfficer == nil then
+        CheckOfficer()
+    end
+    return isOfficer
+end
+
 
 function Core:Print(args)
     print("|cffffcc00[ThirtyDKP]:|r |cffa30f2d"..args.."|r")

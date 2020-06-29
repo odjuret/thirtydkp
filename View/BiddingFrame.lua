@@ -3,20 +3,23 @@ local View = ThirtyDKP.View;
 local Core = ThirtyDKP.Core;
 local Const = ThirtyDKP.View.Constants;
 
+local BiddingFrame = nil;
 
 function View:CreateBiddingFrame(item)
+    if BiddingFrame then
+        BiddingFrame:Hide()
+        BiddingFrame:SetParent(nil)
+        BiddingFrame = nil;
+    end
+
     local itemName,_,_,_,_,_,_,_,_,itemIcon = GetItemInfo(item)
 
-	BiddingFrame = CreateFrame('Frame', 'ThirtyDKP_BiddingFrame', UIParent, "ShadowOverlaySmallTemplate"); 
-	BiddingFrame:SetShown(false);
-	BiddingFrame:SetSize(200, 80);
-    BiddingFrame:SetFrameStrata("HIGH");
+	BiddingFrame = CreateFrame('Frame', 'ThirtyDKP_BiddingFrame', UIParent, "TooltipBorderedFrameTemplate"); 
+	BiddingFrame:Hide()
+	BiddingFrame:SetSize(Const.LootTableWidth, 80);
+    BiddingFrame:SetFrameStrata("DIALOG");
+    BiddingFrame:SetClampedToScreen(true);
     BiddingFrame:SetFrameLevel(10);
-    BiddingFrame:SetBackdrop({
-        bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-        tile = true, 
-    });
-    BiddingFrame:SetBackdropColor(0,0,0,0.8);
 	BiddingFrame:SetPoint(Const.CENTER_POINT, UIParent, Const.CENTER_POINT, 200, 100); -- point, relative frame, relative point on relative frame
     BiddingFrame:EnableMouse(true);
     BiddingFrame:SetMovable(true);
@@ -25,7 +28,7 @@ function View:CreateBiddingFrame(item)
     BiddingFrame:SetScript("OnDragStop", BiddingFrame.StopMovingOrSizing);
 
     BiddingFrame.closeBtn = CreateFrame("Button", nil, BiddingFrame, "UIPanelCloseButton")
-	BiddingFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, BiddingFrame, Const.TOP_RIGHT_POINT, 5, 5)
+	BiddingFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, BiddingFrame, Const.TOP_RIGHT_POINT)
     tinsert(UISpecialFrames, BiddingFrame:GetName()); -- Sets frame to close on "Escape"
 
     BiddingFrame.itemIconTexture = BiddingFrame:CreateTexture(nil, Const.OVERLAY_LAYER, nil);
@@ -53,7 +56,7 @@ function View:CreateBiddingFrame(item)
         Core:SubmitBid()
     end)
 
-    BiddingFrame:SetShown(true);
+    BiddingFrame:Show();
 end
 
 function View:ToggleBiddingFrame()
@@ -62,6 +65,8 @@ end
 
 function View:HideBiddingFrame()
     if BiddingFrame then
-        BiddingFrame:SetShown(false);
+        BiddingFrame:Hide();
+        BiddingFrame:SetParent(nil)
+        BiddingFrame = nil;
     end
 end

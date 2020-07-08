@@ -135,6 +135,23 @@ local function AttachBroadcastDKPTableScript(frame)
 end
 
 
+local function AttachRaidScript(frame)
+    frame:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+        GameTooltip:SetText("Raid Management", 0.25, 0.75, 0.90, 1, true);
+        GameTooltip:AddLine("Manage raids and handle manual DKP adjustments", 1.0, 1.0, 1.0, true);
+        GameTooltip:Show();
+    end);
+
+	frame:SetScript("OnLeave", function(self)
+        GameTooltip:Hide()
+    end);
+
+	frame:SetScript("OnClick", function()
+		View:HideOptionsFrame();
+		View:ToggleRaidFrame();
+	end);
+end
 
 local function CreateMainFrame(isOfficer)
     local mainFrameWidth;
@@ -163,7 +180,8 @@ local function CreateMainFrame(isOfficer)
 	MainFrame:SetScript("OnDragStart", MainFrame.StartMoving);
 	MainFrame:SetScript("OnDragStop", MainFrame.StopMovingOrSizing);
 	MainFrame:SetScript("OnHide", function(self)
-		View:HideOptionsFrame()
+		View:HideOptionsFrame();
+		View:HideRaidFrame();
 	end);
 
     -- title
@@ -187,6 +205,7 @@ local function CreateMainFrame(isOfficer)
         MainFrame.optionsButton:RegisterForClicks("AnyUp");
         MainFrame.optionsButton:SetScript("OnClick", function (self, button, down)
             View:ToggleOptionsFrame()
+			View:HideRaidFrame();
         end);
 
 
@@ -222,6 +241,16 @@ local function CreateMainFrame(isOfficer)
         MainFrame.broadcastBtn:RegisterForClicks("AnyUp");
 
         AttachBroadcastDKPTableScript(MainFrame.broadcastBtn);
+
+		MainFrame.raidBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
+        MainFrame.raidBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame.broadcastBtn, Const.TOP_RIGHT_POINT, 0, 0);
+        MainFrame.raidBtn:SetSize(80, Const.ButtonHeight);
+        MainFrame.raidBtn:SetText("Raid");
+        MainFrame.raidBtn:SetNormalFontObject("GameFontNormal");
+        MainFrame.raidBtn:SetHighlightFontObject("GameFontHighlight");
+        MainFrame.raidBtn:RegisterForClicks("AnyUp");
+
+		AttachRaidScript(MainFrame.raidBtn);
     end
 end
 
@@ -247,6 +276,7 @@ function View:Initialize()
     View:CreateBidAnnounceFrame();
     if isOfficer then
         View:CreateOptionsFrame(MainFrame);
+		View:CreateRaidFrame(MainFrame);
     end
 
 	Initialized = true;

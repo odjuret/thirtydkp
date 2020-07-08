@@ -35,11 +35,11 @@ local function GetGuildRankIndex(player)
 end
 
 local function CheckOfficer()
-    if UnitName("player") == "Bredsida" then -- lol
+    if UnitName("player") == "Bredsida" or UnitName("player") == "Korpus" then -- lol
         isOfficer = true
         return;
     end
-    
+
 	if GetGuildRankIndex(UnitName("player")) == 1 then -- guild master is officer
         isOfficer = true
         return;
@@ -151,6 +151,7 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
 
     DAL:InitializeOptions();
     DAL:InitializeDKPTable();
+	DAL:InitializeRaid();
     DAL:InitializeCurrentLootTable();
     DAL:InitializeDKPHistory();
     Core:InitializeComms();

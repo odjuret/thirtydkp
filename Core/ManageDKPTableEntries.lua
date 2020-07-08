@@ -90,7 +90,7 @@ function Core:AwardItem(dkpTableEntry, itemLink)
 end
 
 function Core:HandleBossKill(eventId, ...)
-    if not Core:IsPlayerMasterLooter() then return end
+    if not Core:IsPlayerMasterLooter() or not Core:IsRaidStarted() then return end
     
     local bossName = ...;
     local shouldAwardDKP = false;

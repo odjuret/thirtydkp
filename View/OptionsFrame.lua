@@ -54,7 +54,7 @@ local function CreateAndAttachDkpCostFrame(text, itemName, parent, attachTarget)
 end
 
 function View:CreateOptionsFrame(parentFrame, savedOptions)
-	OptionsFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", UIParent, "TooltipBorderedFrameTemplate"); -- Todo: make mainframe owner??
+	OptionsFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", parentFrame, "TooltipBorderedFrameTemplate"); -- Todo: make mainframe owner??
 	OptionsFrame:SetShown(false);
 	OptionsFrame:SetSize(370, 375);
 	OptionsFrame:SetFrameStrata("HIGH");
@@ -135,8 +135,8 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
     local bootsCostInput = CreateAndAttachDkpCostFrame("Boots:", "boots", itemCostSectionRight, legsCostInput);
     local ringCostInput = CreateAndAttachDkpCostFrame("Ring:", "ring", itemCostSectionRight, bootsCostInput);
     local trinketCostInput = CreateAndAttachDkpCostFrame("Trinket:", "trinket", itemCostSectionRight, ringCostInput);
-    local oneHandedWeaponCostInput = CreateAndAttachDkpCostFrame("1h Weapon:", "oneHandedWeapon", itemCostSectionRight, trinketCostInput);
-    local twoHandedWeaponCostInput = CreateAndAttachDkpCostFrame("2h Weapon:", "twoHandedWeapon", itemCostSectionRight, oneHandedWeaponCostInput);
+    local oneHandedWeaponCostInput = CreateAndAttachDkpCostFrame("One-handed:", "oneHandedWeapon", itemCostSectionRight, trinketCostInput);
+    local twoHandedWeaponCostInput = CreateAndAttachDkpCostFrame("Two-handed:", "twoHandedWeapon", itemCostSectionRight, oneHandedWeaponCostInput);
     local rangedWeaponCostInput = CreateAndAttachDkpCostFrame("Ranged:", "rangedWeapon", itemCostSectionRight, twoHandedWeaponCostInput);
 
 

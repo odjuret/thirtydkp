@@ -4,13 +4,14 @@
 ## Notes: Simple, lightweight and efficient DKP loot system management.
 ## Version: 0.1.0
 ## DefaultState: enabled
-## SavedVariables: ThirtyDKP_Database_DKPTable, ThirtyDKP_Database_CurrentLoot, ThirtyDKP_Database_Options, ThirtyDKP_Database_DKPHistory
+## SavedVariables: ThirtyDKP_Database_DKPTable, ThirtyDKP_Database_CurrentLoot, ThirtyDKP_Database_Options, ThirtyDKP_Database_DKPHistory, ThirtyDKP_Database_Raid
 
 Init.lua
 
 View\Constants.lua
 View\MainFrame.lua
 View\OptionsFrame.lua
+View\RaidFrame.lua
 View\DKPTableFrame.lua
 View\BidAnnounceFrame.lua
 View\BiddingFrame.lua
@@ -20,8 +21,10 @@ DAL\DKPTable.lua
 DAL\CurrentLoot.lua
 DAL\Options.lua
 DAL\DKPHistory.lua
+DAL\Raid.lua
 
 Core\Communication.lua
 Core\Main.lua
 Core\ManageDKPTableEntries.lua
 Core\ManageLootTableEntries.lua
+Core\ManageRaid.lua

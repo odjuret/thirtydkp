@@ -1,6 +1,7 @@
 local addonName, ThirtyDKP = ...
 
 local DAL = ThirtyDKP.DAL
+local Core = ThirtyDKP.Core
 
 local SORT_ASCENDING = "Ascending"
 local SORT_DESCENDING = "Descending"
@@ -34,10 +35,36 @@ function DAL:InitializeOptions()
 			dkpTableSorting = {
 				column = "player",
 				mode = "Ascending"
-			}
+			},
+			addonAdmins = {}
 		};
 	end
 end
+
+function DAL:AddAddonAdmin(playerName)
+	if #ThirtyDKP_Database_Options.addonAdmins > 5 then
+		Core:Print("You currently have more than 5 admins... thats a lot of admins!")
+	end
+	
+	local playerExists = DAL:Table_Search(ThirtyDKP_Database_Options.addonAdmins, playerName)
+  
+    if playerExists == false then
+        table.insert(ThirtyDKP_Database_Options.addonAdmins, playerName);
+    end
+end
+
+function DAL:RemoveAddonAdmin(playerName)
+	local playerExists = DAL:Table_Search(ThirtyDKP_Database_Options.addonAdmins, playerName)
+    if playerExists ~= false then
+        table.remove(ThirtyDKP_Database_Options.addonAdmins, playerExists[1]);
+    end
+end
+
+
+function DAL:GetAddonAdmins()
+	return ThirtyDKP_Database_Options.addonAdmins;
+end
+
 
 function DAL:GetOptions()
 	return ThirtyDKP_Database_Options;

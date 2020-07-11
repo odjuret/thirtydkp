@@ -2,6 +2,7 @@ local addonName, ThirtyDKP = ...
 
 local View = ThirtyDKP.View;
 local Core = ThirtyDKP.Core;
+local DAL = ThirtyDKP.DAL;
 local Const = ThirtyDKP.View.Constants;
 
 -- Main addon window
@@ -148,15 +149,36 @@ local function AttachRaidScript(frame)
     end);
 
 	frame:SetScript("OnClick", function()
-		View:HideOptionsFrame();
+        View:HideOptionsFrame();
+        View:HideTdkpAdminsFrame()
 		View:ToggleRaidFrame();
 	end);
 end
 
-local function CreateMainFrame(isOfficer)
+local function AttachDKPAdminsBtnScripts(frame)
+    frame:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+        GameTooltip:SetText("Admins Management", 0.25, 0.75, 0.90, 1, true);
+        GameTooltip:AddLine("Manage DKP admins for your guild. Admins can change dkp options, adjust dkp, start dkp awarding raids, etc", 1.0, 1.0, 1.0, true);
+        GameTooltip:Show();
+    end);
+
+	frame:SetScript("OnLeave", function(self)
+        GameTooltip:Hide()
+    end);
+
+    frame:SetScript("OnClick", function()
+        View:HideOptionsFrame();
+        View:HideRaidFrame();
+        View:ToggleTdkpAdminsFrame()
+	end);
+end
+
+
+local function CreateMainFrame(isAddonAdmin)
     local mainFrameWidth;
-    if isOfficer then
-        mainFrameWidth = Const.DKPTableWidth + 130
+    if isAddonAdmin then
+        mainFrameWidth = Const.DKPTableWidth + 130 -- make room for options buttons
     else
         mainFrameWidth = Const.DKPTableWidth + 40
     end
@@ -179,9 +201,11 @@ local function CreateMainFrame(isOfficer)
 	MainFrame:RegisterForDrag("LeftButton");
 	MainFrame:SetScript("OnDragStart", MainFrame.StartMoving);
 	MainFrame:SetScript("OnDragStop", MainFrame.StopMovingOrSizing);
-	MainFrame:SetScript("OnHide", function(self)
-		View:HideOptionsFrame();
-		View:HideRaidFrame();
+    MainFrame:SetScript("OnHide", function(self)
+        if isAddonAdmin then
+            View:HideOptionsFrame();
+            View:HideRaidFrame();
+        end
 	end);
 
     -- title
@@ -195,7 +219,7 @@ local function CreateMainFrame(isOfficer)
 	MainFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, MainFrame, Const.TOP_RIGHT_POINT)
 
 
-    if isOfficer then
+    if isAddonAdmin then
         MainFrame.optionsButton = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
         MainFrame.optionsButton:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame, Const.BOTTOM_RIGHT_POINT, -10, 10);
         MainFrame.optionsButton:SetSize(80, Const.ButtonHeight);
@@ -204,8 +228,9 @@ local function CreateMainFrame(isOfficer)
         MainFrame.optionsButton:SetHighlightFontObject("GameFontHighlight");
         MainFrame.optionsButton:RegisterForClicks("AnyUp");
         MainFrame.optionsButton:SetScript("OnClick", function (self, button, down)
-            View:ToggleOptionsFrame()
-			View:HideRaidFrame();
+            View:HideRaidFrame();
+            View:HideTdkpAdminsFrame();
+            View:ToggleOptionsFrame();
         end);
 
 
@@ -220,6 +245,7 @@ local function CreateMainFrame(isOfficer)
 
         AttachAddRaidToTableScripts(MainFrame.addRaidToTableBtn)
 
+
         --  add guild to dkp table button
         MainFrame.addGuildToTableBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
         MainFrame.addGuildToTableBtn:SetPoint(Const.BOTTOM_LEFT_POINT, MainFrame.addRaidToTableBtn, Const.TOP_LEFT_POINT, 0, 0);
@@ -230,6 +256,7 @@ local function CreateMainFrame(isOfficer)
         MainFrame.addGuildToTableBtn:RegisterForClicks("AnyUp");
 
         AttachAddGuildToTableScript(MainFrame.addGuildToTableBtn);
+
 
         --  broadcast dkp table to online members button
         MainFrame.broadcastBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
@@ -242,6 +269,8 @@ local function CreateMainFrame(isOfficer)
 
         AttachBroadcastDKPTableScript(MainFrame.broadcastBtn);
 
+
+        -- raid management button
 		MainFrame.raidBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
         MainFrame.raidBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame.broadcastBtn, Const.TOP_RIGHT_POINT, 0, 0);
         MainFrame.raidBtn:SetSize(80, Const.ButtonHeight);
@@ -250,7 +279,19 @@ local function CreateMainFrame(isOfficer)
         MainFrame.raidBtn:SetHighlightFontObject("GameFontHighlight");
         MainFrame.raidBtn:RegisterForClicks("AnyUp");
 
-		AttachRaidScript(MainFrame.raidBtn);
+        AttachRaidScript(MainFrame.raidBtn);
+        
+
+        -- dkp admins button
+        MainFrame.dkpAdminsBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
+        MainFrame.dkpAdminsBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame.raidBtn, Const.TOP_RIGHT_POINT, 0, 0);
+        MainFrame.dkpAdminsBtn:SetSize(80, Const.ButtonHeight);
+        MainFrame.dkpAdminsBtn:SetText("Admins");
+        MainFrame.dkpAdminsBtn:SetNormalFontObject("GameFontNormal");
+        MainFrame.dkpAdminsBtn:SetHighlightFontObject("GameFontHighlight");
+        MainFrame.dkpAdminsBtn:RegisterForClicks("AnyUp");
+
+        AttachDKPAdminsBtnScripts(MainFrame.dkpAdminsBtn);
     end
 end
 
@@ -269,14 +310,15 @@ end
 function View:Initialize()
     if Initialized then return end
     
-    local isOfficer = Core:IsOfficer();
+    local isAddonAdmin = Core:IsAddonAdmin();
 
-	CreateMainFrame(isOfficer);
+	CreateMainFrame(isAddonAdmin);
     View:CreateDKPTable(MainFrame);
     View:CreateBidAnnounceFrame();
-    if isOfficer then
+    if isAddonAdmin then
         View:CreateOptionsFrame(MainFrame);
 		View:CreateRaidFrame(MainFrame);
+		View:CreateTdkpAdminsFrame(MainFrame);
     end
 
 	Initialized = true;

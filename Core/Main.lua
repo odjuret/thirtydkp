@@ -4,7 +4,7 @@ local View = ThirtyDKP.View
 local DAL = ThirtyDKP.DAL
 local Core = ThirtyDKP.Core
 
-local isOfficer = nil
+local isAddonAdmin = nil
 
 local classColors = {
 	["Druid"] = "FF7D0A",
@@ -34,31 +34,31 @@ local function GetGuildRankIndex(player)
 	end
 end
 
-local function CheckOfficer()
-    if UnitName("player") == "Bredsida" or UnitName("player") == "Korpus" then -- lol
-        isOfficer = true
+local function CheckIsAddonAdmin()
+    local admins = DAL:GetAddonAdmins();
+    local playerNAme = UnitName("player");
+
+    if GetGuildRankIndex(playerNAme) == 1 then -- enforce guild master is always addon admin
+        isAddonAdmin = true
+        DAL:AddAddonAdmin(playerNAme)
         return;
     end
 
-	if GetGuildRankIndex(UnitName("player")) == 1 then -- guild master is officer
-        isOfficer = true
-        return;
-    end
-    if IsInGuild() then
-        local curPlayerRank = GetGuildRankIndex(UnitName("player"))
-        if curPlayerRank then
-            isOfficer = C_GuildInfo.GuildControlGetRankFlags(curPlayerRank)[12]
+    for _, adminName in ipairs(admins) do
+        if adminName == playerNAme then
+            isAddonAdmin = true
+            return;
         end
-    else
-        isOfficer = false;
     end
+
+    isAddonAdmin = false
 end
 
-function Core:IsOfficer()
-    if isOfficer == nil then
-        CheckOfficer()
+function Core:IsAddonAdmin()
+    if isAddonAdmin == nil then
+        CheckIsAddonAdmin()
     end
-    return isOfficer
+    return isAddonAdmin
 end
 
 

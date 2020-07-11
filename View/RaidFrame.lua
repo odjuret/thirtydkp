@@ -11,7 +11,7 @@ local RAID_BUTTON_START = "Start Raid";
 local RAID_BUTTON_END = "End Raid";
 
 function View:CreateRaidFrame(parentFrame)
-	RaidFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", parentFrame, "TooltipBorderedFrameTemplate");
+	RaidFrame = CreateFrame("Frame", "ThirtyDKP_OptionsRaidFrame", parentFrame, "TooltipBorderedFrameTemplate");
 	RaidFrame:SetShown(false);
 	RaidFrame:SetSize(370, 375);
 	RaidFrame:SetFrameStrata("HIGH");

@@ -43,6 +43,8 @@ local function GetDKPCostByEquipLocation(itemEquipLoc)
         return thirtyDkpOptions.itemCosts.chest
     elseif itemEquipLoc == "INVTYPE_WAIST" then
         return thirtyDkpOptions.itemCosts.belt
+    elseif itemEquipLoc == "INVTYPE_HAND" then
+        return thirtyDkpOptions.itemCosts.gloves
     elseif itemEquipLoc == "INVTYPE_LEGS" then
         return thirtyDkpOptions.itemCosts.legs
     elseif itemEquipLoc == "INVTYPE_FEET" then
@@ -76,9 +78,6 @@ end
 function Core:AwardItem(dkpTableEntry, itemLink)
     local _, _, _, _, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink);
     local itemDKPCost = GetDKPCostByEquipLocation(itemEquipLoc);
-    print(tostring(itemEquipLoc))
-    print(tostring(itemLink))
-    print(tostring(itemDKPCost))
 
     if DAL:AdjustPlayerDKP(dkpTableEntry.player, tonumber("-"..itemDKPCost)) then
         Core:Announce(dkpTableEntry.player.." won "..itemLink.." ");

@@ -10,6 +10,28 @@ local Const = ThirtyDKP.View.Constants;
 -- it deserves its own file since it will grow large as development progresses
 local DKPTableFrame = nil;
 
+local selectedDKPTableEntries = {};
+
+function View:GetSelectedDKPTableEntries()
+	return selectedDKPTableEntries;
+end
+
+
+local function UpdateDKPTableRowsTextures()
+	for i, row in ipairs(DKPTableFrame.scrollChild.Rows) do 
+		local playerIsSelected = DAL:Table_Search(selectedDKPTableEntries, row.DKPInfo.PlayerName.originalValue)
+		if playerIsSelected ~= false then
+            row:SetNormalTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
+            row:GetNormalTexture():SetAlpha(1)
+        else
+            row:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
+            row:SetNormalTexture("Interface\\COMMON\\talent-blue-glow")
+            row:GetNormalTexture():SetAlpha(0.5)
+        end
+    end
+end
+
+
 local function CreateDKPTableHeadersRow(parent)
 
 	local headersFrame = CreateFrame("Frame", nil, parent);
@@ -66,11 +88,13 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 	b:GetNormalTexture():SetAllPoints(true)
 
 	b.DKPInfo = {}
-	local colorizedName = Core:AddClassColor(tostring(dkpTable[id].player), tostring(dkpTable[id].class))
+	local originalPlayerNameValue = tostring(dkpTable[id].player);
+	local colorizedName = Core:AddClassColor(originalPlayerNameValue, tostring(dkpTable[id].class))
 	b.DKPInfo.PlayerName = b:CreateFontString(nil, Const.OVERLAY_LAYER)
 	b.DKPInfo.PlayerName:SetFontObject("GameFontHighlight")
 	b.DKPInfo.PlayerName:SetText(colorizedName);
 	b.DKPInfo.PlayerName:SetPoint(Const.LEFT_POINT, Const.Margin, 0)
+	b.DKPInfo.PlayerName.originalValue = originalPlayerNameValue;
 
 	local colorizedClass = Core:AddClassColor(tostring(dkpTable[id].class), tostring(dkpTable[id].class))
 	b.DKPInfo.PlayerClass = b:CreateFontString(nil, Const.OVERLAY_LAYER)
@@ -83,6 +107,23 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 	b.DKPInfo.CurrentDKP:SetFontObject("GameFontHighlight")
 	b.DKPInfo.CurrentDKP:SetText(colorizedDKP);
 	b.DKPInfo.CurrentDKP:SetPoint(Const.RIGHT_POINT, -Const.Margin, 0)
+
+	b:RegisterForClicks("AnyUp");
+	b:SetScript("OnClick", function (self, button, down)
+		if button == "LeftButton" then
+			if not IsShiftKeyDown() then
+				selectedDKPTableEntries = {}
+			end
+			local playerSelected = DAL:Table_Search(selectedDKPTableEntries, originalPlayerNameValue);
+			if playerSelected == false then
+				table.insert(selectedDKPTableEntries, originalPlayerNameValue);
+			else
+				table.remove(selectedDKPTableEntries, playerSelected[1]);
+			end
+			UpdateDKPTableRowsTextures();
+		end
+	end);
+	
 	return b
 end
 
@@ -130,7 +171,6 @@ function View:CreateDKPTable(parentFrame)
 end
 
 function View:UpdateDKPTable()
-	--Core:Print("Attempting to update table")
 	local mainFrame = View:GetMainFrame()
 
 	DKPTableFrame:Hide()

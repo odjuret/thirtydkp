@@ -17,6 +17,7 @@ View\BidAnnounceFrame.lua
 View\BiddingFrame.lua
 View\BroadcastingStatusFrame.lua
 View\AdminsFrame.lua
+View\GeneralFrames.lua
 
 DAL\DKPTable.lua
 DAL\CurrentLoot.lua

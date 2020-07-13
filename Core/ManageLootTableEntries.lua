@@ -26,11 +26,12 @@ function Core:HandleLootWindow()
 end
 
 
-function Core:ManualAddToLootTable(itemLink)
+function Core:ManualBidAnnounce(itemLink)
   if not Core:IsPlayerMasterLooter() then 
     Core:Print("You need to be in a raid and master looter to announce bids!")
     return 
   end
+
   if itemLink ~= nil and itemLink ~= "" then
     -- pcall is lua try catch
     if pcall(function () 

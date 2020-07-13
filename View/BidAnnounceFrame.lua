@@ -9,6 +9,7 @@ local IncomingBidsFrame = nil;
 
 local selectedItem = nil;
 local selectedBidder = nil;
+local selectedItemDKPCost = 0;
 -- todo: move this logic outside the view folder
 local incomingBids = {};
 
@@ -106,7 +107,7 @@ local function CreateCurrentItemForBidFrame()
     local f = BidAnnounceFrame.CurrentItemForBidFrame;
     local itemName, itemIcon = "", nil
 
-    f:SetSize( Const.LootTableWidth+10, BidAnnounceFrame:GetHeight()/2);
+    f:SetSize( Const.LootTableWidth+10, 180);
 	f:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame, Const.TOP_LEFT_POINT, 5, -15 );
 
     f.itemIcon = f:CreateTexture(nil, Const.OVERLAY_LAYER, nil);
@@ -127,25 +128,6 @@ local function CreateCurrentItemForBidFrame()
     else
         f.itemName:SetText("Select an item to auction...");
     end
-
-    f.AwardItemBtn = CreateFrame("Button", nil, f, "GameMenuButtonTemplate");
-    f.AwardItemBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, f, Const.BOTTOM_RIGHT_POINT, 0, 0);
-    f.AwardItemBtn:SetSize(100, 22);
-    f.AwardItemBtn:SetText("Award Item");
-    f.AwardItemBtn:SetNormalFontObject("GameFontNormal");
-    f.AwardItemBtn:SetHighlightFontObject("GameFontHighlight");
-    f.AwardItemBtn:RegisterForClicks("AnyUp");
-    f.AwardItemBtn:SetScript("OnClick", function(self, button)
-        if button == "LeftButton" then
-            if selectedBidder ~= nil then
-                Core:AwardItem(selectedBidder.bidder, selectedItem.item.loot);
-                selectedBidder = nil
-                View:UpdateIncomingBidsFrame();
-            else
-                Core:Print("You need to select a bidder to award an item.")
-            end
-        end
-    end)
 
     if not IncomingBidsFrame then
         CreateIncomingBidsFrame()
@@ -219,6 +201,8 @@ local function CreateLootTableRow(parent, id, lootTable)
     row:SetScript("OnClick", function(self, button)
         if button == "LeftButton" then
             selectedItem = self
+            selectedItemDKPCost = Core:GetDKPCostByItemlink(selectedItem.item.loot);
+            BidAnnounceFrame.CustomDKPCost.input:SetNumber(selectedItemDKPCost);
             UpdateLootTableRowsTextures()
             View:UpdateItemForBidFrame()
         end
@@ -272,39 +256,76 @@ end
 -- Bid announce frame and functions
 -----------------------------
 function View:CreateBidAnnounceFrame()
-	BidAnnounceFrame = CreateFrame('Frame', 'ThirtyDKP_BidAnnounceFrame', UIParent, "TooltipBorderedFrameTemplate"); 
-	BidAnnounceFrame:SetShown(false);
-	BidAnnounceFrame:SetSize(Const.LootTableWidth+20, 400);
-    BidAnnounceFrame:SetFrameStrata("HIGH");
-    BidAnnounceFrame:SetFrameLevel(10);
+    BidAnnounceFrame = CreateFrame('Frame', 'ThirtyDKP_BidAnnounceFrame', UIParent, "TooltipBorderedFrameTemplate"); 
+    local f = BidAnnounceFrame;
+	f:SetShown(false);
+	f:SetSize(Const.LootTableWidth+20, 400);
+    f:SetFrameStrata("HIGH");
+    f:SetFrameLevel(10);
 
-    -- todo: attach to blizz LootFrame as a button maybe?
-	BidAnnounceFrame:SetPoint(Const.CENTER_POINT, UIParent, Const.CENTER_POINT, -200, 0); -- point, relative frame, relative point on relative frame
-    BidAnnounceFrame:EnableMouse(true);
-    BidAnnounceFrame:SetMovable(true);
-	BidAnnounceFrame:RegisterForDrag("LeftButton");
-	BidAnnounceFrame:SetScript("OnDragStart", BidAnnounceFrame.StartMoving);
-    BidAnnounceFrame:SetScript("OnDragStop", BidAnnounceFrame.StopMovingOrSizing);
+	f:SetPoint(Const.CENTER_POINT, UIParent, Const.CENTER_POINT, -200, 0); -- point, relative frame, relative point on relative frame
+    f:EnableMouse(true);
+    f:SetMovable(true);
+	f:RegisterForDrag("LeftButton");
+	f:SetScript("OnDragStart", f.StartMoving);
+    f:SetScript("OnDragStop", f.StopMovingOrSizing);
 
-    BidAnnounceFrame.closeBtn = CreateFrame("Button", nil, BidAnnounceFrame, "UIPanelCloseButton")
-	BidAnnounceFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, BidAnnounceFrame, Const.TOP_RIGHT_POINT)
-    tinsert(UISpecialFrames, BidAnnounceFrame:GetName()); -- Sets frame to close on "Escape"
-    
-    
+    f.closeBtn = CreateFrame("Button", nil, f, "UIPanelCloseButton")
+	f.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, f, Const.TOP_RIGHT_POINT)
+    tinsert(UISpecialFrames, f:GetName()); -- Sets frame to close on "Escape"
+
+
+    local options = DAL:GetOptions();
+
+    -- Inputs
+    local inputSection = CreateFrame("Frame", nil, f, nil);
+    inputSection:SetSize(Const.LootTableWidth/2, 50);
+    inputSection:SetPoint(Const.TOP_LEFT_POINT, f, Const.TOP_LEFT_POINT, 10, -195);
+
+    f.CustomDKPCost = View:CreateInputFrame(inputSection, "DKP Cost:", selectedItemDKPCost, function(input)
+        selectedItemDKPCost = input:GetNumber();
+    end);
+    f.CustomDKPCost:SetPoint(Const.TOP_LEFT_POINT, inputSection, Const.TOP_LEFT_POINT, 0, 0);
+
+    f.BidTimeInput = View:CreateInputFrame(inputSection, "Bid Time:", options.bidTime, function(input)
+        options.bidTime = input:GetNumber();
+    end);
+    f.BidTimeInput:SetPoint(Const.TOP_LEFT_POINT, f.CustomDKPCost, Const.BOTTOM_LEFT_POINT, 0, 0);
+
+
     -- Buttons
-    -- Todo: input frame so user can choose bid timer
+    f.AwardItemBtn = CreateFrame("Button", nil, f, "GameMenuButtonTemplate");
+    f.AwardItemBtn:SetPoint(Const.TOP_LEFT_POINT, inputSection, Const.TOP_RIGHT_POINT, Const.Margin, 0);
+    f.AwardItemBtn:SetSize(100, 22);
+    f.AwardItemBtn:SetText("Award Item");
+    f.AwardItemBtn:SetNormalFontObject("GameFontNormal");
+    f.AwardItemBtn:SetHighlightFontObject("GameFontHighlight");
+    f.AwardItemBtn:RegisterForClicks("AnyUp");
+    f.AwardItemBtn:SetScript("OnClick", function(self, button)
+        if button == "LeftButton" then
+            if selectedBidder ~= nil then
+                Core:AwardItem(selectedBidder.bidder, selectedItem.item.loot, selectedItemDKPCost);
+                selectedBidder = nil
+                View:UpdateIncomingBidsFrame();
+            else
+                Core:Print("You need to select a bidder to award an item.")
+            end
+        end
+    end)
 
-    BidAnnounceFrame.StartAndStopBiddingBtn = CreateFrame("Button", nil, BidAnnounceFrame, "GameMenuButtonTemplate");
-    BidAnnounceFrame.StartAndStopBiddingBtn:SetPoint(Const.TOP_RIGHT_POINT, BidAnnounceFrame, Const.TOP_RIGHT_POINT, -5, -220);
-    BidAnnounceFrame.StartAndStopBiddingBtn:SetSize(100, 22);
-    BidAnnounceFrame.StartAndStopBiddingBtn:SetText("Start Bidding");
-    BidAnnounceFrame.StartAndStopBiddingBtn:SetNormalFontObject("GameFontNormal");
-    BidAnnounceFrame.StartAndStopBiddingBtn:SetHighlightFontObject("GameFontHighlight");
-    BidAnnounceFrame.StartAndStopBiddingBtn:RegisterForClicks("AnyUp");
-    BidAnnounceFrame.StartAndStopBiddingBtn:SetScript("OnClick", function(self, button)
+    f.StartAndStopBiddingBtn = CreateFrame("Button", nil, f, "GameMenuButtonTemplate");
+    f.StartAndStopBiddingBtn:SetPoint(Const.BOTTOM_LEFT_POINT, inputSection, Const.BOTTOM_RIGHT_POINT, Const.Margin, 0);
+    f.StartAndStopBiddingBtn:SetSize(100, 22);
+    f.StartAndStopBiddingBtn:SetText("Start Bidding");
+    f.StartAndStopBiddingBtn:SetNormalFontObject("GameFontNormal");
+    f.StartAndStopBiddingBtn:SetHighlightFontObject("GameFontHighlight");
+    f.StartAndStopBiddingBtn:RegisterForClicks("AnyUp");
+    f.StartAndStopBiddingBtn:SetScript("OnClick", function(self, button)
         if selectedItem then
             if not Core:IsBiddingInProgress() then
-                Core:StartBidding(selectedItem.item.loot, 15)
+                incomingBids = {};
+                View:UpdateIncomingBidsFrame();
+                Core:StartBidding(selectedItem.item.loot, options.bidTime)
             else
                 Core:Print("An item is already out for bid, please wait.")
             end
@@ -314,8 +335,8 @@ function View:CreateBidAnnounceFrame()
         
     end)
 
-    CreateLootTableFrame()
     CreateCurrentItemForBidFrame()
+    CreateLootTableFrame()
 end
 
 function View:ToggleBidAnnounceFrame()

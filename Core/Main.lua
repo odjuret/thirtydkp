@@ -132,7 +132,7 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
             local arg2 = strsub(argsAsString, 5); 
 
             if arg1 == 'bid' then
-                Core:ManualAddToLootTable(arg2)
+                Core:ManualBidAnnounce(arg2)
             end
         end
     end

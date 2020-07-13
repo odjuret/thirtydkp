@@ -33,6 +33,10 @@ local bossEventIds = {
 
 local function GetDKPCostByEquipLocation(itemEquipLoc)
     local thirtyDkpOptions = DAL:GetOptions();
+    if not itemEquipLoc then
+        return thirtyDkpOptions.itemCosts.default
+    end
+
     if itemEquipLoc == "INVTYPE_HEAD" then
         return thirtyDkpOptions.itemCosts.head
     elseif itemEquipLoc == "INVTYPE_NECK" then
@@ -74,11 +78,14 @@ local function GetDKPCostByEquipLocation(itemEquipLoc)
     end
 end
 
-
-function Core:AwardItem(dkpTableEntry, itemLink)
+function Core:GetDKPCostByItemlink(itemLink)
     local _, _, _, _, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink);
     local itemDKPCost = GetDKPCostByEquipLocation(itemEquipLoc);
+    return itemDKPCost
+end
 
+
+function Core:AwardItem(dkpTableEntry, itemLink, itemDKPCost)
     if DAL:AdjustPlayerDKP(dkpTableEntry.player, tonumber("-"..itemDKPCost)) then
         Core:Announce(dkpTableEntry.player.." won "..itemLink.." ");
         -- add event to history

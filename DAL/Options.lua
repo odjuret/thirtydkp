@@ -36,7 +36,8 @@ function DAL:InitializeOptions()
 				column = "player",
 				mode = "Ascending"
 			},
-			addonAdmins = {}
+			addonAdmins = {},
+			bidTime = 20
 		};
 	end
 end

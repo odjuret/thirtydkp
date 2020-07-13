@@ -89,7 +89,7 @@ local function HandleSubmitBidMessage(prefix, message, distribution, sender)
 end
 
 function Core:SubmitBid()
-    Communicator:SendCommMessage(SUBMIT_BIDDING_CHANNEL_PREFIX, "amessagejusttokeepfromdisconnecting", "RAID")
+    Communicator:SendCommMessage(SUBMIT_BIDDING_CHANNEL_PREFIX, "nodisconnectmsg", "RAID")
 end
 
 

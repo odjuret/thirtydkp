@@ -155,6 +155,7 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
     DAL:InitializeCurrentLootTable();
     DAL:InitializeDKPHistory();
     Core:InitializeComms();
+    Core:CheckDataVersion(); 
 
     if not View:IsInitialized() then
         View:Initialize();

@@ -90,6 +90,11 @@ function Core:AwardItem(dkpTableEntry, itemLink, itemDKPCost)
         Core:Announce(dkpTableEntry.player.." won "..itemLink.." ");
         -- add event to history
         DAL:AddToHistory(dkpTableEntry.player, tonumber("-"..itemDKPCost), "Loot: "..itemLink)
+        -- update table versions
+        DAL:UpdateDKPHistoryVersion()
+        DAL:UpdateDKPTableVersion()
+        -- broadcast event
+        Core:SendDKPEventMessage(dkpTableEntry.player, tonumber("-"..itemDKPCost), "Loot: "..itemLink)
     else
         Core:Announce("Could not award "..dkpTableEntry.player.." with "..itemLink.." ");
     end 
@@ -130,6 +135,11 @@ function Core:HandleBossKill(eventId, ...)
     end
     -- add event to history
     DAL:AddToHistory(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
+    -- update table versions
+    DAL:UpdateDKPHistoryVersion()
+    DAL:UpdateDKPTableVersion()
+    -- broadcast event
+    Core:SendDKPEventMessage(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
 end
 
 

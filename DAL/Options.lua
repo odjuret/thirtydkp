@@ -86,3 +86,9 @@ function DAL:ToggleDKPTableSorting(column)
 		ThirtyDKP_Database_Options.dkpTableSorting.column = column
 	end
 end
+
+function DAL:WipeAndSetNewOptions(newOptions)
+	ThirtyDKP_Database_Options = {}
+	ThirtyDKP_Database_Options = newOptions
+end
+

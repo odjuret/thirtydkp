@@ -108,8 +108,9 @@ end
 local function AttachBroadcastDKPTableScript(frame)
     frame:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-        GameTooltip:SetText("Broadcast DKP table", 0.25, 0.75, 0.90, 1, true);
-        GameTooltip:AddLine("Attempts to broadcast out the latest DKP table to other online members", 1.0, 1.0, 1.0, true);
+        GameTooltip:SetText("Broadcasts ThirtyDKP data", 0.25, 0.75, 0.90, 1, true);
+        GameTooltip:AddLine("Attempts to broadcast out the latest ThirtyDKP data to other online members:", 1.0, 1.0, 1.0, true);
+        GameTooltip:AddLine("dkp table, dkp history and addon options", 1.0, 1.0, 1.0, true);
         GameTooltip:Show();
     end);
 
@@ -118,12 +119,12 @@ local function AttachBroadcastDKPTableScript(frame)
     end);
 
     frame:SetScript("OnClick", function ()
-        StaticPopupDialogs["BROADCAST_DKPTABLE"] = {
-            text = "Are you sure you want to broadcast your DKP table?",
+        StaticPopupDialogs["BROADCAST_THIRTYDKPDATA"] = {
+            text = "Are you sure you want to broadcast your ThirtyDKP data?",
             button1 = "Yes",
             button2 = "No",
             OnAccept = function()
-                Core:BroadcastDKPTable();
+                Core:BroadcastThirtyDKPData();
                 View:ShowBroadcastingStatusFrame()
             end,
             timeout = 0,
@@ -131,7 +132,7 @@ local function AttachBroadcastDKPTableScript(frame)
             hideOnEscape = true,
             preferredIndex = 3,
         }
-        StaticPopup_Show("BROADCAST_DKPTABLE")
+        StaticPopup_Show("BROADCAST_THIRTYDKPDATA")
     end);
 end
 

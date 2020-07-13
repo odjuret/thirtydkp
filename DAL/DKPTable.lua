@@ -151,3 +151,9 @@ function DAL:AdjustPlayerDKP(playerName, adjustment)
         return true;
     end
 end
+
+function DAL:UpdateDKPTableVersion()
+	local currentTime = time();
+	local index = UnitName("player").."-"..currentTime
+	ThirtyDKP_Database_DKPTable.version = index
+end

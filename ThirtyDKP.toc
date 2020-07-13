@@ -30,3 +30,4 @@ Core\Main.lua
 Core\ManageDKPTableEntries.lua
 Core\ManageLootTableEntries.lua
 Core\ManageRaid.lua
+Core\DataSync.lua

@@ -14,6 +14,7 @@ local DKPTABLE_BROADCAST_CHANNEL_PREFIX = "TDKPBroadcast";
 local PRINT_MSG_CHANNEL_PREFIX = "TDKPPrintMsg";
 local START_BIDDING_CHANNEL_PREFIX = "TDKPStartBid";
 local SUBMIT_BIDDING_CHANNEL_PREFIX = "TDKPSubmitBid";
+local DKP_EVENT_CHANNEL_PREFIX = "TDKPDKPEvent";
 
 local biddingInProgress = false
 
@@ -21,7 +22,8 @@ function Core:IsBiddingInProgress()
     return biddingInProgress
 end
 
-
+-------------------------
+-- incoming communication
 
 local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sender)
     if (sender ~= UnitName("player")) then
@@ -34,7 +36,9 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
                 button1 = "Yes",
                 button2 = "No",
                 OnAccept = function()
-                    DAL:WipeAndSetNewDKPTable(deserialized)
+                    DAL:WipeAndSetNewDKPTable(deserialized.dkpTable)
+                    DAL:WipeAndSetNewOptions(deserialized.options)
+                    DAL:WipeAndSetNewHistory(deserialized.history)
                     View:UpdateDKPTable()
                 end,
                 timeout = 0,
@@ -88,18 +92,62 @@ local function HandleSubmitBidMessage(prefix, message, distribution, sender)
     end
 end
 
+local function HandleDKPEventMessage(prefix, message, distribution, sender)
+    if (sender ~= UnitName("player")) then
+        local decoded = LibDeflate:DecompressDeflate(LibDeflate:DecodeForWoWAddonChannel(message))
+        local success, deserialized = LibAceSerializer:Deserialize(decoded);
+        if success then
+            DAL:WipeAndSetNewDKPTable(deserialized.updatedTable)
+
+            -- add event to history
+            DAL:AddToHistory(deserialized.players, deserialized.dkpAdjustment, deserialized.reason)
+        end
+    end
+end
+
+
+------------------------------
+-- Outgoing communication below
+
+function Core:SendDKPEventMessage(listOfAdjustedPlayers, dkpAdjustment, reason)
+    local serialized = nil;
+    local packet = nil;
+    local unprocessedTable = {
+        updatedTable = DAL:GetDKPTable(),
+        players = listOfAdjustedPlayers,
+        dkpAdjustment = dkpAdjustment,
+        reason = reason,
+    }
+
+    if unprocessedTable then
+        serialized = LibAceSerializer:Serialize(unprocessedTable);  -- serializes tables to a string
+    end
+
+    local compressed = LibDeflate:CompressDeflate(serialized, {level = 9})
+    if compressed then
+        packet = LibDeflate:EncodeForWoWAddonChannel(compressed)
+    end
+    
+    Communicator:SendCommMessage(DKP_EVENT_CHANNEL_PREFIX, packet, "RAID", nil, "NORMAL")
+end
+
+
 function Core:SubmitBid()
     Communicator:SendCommMessage(SUBMIT_BIDDING_CHANNEL_PREFIX, "nodisconnectmsg", "RAID")
 end
 
 
-function Core:BroadcastDKPTable()
+function Core:BroadcastThirtyDKPData()
     local serialized = nil;
     local packet = nil;
-    local tempTable = DAL:GetDKPTable()
+    local unprocessedTables = {
+        dkpTable = DAL:GetDKPTable(),
+        options = DAL:GetOptions(),
+        history = DAL:GetDKPHistory(),
+    }
 
-    if tempTable then
-        serialized = LibAceSerializer:Serialize(tempTable);  -- serializes tables to a string
+    if unprocessedTables then
+        serialized = LibAceSerializer:Serialize(unprocessedTables);  -- serializes tables to a string
     end
 
     local compressed = LibDeflate:CompressDeflate(serialized, {level = 9})
@@ -153,6 +201,10 @@ function Communicator:OnCommReceived(prefix, message, distribution, sender)
     
     elseif prefix == SUBMIT_BIDDING_CHANNEL_PREFIX then
         HandleSubmitBidMessage(prefix, message, distribution, sender)
+
+    elseif prefix == DKP_EVENT_CHANNEL_PREFIX then
+        HandleDKPEventMessage(prefix, message, distribution, sender)
+
     end
 
 end
@@ -167,5 +219,6 @@ function Core:InitializeComms()
     Communicator:RegisterComm(START_BIDDING_CHANNEL_PREFIX, Communicator:OnCommReceived());
     Communicator:RegisterComm(PRINT_MSG_CHANNEL_PREFIX, Communicator:OnCommReceived());
     Communicator:RegisterComm(SUBMIT_BIDDING_CHANNEL_PREFIX, Communicator:OnCommReceived());
+    Communicator:RegisterComm(DKP_EVENT_CHANNEL_PREFIX, Communicator:OnCommReceived());
 
 end

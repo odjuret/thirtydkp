@@ -153,7 +153,7 @@ function View:CreateDKPTable(parentFrame)
 	DKPTableFrame:SetFrameLevel(9);
 
 	DKPTableFrame:SetSize( Const.DKPTableWidth, Const.DKPTableRowHeight*12);
-	DKPTableFrame:SetPoint( Const.TOP_LEFT_POINT, 10, -30 );
+	DKPTableFrame:SetPoint( Const.TOP_LEFT_POINT, 5, -30 );
 	DKPTableFrame.scrollBar = _G["DKPTableScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 
 	-- Child frame which holds all the content being scrolled through.

@@ -234,7 +234,7 @@ local function CreateLootTableFrame()
     local lootTable = BidAnnounceFrame.LootTable
 
 	lootTable:SetSize( Const.LootTableWidth, numberOfRowsInLootTable*7);
-	lootTable:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame, Const.TOP_LEFT_POINT, 5, -Const.LootTableWidth );
+	lootTable:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame, Const.TOP_LEFT_POINT, 5, -250 );
 	lootTable:SetPoint( Const.BOTTOM_RIGHT_POINT, BidAnnounceFrame, Const.BOTTOM_RIGHT_POINT, -27, 5 );
 	lootTable.scrollBar = _G["BidAnnounceFrameScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 

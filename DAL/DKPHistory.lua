@@ -7,6 +7,11 @@ function DAL:InitializeDKPHistory()
     if not ThirtyDKP_Database_DKPHistory then ThirtyDKP_Database_DKPHistory = {} end;
 end
 
+function DAL:GetDKPHistory()
+    return ThirtyDKP_Database_DKPHistory
+end
+
+
 function DAL:AddToHistory(affectedPlayers, amount, reason)
     if(type(amount) == "string") then
         -- todo: percentage 
@@ -21,4 +26,15 @@ function DAL:AddToHistory(affectedPlayers, amount, reason)
             reason=reason
         });
     end
+end
+
+function DAL:WipeAndSetNewHistory(newHistory)
+    ThirtyDKP_Database_DKPHistory = {}
+    ThirtyDKP_Database_DKPHistory = newHistory
+end
+
+function DAL:UpdateDKPHistoryVersion()
+	local currentTime = time();
+	local index = UnitName("player").."-"..currentTime
+	ThirtyDKP_Database_DKPHistory.version = index
 end

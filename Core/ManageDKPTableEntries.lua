@@ -142,34 +142,29 @@ function Core:HandleBossKill(eventId, ...)
     Core:SendDKPEventMessage(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
 end
 
+local function IsInSameGuild(playerName)
+	for i=1, GetNumGuildMembers() do
+		nameFromGuild, _, _, _, _ = GetGuildRosterInfo(i)
+
+		nameFromGuild = strsub(nameFromGuild, 1, string.find(nameFromGuild, "-")-1) -- required to remove server name from player (can remove in classic if this is not an issue)
+		if nameFromGuild == playerName then
+			return true;
+		end
+	end
+
+	return false;
+end
+
 
 function Core:AddRaidToDKPTable()
-    local nameFromRaid;
-    local guildSize = GetNumGuildMembers();
-    local nameFromGuild, classFromGuild;
-    local InGuild = false; -- Only adds player to list if the player is found in the guild roster.
-
-
-    -- for every person in the raid
     for i=1, GetNumGroupMembers() do
-        nameFromRaid = GetRaidRosterInfo(i)
+        local playerName, _, _, _, playerClass = GetRaidRosterInfo(i)
         
-        -- see if they exist in guild
-        for j=1, guildSize do
-            nameFromGuild, _, _, _, classFromGuild = GetGuildRosterInfo(j)
-
-            nameFromGuild = strsub(nameFromGuild, 1, string.find(nameFromGuild, "-")-1) -- required to remove server name from player (can remove in classic if this is not an issue)
-            if nameFromGuild == nameFromRaid then
-                InGuild = true;
-                break;
+		if playerName and IsInSameGuild(playerName) then
+            if DAL:AddToDKPTable(playerName, playerClass) then
+                Core:Print("added "..playerName.." successfully to table.")
             end
-        end
-        if nameFromRaid and InGuild then
-            if DAL:AddToDKPTable(nameFromGuild, classFromGuild) then
-                Core:Print("added "..nameFromGuild.." successfully to table.")
-            end
-        end
-        InGuild = false;
+		end
     end
 end
 
@@ -189,4 +184,52 @@ function Core:AddGuildToDKPTable()
             end
         end
     end
+end
+
+
+function Core:ApplyOnTimeBonus()
+	local listOfAwardedPlayers = "";
+	local onTimeBonus = DAL:GetOptions().onTimeBonus;
+
+	for i=1, GetNumGroupMembers() do
+        local playerName, _, _, _, playerClass = GetRaidRosterInfo(i)
+
+		if DAL:AdjustPlayerDKP(playerName, onTimeBonus) then
+            listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+		elseif IsInSameGuild(playerName) then
+            if DAL:AddToDKPTable(playerName, playerClass) then
+                Core:Print("added "..playerName.." successfully to table.")
+				listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+            end
+		end
+	end
+
+	DAL:AddToHistory(listOfAwardedPlayers, onTimeBonus, "On Time Bonus");
+	DAL:UpdateDKPHistoryVersion()
+	DAL:UpdateDKPTableVersion()
+	Core:SendDKPEventMessage(listOfAwardedPlayers, onTimeBonus, "On Time Bonus")
+end
+
+
+function Core:ApplyRaidEndBonus()
+	local listOfAwardedPlayers = "";
+	local raidCompletionBonus = DAL:GetOptions().raidCompletionBonus;
+
+	for i=1, GetNumGroupMembers() do
+        local playerName, _, _, _, playerClass = GetRaidRosterInfo(i)
+
+		if DAL:AdjustPlayerDKP(playerName, raidCompletionBonus) then
+            listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+		elseif IsInSameGuild(playerName) then
+            if DAL:AddToDKPTable(playerName, playerClass) then
+                Core:Print("added "..playerName.." successfully to table.")
+				listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+            end
+		end
+
+		DAL:AddToHistory(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus");
+		DAL:UpdateDKPHistoryVersion()
+		DAL:UpdateDKPTableVersion()
+		Core:SendDKPEventMessage(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
+	end
 end

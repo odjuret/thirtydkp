@@ -31,8 +31,18 @@ function View:CreateRaidFrame(parentFrame)
 	local raidInfo = DAL:GetRaid();
 
 	local startOrEndRaidBtn = CreateFrame("Button", nil, RaidFrame, "GameMenuButtonTemplate");
-	startOrEndRaidBtn:SetSize(100, 30);
+	startOrEndRaidBtn:SetSize(100, 45);
 	startOrEndRaidBtn:SetPoint(Const.TOP_LEFT_POINT, RaidFrame, Const.TOP_LEFT_POINT, 10, -35);
+
+	local onTimeBonusButton = CreateFrame("CheckButton", "onTimeBonusButton", RaidFrame, "ChatConfigCheckButtonTemplate");
+	onTimeBonusButton:SetPoint(Const.TOP_LEFT_POINT, startOrEndRaidBtn, Const.TOP_RIGHT_POINT, 10, 0);
+	onTimeBonusButtonText:SetText("Give on-time bonus");
+	onTimeBonusButton:SetChecked(true);
+
+	local raidEndBonusButton = CreateFrame("CheckButton", "raidEndBonusButton", RaidFrame, "ChatConfigCheckButtonTemplate");
+	raidEndBonusButton:SetPoint(Const.TOP_LEFT_POINT, onTimeBonusButton, Const.BOTTOM_LEFT_POINT, 0, 0);
+	raidEndBonusButton:SetChecked(true);
+	raidEndBonusButtonText:SetText("Give raid completion bonus");
 
 	if raidInfo.raidOngoing then
 		startOrEndRaidBtn:SetText(RAID_BUTTON_END);
@@ -58,15 +68,23 @@ function View:CreateRaidFrame(parentFrame)
 		if self:GetText() == RAID_BUTTON_START then
 			Core:StartRaid();
 			startOrEndRaidBtn:SetText(RAID_BUTTON_END);
+
+			if onTimeBonusButton:GetChecked() then
+				Core:ApplyOnTimeBonus();
+			end
 		else
 			Core:EndRaid();
 			startOrEndRaidBtn:SetText(RAID_BUTTON_START);
+
+			if raidEndBonusButton:GetChecked() then
+				Core:ApplyRaidEndBonus();
+			end
 		end
 	end);
 
 	local applyDecayBtn = CreateFrame("Button", nil, RaidFrame, "GameMenuButtonTemplate");
 	applyDecayBtn:SetSize(100, 30);
-	applyDecayBtn:SetPoint(Const.TOP_LEFT_POINT, startOrEndRaidBtn, Const.BOTTOM_LEFT_POINT, 0, 0);
+	applyDecayBtn:SetPoint(Const.TOP_LEFT_POINT, startOrEndRaidBtn, Const.BOTTOM_LEFT_POINT, 0, -25);
 	applyDecayBtn:SetText("Apply Decay");
 	applyDecayBtn:SetNormalFontObject("GameFontNormal");
 	applyDecayBtn:SetHighlightFontObject("GameFontHighlight");

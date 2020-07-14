@@ -36,22 +36,22 @@ end
 
 local function CheckIsAddonAdmin()
     local admins = DAL:GetAddonAdmins();
-    local playerNAme = UnitName("player");
+    local playerName = UnitName("player");
 
-    if GetGuildRankIndex(playerNAme) == 1 then -- enforce guild master is always addon admin
+    if GetGuildRankIndex(playerName) == 1 then -- enforce guild master is always addon admin
         isAddonAdmin = true
-        DAL:AddAddonAdmin(playerNAme)
+        DAL:AddAddonAdmin(playerName)
         return;
     end
 
     for _, adminName in ipairs(admins) do
-        if adminName == playerNAme then
+        if adminName == playerName then
             isAddonAdmin = true
             return;
         end
     end
 
-    isAddonAdmin = false
+    isAddonAdmin = false;
 end
 
 function Core:IsAddonAdmin()
@@ -167,7 +167,6 @@ end
 ----------------------------------
 -- Register Events and Initialise AddOn, this should be done in a Init.lua file
 ----------------------------------
-
 local events = CreateFrame("Frame", "TDKPEventsFrame");
 events:RegisterEvent("ADDON_LOADED");
 events:RegisterEvent("LOOT_OPENED");

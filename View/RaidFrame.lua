@@ -90,6 +90,7 @@ function View:CreateRaidFrame(parentFrame)
 	applyDecayBtn:SetHighlightFontObject("GameFontHighlight");
 	applyDecayBtn:RegisterForClicks("AnyUp");
 	applyDecayBtn:SetScript("OnClick", function (self, button, down)
+		Core:ApplyDecay();
 	end);
 end
 

@@ -233,3 +233,18 @@ function Core:ApplyRaidEndBonus()
 		Core:SendDKPEventMessage(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
 	end
 end
+
+function Core:ApplyDecay()
+	local decay = DAL:GetOptions().decay / 100.0;
+
+	for i=1, GetNumGuildMembers() do
+		local playerName = GetGuildRosterInfo(i);
+        playerName = strsub(playerName, 1, string.find(playerName, "-")-1) -- required to remove server name from player (can remove in classic if this is not an issue)
+		local dkpEntry = DAL:GetFromDKPTable(playerName);
+
+		if dkpEntry then
+			local decayAmount = math.floor(dkpEntry.dkp * decay);
+			DAL:AdjustPlayerDKP(playerName, -decayAmount);
+		end
+	end
+end

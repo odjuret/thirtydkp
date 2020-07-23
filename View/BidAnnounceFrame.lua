@@ -282,12 +282,12 @@ function View:CreateBidAnnounceFrame()
     inputSection:SetSize(Const.LootTableWidth/2, 50);
     inputSection:SetPoint(Const.TOP_LEFT_POINT, f, Const.TOP_LEFT_POINT, 10, -195);
 
-    f.CustomDKPCost = View:CreateInputFrame(inputSection, "DKP Cost:", selectedItemDKPCost, function(input)
+    f.CustomDKPCost = View:CreateNumericInputFrame(inputSection, "DKP Cost:", selectedItemDKPCost, function(input)
         selectedItemDKPCost = input:GetNumber();
     end);
     f.CustomDKPCost:SetPoint(Const.TOP_LEFT_POINT, inputSection, Const.TOP_LEFT_POINT, 0, 0);
 
-    f.BidTimeInput = View:CreateInputFrame(inputSection, "Bid Time:", options.bidTime, function(input)
+    f.BidTimeInput = View:CreateNumericInputFrame(inputSection, "Bid Time:", options.bidTime, function(input)
         options.bidTime = input:GetNumber();
     end);
     f.BidTimeInput:SetPoint(Const.TOP_LEFT_POINT, f.CustomDKPCost, Const.BOTTOM_LEFT_POINT, 0, 0);

@@ -9,6 +9,11 @@ local RaidFrame = nil;
 local RAID_FRAME_TITLE = "Raid";
 local RAID_BUTTON_START = "Start Raid";
 local RAID_BUTTON_END = "End Raid";
+local ADJUST_DKP_LABEL = "Adjust DKP";
+local ADJUST_DKP_REASON_LABEL = "Reason";
+
+local DkpAdjustReason = "";
+local DkpAdjustAmount = 0;
 
 function View:CreateRaidFrame(parentFrame)
 	RaidFrame = CreateFrame("Frame", "ThirtyDKP_OptionsRaidFrame", parentFrame, "TooltipBorderedFrameTemplate");
@@ -92,6 +97,77 @@ function View:CreateRaidFrame(parentFrame)
 	applyDecayBtn:SetScript("OnClick", function (self, button, down)
 		Core:ApplyDecay();
 	end);
+
+	local adjustDkpSection = CreateFrame("Frame", nil, RaidFrame, nil);
+	adjustDkpSection:SetSize(RaidFrame:GetWidth() - 25, 70);
+	adjustDkpSection:SetPoint(Const.TOP_LEFT_POINT, applyDecayBtn, Const.BOTTOM_LEFT_POINT, 0, -10);
+
+    local adjustDkpLabel = adjustDkpSection:CreateFontString(nil, Const.OVERLAY_LAYER);
+    adjustDkpLabel:SetFontObject("GameFontWhite");
+    adjustDkpLabel:SetPoint(Const.TOP_LEFT_POINT, adjustDkpSection, Const.TOP_LEFT_POINT, 0, -25);
+    adjustDkpLabel:SetText(ADJUST_DKP_LABEL);
+
+
+	local reasonInput = View:CreateTextInputFrame(adjustDkpSection, "Reason:", "", function(input)
+		DkpAdjustReason = input:GetText();
+	end);
+	reasonInput:SetPoint(Const.TOP_LEFT_POINT, adjustDkpLabel, Const.BOTTOM_LEFT_POINT, 0, -10);
+
+	local amountWrapper = CreateFrame("Frame", nil, RaidFrame, nil);
+	amountWrapper:SetSize(130, 20);
+	amountWrapper:SetPoint(Const.TOP_LEFT_POINT, reasonInput, BOTTOM_LEFT_POINT, 0, 0);
+	local amountInput = View:CreateTextInputFrame(amountWrapper, "Amount:", 0, function(input)
+		local text = input:GetText();
+		if not text:match("^-?%d*$") then
+			if #text == 1 then
+				input:SetText("");
+			else
+				input:SetText(text:sub(0, #text - 1));
+			end
+		elseif #text > 0 then
+			DkpAdjustAmount = tonumber(input:GetText());
+		end
+	end);
+	amountInput:SetPoint(Const.TOP_LEFT_POINT, reasonInput, Const.BOTTOM_LEFT_POINT, 0, 0);
+
+	local dkpAdjustBtn = CreateFrame("Button", nil, RaidFrame, "GameMenuButtonTemplate");
+	dkpAdjustBtn:SetSize(100, 30);
+	dkpAdjustBtn:SetPoint(Const.TOP_LEFT_POINT, amountInput, Const.BOTTOM_LEFT_POINT, 0, -10);
+	dkpAdjustBtn:SetText("Adjust");
+	dkpAdjustBtn:SetNormalFontObject("GameFontNormal");
+	dkpAdjustBtn:SetHighlightFontObject("GameFontHighlight");
+	dkpAdjustBtn:RegisterForClicks("AnyUp");
+	dkpAdjustBtn:SetScript("OnClick", function (self, button, down)
+		if #DkpAdjustReason == 0 then
+			Core:Print("No reason given");
+			return;
+		end
+
+		if DkpAdjustAmount == 0 then
+			Core:Print("No amount given");
+			return;
+		end
+
+		local selectedPlayers = View:GetSelectedDKPTableEntries();
+
+		if #selectedPlayers == 0 then
+			Core:Print("No players selected");
+			return;
+		end
+
+		local listOfAdjustedPlayers = "";
+
+        for i, selectedPlayer in ipairs(selectedPlayers) do
+            if DAL:AdjustPlayerDKP(selectedPlayer, DkpAdjustAmount) then
+				listOfAdjustedPlayers = listOfAdjustedPlayers..", "..selectedPlayer;
+			end
+        end
+
+		DAL:AddToHistory(listOfAdjustedPlayers, DkpAdjustAmount, DkpAdjustReason);
+		DAL:UpdateDKPHistoryVersion()
+		DAL:UpdateDKPTableVersion()
+	end);
+
 end
 
 function View:ToggleRaidFrame()

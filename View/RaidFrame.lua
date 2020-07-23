@@ -87,20 +87,9 @@ function View:CreateRaidFrame(parentFrame)
 		end
 	end);
 
-	local applyDecayBtn = CreateFrame("Button", nil, RaidFrame, "GameMenuButtonTemplate");
-	applyDecayBtn:SetSize(100, 30);
-	applyDecayBtn:SetPoint(Const.TOP_LEFT_POINT, startOrEndRaidBtn, Const.BOTTOM_LEFT_POINT, 0, -25);
-	applyDecayBtn:SetText("Apply Decay");
-	applyDecayBtn:SetNormalFontObject("GameFontNormal");
-	applyDecayBtn:SetHighlightFontObject("GameFontHighlight");
-	applyDecayBtn:RegisterForClicks("AnyUp");
-	applyDecayBtn:SetScript("OnClick", function (self, button, down)
-		Core:ApplyDecay();
-	end);
-
 	local adjustDkpSection = CreateFrame("Frame", nil, RaidFrame, nil);
 	adjustDkpSection:SetSize(RaidFrame:GetWidth() - 25, 70);
-	adjustDkpSection:SetPoint(Const.TOP_LEFT_POINT, applyDecayBtn, Const.BOTTOM_LEFT_POINT, 0, -10);
+	adjustDkpSection:SetPoint(Const.TOP_LEFT_POINT, startOrEndRaidBtn, Const.BOTTOM_LEFT_POINT, 0, -10);
 
     local adjustDkpLabel = adjustDkpSection:CreateFontString(nil, Const.OVERLAY_LAYER);
     adjustDkpLabel:SetFontObject("GameFontWhite");
@@ -166,6 +155,17 @@ function View:CreateRaidFrame(parentFrame)
 		DAL:AddToHistory(listOfAdjustedPlayers, DkpAdjustAmount, DkpAdjustReason);
 		DAL:UpdateDKPHistoryVersion()
 		DAL:UpdateDKPTableVersion()
+	end);
+
+	local applyDecayBtn = CreateFrame("Button", nil, RaidFrame, "GameMenuButtonTemplate");
+	applyDecayBtn:SetSize(100, 30);
+	applyDecayBtn:SetPoint(Const.TOP_LEFT_POINT, dkpAdjustBtn, Const.BOTTOM_LEFT_POINT, 0, -10);
+	applyDecayBtn:SetText("Apply Decay");
+	applyDecayBtn:SetNormalFontObject("GameFontNormal");
+	applyDecayBtn:SetHighlightFontObject("GameFontHighlight");
+	applyDecayBtn:RegisterForClicks("AnyUp");
+	applyDecayBtn:SetScript("OnClick", function (self, button, down)
+		Core:ApplyDecay();
 	end);
 
 end

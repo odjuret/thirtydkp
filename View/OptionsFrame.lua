@@ -11,7 +11,7 @@ local OPTIONS_FRAME_TITLE = "Options"
 
 local function CreateDkpCostInputFrame(text, itemName, parent)
     local options = DAL:GetOptions();
-    local frame = View:CreateInputFrame(parent, text, options.itemCosts[itemName], function(input)
+    local frame = View:CreateNumericInputFrame(parent, text, options.itemCosts[itemName], function(input)
         options.itemCosts[itemName] = input:GetNumber();
     end);
 
@@ -54,22 +54,22 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
     miscSectionRight:SetSize(180, 70);
     miscSectionRight:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.TOP_RIGHT_POINT, 20, 0);
 
-	local dkpGainPerKill = View:CreateInputFrame(miscSectionLeft, "DKP Per Kill:", options.dkpGainPerKill, function(input)
+	local dkpGainPerKill = View:CreateNumericInputFrame(miscSectionLeft, "DKP Per Kill:", options.dkpGainPerKill, function(input)
         options.dkpGainPerKill = input:GetNumber();
     end);
     dkpGainPerKill:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.TOP_LEFT_POINT, 0, 0);
 
-    local onTimeBonus = View:CreateInputFrame(miscSectionLeft, "On Time Bonus:", options.onTimeBonus, function(input)
+    local onTimeBonus = View:CreateNumericInputFrame(miscSectionLeft, "On Time Bonus:", options.onTimeBonus, function(input)
         options.onTimeBonus = input:GetNumber();
     end);
 	onTimeBonus:SetPoint(Const.TOP_LEFT_POINT, dkpGainPerKill, Const.BOTTOM_LEFT_POINT, 0, 0);
 
-	local raidCompletionBonus = View:CreateInputFrame(miscSectionRight, "Raid Completion Bonus:", options.raidCompletionBonus, function(input)
+	local raidCompletionBonus = View:CreateNumericInputFrame(miscSectionRight, "Raid Completion Bonus:", options.raidCompletionBonus, function(input)
         options.raidCompletionBonus = input:GetNumber();
     end);
 	raidCompletionBonus:SetPoint(Const.TOP_LEFT_POINT, miscSectionRight, Const.TOP_LEFT_POINT, 0, 0);
 
-	local decay = View:CreateInputFrame(miscSectionRight, "Decay Percent:", options.decay, function(input)
+	local decay = View:CreateNumericInputFrame(miscSectionRight, "Decay Percent:", options.decay, function(input)
         options.decay = input:GetNumber();
     end);
 	decay:SetPoint(Const.TOP_LEFT_POINT, raidCompletionBonus, Const.BOTTOM_LEFT_POINT, 0, 0);

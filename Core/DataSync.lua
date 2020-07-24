@@ -45,12 +45,10 @@ local function CompareDataVersions()
             isUpToDate = true
         end
 
-        if isUpToDate then
-            Core:Print("ThirtyDKP data is up do date.")
-        else
-            Core:Print("ThirtyDKP data is out of date, request an update from "..entrySender)
+        if not isUpToDate then
+            local formattedDate = Core:FormatTimestamp(knownLatestVersionDate)
+            Core:Print("Newer dkp data found from "..formattedDate..". By "..knownLatestVersionOwner..".")
         end
-
     else
         -- No history or version to check, so probably brand new install.
         Core:Print("No ThirtyDKP data found. If new installation, go raiding or request broadcast from admins.")

@@ -157,3 +157,7 @@ function DAL:UpdateDKPTableVersion()
 	local index = UnitName("player").."-"..currentTime
 	ThirtyDKP_Database_DKPTable.version = index
 end
+
+function DAL:GetDKPTableVersion()
+	return ThirtyDKP_Database_DKPTable.version
+end

@@ -4,17 +4,44 @@ local Core = ThirtyDKP.Core
 local DAL = ThirtyDKP.DAL
 
 local isUpToDate = false
+local knownLatestVersionOwner = nil
+local knownLatestVersionDate = nil
 
-function Core:CheckDataVersion()
-    local history = DAL:GetDKPHistory();
+local function InitializeLatestKnownVersion()
+    local dkpTableVersion = DAL:GetDKPTableVersion()
+    local localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion)
+    knownLatestVersionOwner = localVersionOwner
+    knownLatestVersionDate = localVersionDate
+end
 
-    if #history > 0 and history.version then
-        local latestHistoryEntry = history[#history];
+function Core:GetLatestKnownVersion()
+    if knownLatestVersionOwner == nil then
+        InitializeLatestKnownVersion()
+    end
+    return knownLatestVersionOwner.."-"..knownLatestVersionDate
+end
 
-        local entrySender, entryDate = strsplit("-", latestHistoryEntry.index) 
-        local versionSender, versionDate = strsplit("-", history.version) 
 
-        if tonumber(entryDate) <= tonumber(versionDate) then
+function Core:TryUpdateKnownVersion(incomingVersionIndex)
+    local incomingVersionOwner, incomingVersionDate = strsplit("-", incomingVersionIndex)
+
+    if knownLatestVersionOwner == nil then
+        InitializeLatestKnownVersion()
+    end
+
+    if (incomingVersionDate > knownLatestVersionDate) then
+        knownLatestVersionOwner = incomingVersionOwner
+        knownLatestVersionDate = incomingVersionDate
+    end
+end
+
+local function CompareDataVersions()
+    local dkpTableVersion = DAL:GetDKPTableVersion()
+
+    if dkpTableVersion ~= nil then
+        local localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion) 
+
+        if tonumber(knownLatestVersionDate) <= tonumber(localVersionDate) then
             isUpToDate = true
         end
 
@@ -28,4 +55,14 @@ function Core:CheckDataVersion()
         -- No history or version to check, so probably brand new install.
         Core:Print("No ThirtyDKP data found. If new installation, go raiding or request broadcast from admins.")
     end
+end
+
+
+function Core:CheckDataVersion()
+    Core:Print("Attempting to sync DKP data with guild.")
+    -- Request data versions from online members
+    local latestKnownVersion = Core:GetLatestKnownVersion()
+    Core:RequestDataVersionSync(latestKnownVersion)
+
+    C_Timer.After(5, CompareDataVersions)
 end

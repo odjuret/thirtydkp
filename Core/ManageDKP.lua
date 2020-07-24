@@ -135,7 +135,7 @@ function Core:HandleBossKill(eventId, ...)
     end
     -- add event to history
     DAL:AddToHistory(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
-    -- update table versions
+    -- update table versions (since only master looters get here)
     DAL:UpdateDKPHistoryVersion()
     DAL:UpdateDKPTableVersion()
     -- broadcast event

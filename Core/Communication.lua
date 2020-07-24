@@ -15,6 +15,8 @@ local PRINT_MSG_CHANNEL_PREFIX = "TDKPPrintMsg";
 local START_BIDDING_CHANNEL_PREFIX = "TDKPStartBid";
 local SUBMIT_BIDDING_CHANNEL_PREFIX = "TDKPSubmitBid";
 local DKP_EVENT_CHANNEL_PREFIX = "TDKPDKPEvent";
+local DATA_VERSION_SYNC_CHANNEL_PREFIX = "TDKPDataSync";
+local DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX = "TDKPDataSyncRe";
 
 local biddingInProgress = false
 
@@ -105,9 +107,27 @@ local function HandleDKPEventMessage(prefix, message, distribution, sender)
     end
 end
 
+local function HandleDataVersionSyncMessage(prefix, message, distribution, sender)
+    print("syncmessgae"..sender)
+    if (sender ~= UnitName("player")) then
+        Core:TryUpdateKnownVersion(message)
+        local latestKnownVersion = Core:GetLatestKnownVersion();
+    
+        Communicator:SendCommMessage(DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX, latestKnownVersion, "WHISPER", sender)
+    end
+end
+
+local function HandleDataVersionSyncResponseMessage(prefix, message, distribution, sender)
+    print("syncmessgaeresponse"..sender)
+    Core:TryUpdateKnownVersion(message)
+end
 
 ------------------------------
 -- Outgoing communication below
+
+function Core:RequestDataVersionSync(currentVersionIndex)
+    Communicator:SendCommMessage(DATA_VERSION_SYNC_CHANNEL_PREFIX, currentVersionIndex, "GUILD")
+end
 
 function Core:SendDKPEventMessage(listOfAdjustedPlayers, dkpAdjustment, reason)
     local serialized = nil;
@@ -131,11 +151,9 @@ function Core:SendDKPEventMessage(listOfAdjustedPlayers, dkpAdjustment, reason)
     Communicator:SendCommMessage(DKP_EVENT_CHANNEL_PREFIX, packet, "RAID", nil, "NORMAL")
 end
 
-
 function Core:SubmitBid()
     Communicator:SendCommMessage(SUBMIT_BIDDING_CHANNEL_PREFIX, "nodisconnectmsg", "RAID")
 end
-
 
 function Core:BroadcastThirtyDKPData()
     local serialized = nil;
@@ -161,7 +179,6 @@ end
 function Core:Announce(message)
     Communicator:SendCommMessage(PRINT_MSG_CHANNEL_PREFIX, message, "RAID");
 end
-
 
 function Core:StartBidding(item, timer)
     if IsInRaid() then
@@ -205,8 +222,13 @@ function Communicator:OnCommReceived(prefix, message, distribution, sender)
     elseif prefix == DKP_EVENT_CHANNEL_PREFIX then
         HandleDKPEventMessage(prefix, message, distribution, sender)
 
-    end
+    elseif prefix == DATA_VERSION_SYNC_CHANNEL_PREFIX then
+        HandleDataVersionSyncMessage(prefix, message, distribution, sender)
 
+    elseif prefix == DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX then
+        HandleDataVersionSyncResponseMessage(prefix, message, distribution, sender)
+
+    end
 end
 
 -------------------------------------------------
@@ -220,5 +242,7 @@ function Core:InitializeComms()
     Communicator:RegisterComm(PRINT_MSG_CHANNEL_PREFIX, Communicator:OnCommReceived());
     Communicator:RegisterComm(SUBMIT_BIDDING_CHANNEL_PREFIX, Communicator:OnCommReceived());
     Communicator:RegisterComm(DKP_EVENT_CHANNEL_PREFIX, Communicator:OnCommReceived());
+    Communicator:RegisterComm(DATA_VERSION_SYNC_CHANNEL_PREFIX, Communicator:OnCommReceived());
+    Communicator:RegisterComm(DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX, Communicator:OnCommReceived());
 
 end

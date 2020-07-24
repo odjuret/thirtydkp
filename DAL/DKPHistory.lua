@@ -11,6 +11,9 @@ function DAL:GetDKPHistory()
     return ThirtyDKP_Database_DKPHistory
 end
 
+function DAL:GetLatestDKPHistoryEntry()
+    return ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory]
+end
 
 function DAL:AddToHistory(affectedPlayers, amount, reason)
     if(type(amount) == "string") then

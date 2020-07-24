@@ -66,6 +66,12 @@ function Core:Print(args)
     print("|cffffcc00[ThirtyDKP]:|r |cffa30f2d"..args.."|r")
 end
 
+function Core:FormatTimestamp(timestamp)
+	local str = date("%y/%m/%d %H:%M:%S", timestamp)
+
+	return str;
+end
+
 -- This also returns false if not in raid
 function Core:IsPlayerMasterLooter()
     local _, _, masterlooterRaidID = GetLootMethod();

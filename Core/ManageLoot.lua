@@ -4,6 +4,12 @@ local Core = ThirtyDKP.Core
 local DAL = ThirtyDKP.DAL
 local View = ThirtyDKP.View
 
+local lootAnnouncedForBoss = false;
+
+function Core:SetLootAnnouncedForBoss(isAnnounced)
+  lootAnnouncedForBoss = isAnnounced;
+end
+
 function Core:HandleLootWindow()
   if not Core:IsPlayerMasterLooter() then return end
   local foundEpaxx = false
@@ -15,12 +21,15 @@ function Core:HandleLootWindow()
       if itemRarity > 3 then
         foundEpaxx = true
         DAL:AddToLootTable(itemLink)
-        SendChatMessage("ThirtyDKP: "..itemLink.." is now available for bidding. ", "RAID", nil, nil)
+        if not lootAnnouncedForBoss then
+          SendChatMessage("ThirtyDKP: "..itemLink.." is now available for bidding. ", "RAID", nil, nil)
+        end
       end
     end
   end
 
   if foundEpaxx then
+    lootAnnouncedForBoss = true;
     View:ToggleBidAnnounceFrame();
   end
 end

@@ -27,7 +27,7 @@ DAL\Raid.lua
 
 Core\Communication.lua
 Core\Main.lua
-Core\ManageDKPTableEntries.lua
-Core\ManageLootTableEntries.lua
+Core\ManageDKP.lua
+Core\ManageLoot.lua
 Core\ManageRaid.lua
 Core\DataSync.lua

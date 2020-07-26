@@ -34,8 +34,8 @@ function DAL:InitializeCurrentLootTable()
             end
         end
     
-        for i, lootEntry in ipairs(entriesToRemove) do 
-            table.remove(ThirtyDKP_Database_CurrentLoot, i)
+        for i, lootEntryIndex in ipairs(entriesToRemove) do 
+            table.remove(ThirtyDKP_Database_CurrentLoot, lootEntryIndex)
         end
     end
 

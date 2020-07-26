@@ -19,6 +19,7 @@ local DATA_VERSION_SYNC_CHANNEL_PREFIX = "TDKPDataSync";
 local DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX = "TDKPDataSyncRe";
 
 local biddingInProgress = false
+local passOnItemBidMessage = "PassOnItemForBid"
 
 function Core:IsBiddingInProgress()
     return biddingInProgress
@@ -72,6 +73,11 @@ end
 
 local function HandleSubmitBidMessage(prefix, message, distribution, sender)
     if biddingInProgress then
+        if message == passOnItemBidMessage then
+            SendChatMessage("ThirtyDKP: "..sender.." passed on item out for bid. ", "RAID", nil, nil)
+            return
+        end
+
         Core:Print("Incoming bid from "..sender.."") 
         local player = DAL:GetFromDKPTable(sender)
 
@@ -152,6 +158,11 @@ end
 function Core:SubmitBid()
     Communicator:SendCommMessage(SUBMIT_BIDDING_CHANNEL_PREFIX, "nodisconnectmsg", "RAID")
 end
+
+function Core:SubmitBidPass()
+    Communicator:SendCommMessage(SUBMIT_BIDDING_CHANNEL_PREFIX, passOnItemBidMessage, "RAID")
+end
+
 
 function Core:BroadcastThirtyDKPData()
     local serialized = nil;

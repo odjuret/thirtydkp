@@ -349,6 +349,30 @@ function View:ToggleBidAnnounceFrame()
     BidAnnounceFrame:SetShown(not BidAnnounceFrame:IsShown());
 end
 
+function View:OpenBidAnnounceFrame(itemLink)
+    if not BidAnnounceFrame then
+        View:CreateBidAnnounceFrame()
+    else
+        View:UpdateLootTableFrame();
+    end
+
+    if itemLink ~= nil then
+        for i,row in ipairs(BidAnnounceFrame.LootTable.scrollChild.Rows) do 
+            if row.item.loot == itemLink then
+                selectedItem = row
+            end
+        end
+    
+        selectedItemDKPCost = Core:GetDKPCostByItemlink(selectedItem.item.loot);
+        BidAnnounceFrame.CustomDKPCost.input:SetNumber(selectedItemDKPCost);
+    end
+    
+    UpdateLootTableRowsTextures()
+    View:UpdateItemForBidFrame()
+    BidAnnounceFrame:SetShown(true);
+end
+
+
 function View:HideBidAnnounceFrame()
     BidAnnounceFrame:SetShown(false);
 end

@@ -74,6 +74,7 @@ function View:CreateBiddingFrame(item)
     BiddingFrame.BiddingBtn:RegisterForClicks("AnyUp");
     BiddingFrame.BiddingBtn:SetScript("OnClick", function(self, button)
         Core:SubmitBid()
+        BiddingFrame:Hide()
     end)
 
     BiddingFrame.PassBtn = CreateFrame("Button", nil, BiddingFrame, "GameMenuButtonTemplate");

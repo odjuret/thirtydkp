@@ -49,13 +49,12 @@ function Core:ManualBidAnnounce(itemLink)
         DAL:AddToLootTable(itemLink);
       end
     end) then
-      -- todo: pass itemlink as parameter to ToggleBidAnnounceFrame
       Core:Print("Opening bid announcer for "..itemLink.."" );
-      View:ToggleBidAnnounceFrame();
+      View:OpenBidAnnounceFrame(itemLink)
     else
       Core:Print("Invalid itemlink. Please use command like this: \"/tdkp bid itemlink\" ")
     end
   else
-    View:ToggleBidAnnounceFrame();
+    View:OpenBidAnnounceFrame();
   end
 end

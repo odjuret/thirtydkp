@@ -59,10 +59,10 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
 end
 
 local function HandleStartBiddingMessage(prefix, message, distribution, sender)
-    View:CreateBiddingFrame(message);
-    Core:Print("Bidding started for: "..message.."") 
-    -- todo: include timer in message
-    C_Timer.After(15, function()
+    local timer, itemLink = strsplit("-", message);
+    View:CreateBiddingFrame(itemLink);
+    Core:Print("Bidding started for: "..itemLink.."") 
+    C_Timer.After(timer, function()
         View:HideBiddingFrame()
     end)   
 end
@@ -192,11 +192,12 @@ end
 function Core:StartBidding(item, timer)
     if IsInRaid() then
         biddingInProgress = true
-        Communicator:SendCommMessage(START_BIDDING_CHANNEL_PREFIX, tostring(item), "RAID")
+        local startBiddingMessage = tostring(timer).."-"..tostring(item)
+        Communicator:SendCommMessage(START_BIDDING_CHANNEL_PREFIX, startBiddingMessage, "RAID")
 
         local secondsLeft = timer
         local bidTimer = C_Timer.NewTicker(1, function() 
-            if (secondsLeft % 5 == 0) or secondsLeft < 6 then
+            if (secondsLeft % 10 == 0) or secondsLeft < 6 then
                 Communicator:SendCommMessage(PRINT_MSG_CHANNEL_PREFIX, "Seconds left to bid: "..tostring(secondsLeft), "RAID");
             end
             secondsLeft = secondsLeft-1

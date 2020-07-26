@@ -99,7 +99,7 @@ local function CreateDKPAdminsList()
 end
 
 function View:CreateTdkpAdminsFrame(parentFrame)
-	TdkpAdminsFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", parentFrame, "TooltipBorderedFrameTemplate"); -- Todo: make mainframe owner??
+	TdkpAdminsFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", parentFrame, "TooltipBorderedFrameTemplate");
 	TdkpAdminsFrame:SetShown(false);
 	TdkpAdminsFrame:SetSize(170, 190);
 	TdkpAdminsFrame:SetFrameStrata("HIGH");

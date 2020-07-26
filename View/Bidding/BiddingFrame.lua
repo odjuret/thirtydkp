@@ -27,7 +27,7 @@ function View:CreateBiddingFrame(item)
 	BiddingFrame:SetScript("OnDragStart", BiddingFrame.StartMoving);
     BiddingFrame:SetScript("OnDragStop", BiddingFrame.StopMovingOrSizing);
 
-    -- todo: standardize and move into FrameFactory 
+    -- todo: standardize item frame and move into FrameFactory.lua 
     BiddingFrame.ItemFrame = CreateFrame('Frame', 'ThirtyDKP_BiddingFrame', BiddingFrame);
     local itemFrame = BiddingFrame.ItemFrame
     itemFrame:SetPoint(Const.TOP_LEFT_POINT, 5, -5)

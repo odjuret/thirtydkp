@@ -62,5 +62,5 @@ function Core:CheckDataVersion()
     local latestKnownVersion = Core:GetLatestKnownVersion()
     Core:RequestDataVersionSync(latestKnownVersion)
 
-    C_Timer.After(5, CompareDataVersions)
+    C_Timer.After(6, CompareDataVersions)
 end

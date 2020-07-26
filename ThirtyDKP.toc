@@ -9,15 +9,15 @@
 Init.lua
 
 View\Constants.lua
-View\MainFrame.lua
+View\MainWindow\MainFrame.lua
+View\MainWindow\DKPTableFrame.lua
 View\OptionsFrame.lua
 View\RaidFrame.lua
-View\DKPTableFrame.lua
-View\BidAnnounceFrame.lua
-View\BiddingFrame.lua
+View\Bidding\BidAnnounceFrame.lua
+View\Bidding\BiddingFrame.lua
 View\BroadcastingStatusFrame.lua
 View\AdminsFrame.lua
-View\GeneralFrames.lua
+View\FrameFactory.lua
 
 DAL\DKPTable.lua
 DAL\CurrentLoot.lua

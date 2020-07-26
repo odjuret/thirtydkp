@@ -68,7 +68,6 @@ end
 
 function Core:FormatTimestamp(timestamp)
 	local str = date("%y/%m/%d %H:%M:%S", timestamp)
-
 	return str;
 end
 
@@ -167,7 +166,7 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
         View:Initialize();
     end
 
-    Core:Print("loaded. Type /tdkp to view dkp table and options.")
+    Core:Print("Loaded. Type /tdkp to view dkp table and options.")
 end
 
 ----------------------------------

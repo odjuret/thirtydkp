@@ -108,7 +108,6 @@ local function HandleDKPEventMessage(prefix, message, distribution, sender)
 end
 
 local function HandleDataVersionSyncMessage(prefix, message, distribution, sender)
-    print("syncmessgae"..sender)
     if (sender ~= UnitName("player")) then
         Core:TryUpdateKnownVersion(message)
         local latestKnownVersion = Core:GetLatestKnownVersion();
@@ -118,7 +117,6 @@ local function HandleDataVersionSyncMessage(prefix, message, distribution, sende
 end
 
 local function HandleDataVersionSyncResponseMessage(prefix, message, distribution, sender)
-    print("syncmessgaeresponse"..sender)
     Core:TryUpdateKnownVersion(message)
 end
 

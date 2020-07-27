@@ -30,4 +30,5 @@ Core\Main.lua
 Core\ManageDKP.lua
 Core\ManageLoot.lua
 Core\ManageRaid.lua
+Core\ManageBidding.lua
 Core\DataSync.lua

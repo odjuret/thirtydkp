@@ -87,7 +87,7 @@ end
 
 function Core:AwardItem(dkpTableEntry, itemLink, itemDKPCost)
     if DAL:AdjustPlayerDKP(dkpTableEntry.player, tonumber("-"..itemDKPCost)) then
-        Core:Announce(dkpTableEntry.player.." won "..itemLink.." ");
+        Core:RaidAnnounce(dkpTableEntry.player.." won "..itemLink.." ");
         -- add event to history
         DAL:AddToHistory(dkpTableEntry.player, tonumber("-"..itemDKPCost), "Loot: "..itemLink)
         -- update table versions
@@ -96,7 +96,7 @@ function Core:AwardItem(dkpTableEntry, itemLink, itemDKPCost)
         -- broadcast event
         Core:SendDKPEventMessage(dkpTableEntry.player, tonumber("-"..itemDKPCost), "Loot: "..itemLink)
     else
-        Core:Announce("Could not award "..dkpTableEntry.player.." with "..itemLink.." ");
+        Core:RaidAnnounce("Could not award "..dkpTableEntry.player.." with "..itemLink.." ");
     end 
 end
 

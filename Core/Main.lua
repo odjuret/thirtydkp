@@ -103,18 +103,21 @@ function ThirtyDKP_OnEvent(self, event, arg1, ...)
     if event == "ADDON_LOADED" then
 		ThirtyDKP_OnInitialize(event, arg1)
         self:UnregisterEvent("ADDON_LOADED")
-    end
 
-    if event == "LOOT_OPENED" then
+    elseif event == "LOOT_OPENED" then
         Core:HandleLootWindow()
-    end
 
-    if event == "BOSS_KILL" then
+    elseif event == "BOSS_KILL" then
         Core:HandleBossKill(arg1, ...)
+
+    elseif event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER" then
+        arg1 = strlower(arg1)
+        if string.find(arg1, "!bid") == 1 or string.find(arg1, "!pass") == 1 then
+            Core:HandleSubmitBidRaidMessage(arg1, ...)
+        end
+
     end
-    
-    
-end 
+end
 
 
 function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to run on load triggered registered events at bottom of file
@@ -177,3 +180,13 @@ events:RegisterEvent("ADDON_LOADED");
 events:RegisterEvent("LOOT_OPENED");
 events:RegisterEvent("BOSS_KILL");
 events:SetScript("OnEvent", ThirtyDKP_OnEvent);
+
+function Core:RegisterForRaidMessageEvents()
+    events:RegisterEvent("CHAT_MSG_RAID");
+    events:RegisterEvent("CHAT_MSG_RAID_LEADER");
+end
+
+function Core:UnRegisterForRaidMessageEvents()
+    events:UnregisterEvent("CHAT_MSG_RAID");
+    events:UnregisterEvent("CHAT_MSG_RAID_LEADER");
+end

@@ -78,7 +78,7 @@ function View:ShowBroadcastingStatusFrame()
 			self:SetScript("OnUpdate", nil)
 			C_Timer.After(2, function()
                 BroadcastingStatusFrame:Hide()
-                Core:Announce("Broadcasting complete!")
+                Core:RaidAnnounce("Broadcasting complete!")
 			end)
 		end
 	end)

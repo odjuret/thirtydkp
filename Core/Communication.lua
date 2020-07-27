@@ -18,12 +18,6 @@ local DKP_EVENT_CHANNEL_PREFIX = "TDKPDKPEvent";
 local DATA_VERSION_SYNC_CHANNEL_PREFIX = "TDKPDataSync";
 local DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX = "TDKPDataSyncRe";
 
-local biddingInProgress = false
-local passOnItemBidMessage = "PassOnItemForBid"
-
-function Core:IsBiddingInProgress()
-    return biddingInProgress
-end
 
 -------------------------
 -- incoming communication
@@ -59,12 +53,7 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
 end
 
 local function HandleStartBiddingMessage(prefix, message, distribution, sender)
-    local timer, itemLink = strsplit("-", message);
-    View:CreateBiddingFrame(itemLink);
-    Core:Print("Bidding started for: "..itemLink.."") 
-    C_Timer.After(timer, function()
-        View:HideBiddingFrame()
-    end)   
+    Core:IncomingStartBiddingHandler(message)  
 end
 
 local function HandlePrintMsgMessage(prefix, message, distribution, sender)
@@ -72,32 +61,7 @@ local function HandlePrintMsgMessage(prefix, message, distribution, sender)
 end
 
 local function HandleSubmitBidMessage(prefix, message, distribution, sender)
-    if biddingInProgress then
-        if message == passOnItemBidMessage then
-            SendChatMessage("ThirtyDKP: "..sender.." passed on item out for bid. ", "RAID", nil, nil)
-            return
-        end
-
-        Core:Print("Incoming bid from "..sender.."") 
-        local player = DAL:GetFromDKPTable(sender)
-
-        if player == false then
-            local nameFromRaid, classFromRaid;
-
-            -- for every person in the raid
-            for i=1, GetNumGroupMembers() do
-                nameFromRaid, _, _, _, classFromRaid = GetRaidRosterInfo(i)
-                
-                if nameFromRaid == sender then
-                    DAL:AddToDKPTable(sender, classFromRaid) 
-                    Core:Print("added "..sender.." successfully to dkp table.")
-                    player = DAL:GetFromDKPTable(sender)
-                end
-            end
-        end
-        
-        View:AddBidder(player)
-    end
+    Core:IncomingBidsHandler(message, sender)
 end
 
 local function HandleDKPEventMessage(prefix, message, distribution, sender)
@@ -155,14 +119,9 @@ function Core:SendDKPEventMessage(listOfAdjustedPlayers, dkpAdjustment, reason)
     Communicator:SendCommMessage(DKP_EVENT_CHANNEL_PREFIX, packet, "RAID", nil, "NORMAL")
 end
 
-function Core:SubmitBid()
-    Communicator:SendCommMessage(SUBMIT_BIDDING_CHANNEL_PREFIX, "nodisconnectmsg", "RAID")
+function Core:CommunicateSubmitBids(submitBidsMessage)
+    Communicator:SendCommMessage(SUBMIT_BIDDING_CHANNEL_PREFIX, submitBidsMessage, "RAID")
 end
-
-function Core:SubmitBidPass()
-    Communicator:SendCommMessage(SUBMIT_BIDDING_CHANNEL_PREFIX, passOnItemBidMessage, "RAID")
-end
-
 
 function Core:BroadcastThirtyDKPData()
     local serialized = nil;
@@ -185,31 +144,12 @@ function Core:BroadcastThirtyDKPData()
     Communicator:SendCommMessage(DKPTABLE_BROADCAST_CHANNEL_PREFIX, packet, "GUILD", nil, "NORMAL", ThirtyDKP_BroadcastingCallback, nil)
 end
 
-function Core:Announce(message)
+function Core:RaidAnnounce(message)
     Communicator:SendCommMessage(PRINT_MSG_CHANNEL_PREFIX, message, "RAID");
 end
 
-function Core:StartBidding(item, timer)
-    if IsInRaid() then
-        biddingInProgress = true
-        local startBiddingMessage = tostring(timer).."-"..tostring(item)
-        Communicator:SendCommMessage(START_BIDDING_CHANNEL_PREFIX, startBiddingMessage, "RAID")
-
-        local secondsLeft = timer
-        local bidTimer = C_Timer.NewTicker(1, function() 
-            if (secondsLeft % 10 == 0) or secondsLeft < 6 then
-                Communicator:SendCommMessage(PRINT_MSG_CHANNEL_PREFIX, "Seconds left to bid: "..tostring(secondsLeft), "RAID");
-            end
-            secondsLeft = secondsLeft-1
-            if secondsLeft == 0 then
-                biddingInProgress = false
-                Communicator:SendCommMessage(PRINT_MSG_CHANNEL_PREFIX, "Bidding closed for: "..tostring(item), "RAID");
-                View:HideBiddingFrame()
-            end
-        end, timer)
-    else
-        Core:Print("You need to be in a raid to start bidding.")
-    end
+function Core:CommunicateBidding(startBiddingMessage)
+    Communicator:SendCommMessage(START_BIDDING_CHANNEL_PREFIX, startBiddingMessage, "RAID")
 end
 
 

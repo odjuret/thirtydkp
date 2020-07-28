@@ -16,11 +16,11 @@ function DAL:InitializeOptions()
 			},
 			addonAdmins = {},
 			bidTime = 20,
+			decay = 0,
+			onTimeBonus = 0,
+			raidCompletionBonus = 0,
 			naxxramas = {
 				dkpGainPerKill = 0,
-				onTimeBonus = 0,
-				raidCompletionBonus = 0,
-				decay = 0,
 				itemCosts = {
 					head = 0,
 					neck = 0,
@@ -42,9 +42,6 @@ function DAL:InitializeOptions()
 			},
 			aq40 = {
 				dkpGainPerKill = 0,
-				onTimeBonus = 0,
-				raidCompletionBonus = 0,
-				decay = 0,
 				itemCosts = {
 					head = 0,
 					neck = 0,
@@ -66,9 +63,6 @@ function DAL:InitializeOptions()
 			},
 			bwl = {
 				dkpGainPerKill = 0,
-				onTimeBonus = 0,
-				raidCompletionBonus = 0,
-				decay = 0,
 				itemCosts = {
 					head = 0,
 					neck = 0,
@@ -90,9 +84,6 @@ function DAL:InitializeOptions()
 			},
 			mc = {
 				dkpGainPerKill = 0,
-				onTimeBonus = 0,
-				raidCompletionBonus = 0,
-				decay = 0,
 				itemCosts = {
 					head = 0,
 					neck = 0,
@@ -114,9 +105,6 @@ function DAL:InitializeOptions()
 			},
 			onyxia = {
 				dkpGainPerKill = 0,
-				onTimeBonus = 0,
-				raidCompletionBonus = 0,
-				decay = 0,
 				itemCosts = {
 					head = 0,
 					neck = 0,

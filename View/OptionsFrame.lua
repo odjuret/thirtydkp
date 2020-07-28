@@ -28,7 +28,7 @@ local RAID_DISPLAY_NAME = {
 local function CreateDkpCostInputFrame(text, itemName, parent)
     local options = DAL:GetRaidOptions(SelectedRaid);
     local frame = View:CreateNumericInputFrame(parent, text, options.itemCosts[itemName], function(input)
-        options.itemCosts[itemName] = input:GetNumber();
+		DAL:GetRaidOptions(SelectedRaid).itemCosts[itemName] = input:GetNumber();
     end);
 
     return frame;
@@ -43,10 +43,6 @@ end
 function View:UpdateOptionsFrame()
 	local options = DAL:GetRaidOptions(SelectedRaid);
 	OptionsFrame.dkpGainPerKill.input:SetNumber(options.dkpGainPerKill);
-	OptionsFrame.onTimeBonus.input:SetNumber(options.onTimeBonus);
-	OptionsFrame.raidCompletionBonus.input:SetNumber(options.raidCompletionBonus);
-	OptionsFrame.decay.input:SetNumber(options.decay);
-
 	OptionsFrame.headCostInput.input:SetNumber(options.itemCosts.head);
 	OptionsFrame.neckCostInput.input:SetNumber(options.itemCosts.neck);
 	OptionsFrame.shouldersCostInput.input:SetNumber(options.itemCosts.shoulders);
@@ -118,52 +114,63 @@ function View:CreateOptionsFrame(parentFrame)
     title:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 15, -10);
     title:SetText(OPTIONS_FRAME_TITLE);
 
-    local options = DAL:GetRaidOptions(SelectedRaid);
+	local options = DAL:GetOptions();
+    local raidOptions = DAL:GetRaidOptions(SelectedRaid);
+
+	local globalOptionsHeader = OptionsFrame:CreateFontString(nil, OVERLAY_LAYER);
+	globalOptionsHeader:SetFontObject("GameFontWhite");
+	globalOptionsHeader:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 10, -35);
+	globalOptionsHeader:SetText("Global Options");
+
+
+    -- global settings, two sections
+    local globalSectionLeft = CreateFrame("Frame", nil, OptionsFrame, nil);
+    globalSectionLeft:SetSize(180, 70);
+    globalSectionLeft:SetPoint(Const.TOP_LEFT_POINT, globalOptionsHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
+
+    local globalSectionRight = CreateFrame("Frame", nil, OptionsFrame, nil);
+    globalSectionRight:SetSize(135, 70);
+    globalSectionRight:SetPoint(Const.TOP_LEFT_POINT, globalSectionLeft, Const.TOP_RIGHT_POINT, 20, 0);
+
+    OptionsFrame.onTimeBonus = View:CreateNumericInputFrame(globalSectionLeft, "On Time Bonus:", options.onTimeBonus, function(input)
+        options.onTimeBonus = input:GetNumber();
+    end);
+	OptionsFrame.onTimeBonus:SetPoint(Const.TOP_LEFT_POINT, globalSectionLeft, Const.TOP_LEFT_POINT, 0, 0);
+
+	OptionsFrame.raidCompletionBonus = View:CreateNumericInputFrame(globalSectionLeft, "Raid Completion Bonus:", options.raidCompletionBonus, function(input)
+        options.raidCompletionBonus = input:GetNumber();
+    end);
+	OptionsFrame.raidCompletionBonus:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame.onTimeBonus, Const.BOTTOM_LEFT_POINT, 0, 0);
+
+	OptionsFrame.decay = View:CreateNumericInputFrame(globalSectionRight, "Decay Percent:", options.decay, function(input)
+        options.decay = input:GetNumber();
+    end);
+	OptionsFrame.decay:SetPoint(Const.TOP_LEFT_POINT);
+
+
+	local raidOptionsHeader = OptionsFrame:CreateFontString(nil, OVERLAY_LAYER);
+	raidOptionsHeader:SetFontObject("GameFontWhite");
+	raidOptionsHeader:SetPoint(Const.TOP_LEFT_POINT, globalSectionLeft, Const.BOTTOM_LEFT_POINT, -10, 0);
+	raidOptionsHeader:SetText("Raid Specific Options for: ");
 
 	OptionsFrame.raidDropdown = CreateFrame("Frame", "ThirtyDKP_RaidOptionsDropdown", OptionsFrame, "UIDropDownMenuTemplate");
-	OptionsFrame.raidDropdown:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 0, -35);
+	OptionsFrame.raidDropdown:SetPoint(Const.LEFT_POINT, raidOptionsHeader, Const.RIGHT_POINT, 0, -4);
 	UIDropDownMenu_SetWidth(OptionsFrame.raidDropdown, 110);
 	UIDropDownMenu_Initialize(OptionsFrame.raidDropdown, InitializeRaidDropdown);
-	UIDropDownMenu_SetText(OptionsFrame.raidDropdown, RAID_DISPLAY_NAME[DAL:GetOptions().selectedRaid]);
+	UIDropDownMenu_SetText(OptionsFrame.raidDropdown, RAID_DISPLAY_NAME[SelectedRaid]);
 
-	local miscSectionHeader = OptionsFrame:CreateFontString(nil, OVERLAY_LAYER);
-	miscSectionHeader:SetFontObject("GameFontWhite");
-	miscSectionHeader:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame.raidDropdown, Const.BOTTOM_LEFT_POINT, 10, -10);
-	miscSectionHeader:SetText("Miscellaneous");
 
-    -- Misc settings, two sections
-    local miscSectionLeft = CreateFrame("Frame", nil, OptionsFrame, nil);
-    miscSectionLeft:SetSize(135, 70);
-    miscSectionLeft:SetPoint(Const.TOP_LEFT_POINT, miscSectionHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
-
-    local miscSectionRight = CreateFrame("Frame", nil, OptionsFrame, nil);
-    miscSectionRight:SetSize(180, 70);
-    miscSectionRight:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.TOP_RIGHT_POINT, 20, 0);
-
-	OptionsFrame.dkpGainPerKill = View:CreateNumericInputFrame(miscSectionLeft, "DKP Per Kill:", options.dkpGainPerKill, function(input)
+	local dkpGainSection = CreateFrame("Frame", nil, OptionsFrame, nil);
+	dkpGainSection:SetSize(115, 30);
+	dkpGainSection:SetPoint(Const.TOP_LEFT_POINT, raidOptionsHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
+	OptionsFrame.dkpGainPerKill = View:CreateNumericInputFrame(dkpGainSection, "DKP Per Kill:", raidOptions.dkpGainPerKill, function(input)
 		DAL:GetRaidOptions(SelectedRaid).dkpGainPerKill = input:GetNumber();
     end);
-    OptionsFrame.dkpGainPerKill:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.TOP_LEFT_POINT, 0, 0);
-
-    OptionsFrame.onTimeBonus = View:CreateNumericInputFrame(miscSectionLeft, "On Time Bonus:", options.onTimeBonus, function(input)
-        DAL:GetRaidOptions(SelectedRaid).onTimeBonus = input:GetNumber();
-    end);
-	OptionsFrame.onTimeBonus:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame.dkpGainPerKill, Const.BOTTOM_LEFT_POINT, 0, 0);
-
-	OptionsFrame.raidCompletionBonus = View:CreateNumericInputFrame(miscSectionRight, "Raid Completion Bonus:", options.raidCompletionBonus, function(input)
-        DAL:GetRaidOptions(SelectedRaid).raidCompletionBonus = input:GetNumber();
-    end);
-	OptionsFrame.raidCompletionBonus:SetPoint(Const.TOP_LEFT_POINT, miscSectionRight, Const.TOP_LEFT_POINT, 0, 0);
-
-	OptionsFrame.decay = View:CreateNumericInputFrame(miscSectionRight, "Decay Percent:", options.decay, function(input)
-        DAL:GetRaidOptions(SelectedRaid).decay = input:GetNumber();
-    end);
-	OptionsFrame.decay:SetPoint(Const.TOP_LEFT_POINT, raidCompletionBonus, Const.BOTTOM_LEFT_POINT, 0, 0);
-
+    OptionsFrame.dkpGainPerKill:SetAllPoints();
 
 	local itemCostHeader = OptionsFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
-	itemCostHeader:SetFontObject("GameFontWhite");
-	itemCostHeader:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.BOTTOM_LEFT_POINT, -10, -10);
+	itemCostHeader:SetFontObject("GameFontNormal");
+	itemCostHeader:SetPoint(Const.TOP_LEFT_POINT, dkpGainSection, Const.BOTTOM_LEFT_POINT, 0, -10);
 	itemCostHeader:SetText("Item Costs");
 
     -- Item cost setting, two sections

@@ -8,9 +8,25 @@ local OptionsFrame = nil;
 
 local OPTIONS_FRAME_TITLE = "Options"
 
+local RAID_NAXX = "naxxramas";
+local RAID_AQ40 = "aq40";
+local RAID_BWL = "bwl";
+local RAID_MC = "mc";
+local RAID_ONYXIA = "onyxia";
+
+local SelectedRaid = RAID_NAXX;
+
+
+local RAID_DISPLAY_NAME = {
+	naxxramas = "Naxxramas",
+	aq40 = "Ahn'Qiraj",
+	bwl = "Blackwing Lair",
+	mc = "Molten Core",
+	onyxia = "Onyxia",
+};
 
 local function CreateDkpCostInputFrame(text, itemName, parent)
-    local options = DAL:GetOptions();
+    local options = DAL:GetRaidOptions(SelectedRaid);
     local frame = View:CreateNumericInputFrame(parent, text, options.itemCosts[itemName], function(input)
         options.itemCosts[itemName] = input:GetNumber();
     end);
@@ -25,7 +41,7 @@ local function CreateAndAttachDkpCostFrame(text, itemName, parent, attachTarget)
 end
 
 function View:UpdateOptionsFrame()
-	local options = DAL:GetOptions();
+	local options = DAL:GetRaidOptions(SelectedRaid);
 	OptionsFrame.dkpGainPerKill.input:SetNumber(options.dkpGainPerKill);
 	OptionsFrame.onTimeBonus.input:SetNumber(options.onTimeBonus);
 	OptionsFrame.raidCompletionBonus.input:SetNumber(options.raidCompletionBonus);
@@ -47,11 +63,51 @@ function View:UpdateOptionsFrame()
 	OptionsFrame.rangedWeaponCostInput.input:SetNumber(options.itemCosts.rangedWeapon);
 end
 
+local function RaidDropdownOnClick(self, arg1, arg2, checked)
+	SelectedRaid = arg1;
+	UIDropDownMenu_SetText(OptionsFrame.raidDropdown, RAID_DISPLAY_NAME[arg1]);
+	View:UpdateOptionsFrame();
+end
 
-function View:CreateOptionsFrame(parentFrame, savedOptions)
+local function InitializeRaidDropdown(frame, level, menuList)
+	local info = UIDropDownMenu_CreateInfo();
+	info.func = RaidDropdownOnClick;
+
+	info.text = "Naxxramas";
+	info.arg1 = RAID_NAXX;
+	info.arg2 = info.text;
+	info.checked = SelectedRaid == RAID_NAXX;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = "Ahn'Qiraj";
+	info.arg1 = RAID_AQ40;
+	info.arg2 = info.text;
+	info.checked = SelectedRaid == RAID_AQ40;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = "Blackwing Lair";
+	info.arg1 = RAID_BWL;
+	info.arg2 = info.text;
+	info.checked = SelectedRaid == RAID_BWL;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = "Molten Core";
+	info.arg1 = RAID_MC;
+	info.arg2 = info.text;
+	info.checked = SelectedRaid == RAID_MC;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = "Onyxia";
+	info.arg1 = RAID_ONYXIA;
+	info.arg2 = info.text;
+	info.checked = selectedRaid == RAID_ONYXIA;
+	UIDropDownMenu_AddButton(info);
+end
+
+function View:CreateOptionsFrame(parentFrame)
 	OptionsFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", parentFrame, "TooltipBorderedFrameTemplate"); 
 	OptionsFrame:SetShown(false);
-	OptionsFrame:SetSize(370, 375);
+	OptionsFrame:SetSize(370, 420);
 	OptionsFrame:SetFrameStrata("HIGH");
 	OptionsFrame:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
     OptionsFrame:EnableMouse(true);
@@ -62,11 +118,17 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
     title:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 15, -10);
     title:SetText(OPTIONS_FRAME_TITLE);
 
-    local options = DAL:GetOptions();
+    local options = DAL:GetRaidOptions(SelectedRaid);
+
+	OptionsFrame.raidDropdown = CreateFrame("Frame", "ThirtyDKP_RaidOptionsDropdown", OptionsFrame, "UIDropDownMenuTemplate");
+	OptionsFrame.raidDropdown:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 0, -35);
+	UIDropDownMenu_SetWidth(OptionsFrame.raidDropdown, 110);
+	UIDropDownMenu_Initialize(OptionsFrame.raidDropdown, InitializeRaidDropdown);
+	UIDropDownMenu_SetText(OptionsFrame.raidDropdown, RAID_DISPLAY_NAME[DAL:GetOptions().selectedRaid]);
 
 	local miscSectionHeader = OptionsFrame:CreateFontString(nil, OVERLAY_LAYER);
 	miscSectionHeader:SetFontObject("GameFontWhite");
-	miscSectionHeader:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 10, -35);
+	miscSectionHeader:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame.raidDropdown, Const.BOTTOM_LEFT_POINT, 10, -10);
 	miscSectionHeader:SetText("Miscellaneous");
 
     -- Misc settings, two sections
@@ -79,22 +141,22 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
     miscSectionRight:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.TOP_RIGHT_POINT, 20, 0);
 
 	OptionsFrame.dkpGainPerKill = View:CreateNumericInputFrame(miscSectionLeft, "DKP Per Kill:", options.dkpGainPerKill, function(input)
-        options.dkpGainPerKill = input:GetNumber();
+		DAL:GetRaidOptions(SelectedRaid).dkpGainPerKill = input:GetNumber();
     end);
     OptionsFrame.dkpGainPerKill:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.TOP_LEFT_POINT, 0, 0);
 
     OptionsFrame.onTimeBonus = View:CreateNumericInputFrame(miscSectionLeft, "On Time Bonus:", options.onTimeBonus, function(input)
-        options.onTimeBonus = input:GetNumber();
+        DAL:GetRaidOptions(SelectedRaid).onTimeBonus = input:GetNumber();
     end);
-	OptionsFrame.onTimeBonus:SetPoint(Const.TOP_LEFT_POINT, dkpGainPerKill, Const.BOTTOM_LEFT_POINT, 0, 0);
+	OptionsFrame.onTimeBonus:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame.dkpGainPerKill, Const.BOTTOM_LEFT_POINT, 0, 0);
 
 	OptionsFrame.raidCompletionBonus = View:CreateNumericInputFrame(miscSectionRight, "Raid Completion Bonus:", options.raidCompletionBonus, function(input)
-        options.raidCompletionBonus = input:GetNumber();
+        DAL:GetRaidOptions(SelectedRaid).raidCompletionBonus = input:GetNumber();
     end);
 	OptionsFrame.raidCompletionBonus:SetPoint(Const.TOP_LEFT_POINT, miscSectionRight, Const.TOP_LEFT_POINT, 0, 0);
 
 	OptionsFrame.decay = View:CreateNumericInputFrame(miscSectionRight, "Decay Percent:", options.decay, function(input)
-        options.decay = input:GetNumber();
+        DAL:GetRaidOptions(SelectedRaid).decay = input:GetNumber();
     end);
 	OptionsFrame.decay:SetPoint(Const.TOP_LEFT_POINT, raidCompletionBonus, Const.BOTTOM_LEFT_POINT, 0, 0);
 
@@ -148,3 +210,4 @@ end
 function View:HideOptionsFrame()
     OptionsFrame:SetShown(false);
 end
+

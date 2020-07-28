@@ -2,6 +2,7 @@ local addonName, ThirtyDKP = ...
 
 local Core = ThirtyDKP.Core
 local DAL = ThirtyDKP.DAL
+local View = ThirtyDKP.View;
 
 local bossEventIds = {  
         -- MC 
@@ -140,6 +141,7 @@ function Core:HandleBossKill(eventId, ...)
     DAL:UpdateDKPTableVersion()
     -- broadcast event
     Core:SendDKPEventMessage(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
+	View:UpdateDKPTable();
 end
 
 local function IsInSameGuild(playerName)
@@ -208,6 +210,7 @@ function Core:ApplyOnTimeBonus()
 	DAL:UpdateDKPHistoryVersion()
 	DAL:UpdateDKPTableVersion()
 	Core:SendDKPEventMessage(listOfAwardedPlayers, onTimeBonus, "On Time Bonus")
+	View:UpdateDKPTable();
 end
 
 
@@ -226,12 +229,13 @@ function Core:ApplyRaidEndBonus()
 				listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
             end
 		end
-
-		DAL:AddToHistory(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus");
-		DAL:UpdateDKPHistoryVersion()
-		DAL:UpdateDKPTableVersion()
-		Core:SendDKPEventMessage(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
 	end
+
+	DAL:AddToHistory(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus");
+	DAL:UpdateDKPHistoryVersion()
+	DAL:UpdateDKPTableVersion()
+	Core:SendDKPEventMessage(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
+	View:UpdateDKPTable();
 end
 
 function Core:ApplyDecay()
@@ -244,7 +248,13 @@ function Core:ApplyDecay()
 
 		if dkpEntry then
 			local decayAmount = math.floor(dkpEntry.dkp * decay);
-			DAL:AdjustPlayerDKP(playerName, -decayAmount);
+			if DAL:AdjustPlayerDKP(playerName, -decayAmount) then
+				DAL:AddToHistory(playerName, decay, "Decay");
+			end
 		end
 	end
+
+	DAL:UpdateDKPHistoryVersion()
+	DAL:UpdateDKPTableVersion()
+	View:UpdateDKPTable();
 end

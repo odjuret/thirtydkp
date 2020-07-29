@@ -57,7 +57,7 @@ local function PopulateDKPHistoryList(scrollChild, dkpHistory)
 
     for i = 0, #dkpHistory-1 do
         local entryYear, entryMonth, entryDay, entryTimeofday = Core:GetDateAndTimeArray(dkpHistory[#dkpHistory - i].timestamp);
-        if entryYear ~= lastEntryYear and entryMonth ~= lastEntryMonth and entryDay ~= lastEntryDay then
+        if i==0 or (entryYear ~= lastEntryYear and entryMonth ~= lastEntryMonth and entryDay ~= lastEntryDay) then
             scrollChild.Rows[i] = CreateDKPHistoryListRow(scrollChild, #dkpHistory - i, dkpHistory, true)
         else
             scrollChild.Rows[i] = CreateDKPHistoryListRow(scrollChild, #dkpHistory - i, dkpHistory, false)

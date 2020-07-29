@@ -71,6 +71,14 @@ function Core:FormatTimestamp(timestamp)
 	return str;
 end
 
+function Core:GetDateAndTimeArray(timestamp)
+    local year, month, day, timeofday
+    local currentDateAndTime = Core:FormatTimestamp(timestamp)
+    timeofday = strsub(currentDateAndTime, 10)
+    year, month, day = strsplit("/", strsub(currentDateAndTime, 1, 8))
+    return year, month, day, timeofday
+end
+
 -- This also returns false if not in raid
 function Core:IsPlayerMasterLooter()
     local _, _, masterlooterRaidID = GetLootMethod();

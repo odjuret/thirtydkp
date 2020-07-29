@@ -74,3 +74,20 @@ function View:CreateTextInputFrame(parent, label, value, valueChangedCallback)
 
     return wrapper;
 end
+
+function View:CreateContainerFrame(parentFrame, title, width, height)
+    local f = CreateFrame("Frame", "ThirtyDKP_HistoryFrame", parentFrame, "TooltipBorderedFrameTemplate");
+	f:SetShown(false);
+	f:SetSize(width, height);
+	f:SetFrameStrata("HIGH");
+	f:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
+    f:EnableMouse(true);
+
+    -- title
+    f.title = f:CreateFontString(nil, Const.OVERLAY_LAYER);
+    f.title:SetFontObject("GameFontNormal");
+    f.title:SetPoint(Const.TOP_LEFT_POINT, f, Const.TOP_LEFT_POINT, 15, -10);
+    f.title:SetText(title);
+
+    return f
+end

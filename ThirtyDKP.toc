@@ -17,6 +17,7 @@ View\Bidding\BidAnnounceFrame.lua
 View\Bidding\BiddingFrame.lua
 View\BroadcastingStatusFrame.lua
 View\AdminsFrame.lua
+View\DKPHistoryFrame.lua
 View\FrameFactory.lua
 
 DAL\DKPTable.lua

@@ -43,6 +43,7 @@ local function CompareDataVersions()
 
         if tonumber(knownLatestVersionDate) <= tonumber(localVersionDate) then
             isUpToDate = true
+            Core:Print("Up-to-date. The reliability of this statement is directly related to number of guildies online.")
         end
 
         if not isUpToDate then
@@ -57,7 +58,7 @@ end
 
 
 function Core:CheckDataVersion()
-    Core:Print("Attempting to sync DKP data with guild.")
+    Core:Print("Attempting to sync DKP data with online guildies.")
     -- Request data versions from online members
     local latestKnownVersion = Core:GetLatestKnownVersion()
     Core:RequestDataVersionSync(latestKnownVersion)

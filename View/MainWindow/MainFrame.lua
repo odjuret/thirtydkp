@@ -152,6 +152,7 @@ local function AttachRaidScript(frame)
 	frame:SetScript("OnClick", function()
         View:HideOptionsFrame();
         View:HideTdkpAdminsFrame()
+        View:HideDKPHistoryFrame();
 		View:ToggleRaidFrame();
 	end);
 end
@@ -171,10 +172,31 @@ local function AttachDKPAdminsBtnScripts(frame)
     frame:SetScript("OnClick", function()
         View:HideOptionsFrame();
         View:HideRaidFrame();
+        View:HideDKPHistoryFrame();
         View:ToggleTdkpAdminsFrame()
 	end);
 end
 
+
+local function AttachDKPHistoryBtnScripts(frame)
+    frame:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+        GameTooltip:SetText("DKP History", 0.25, 0.75, 0.90, 1, true);
+        GameTooltip:AddLine("Manage DKP history for your guild.", 1.0, 1.0, 1.0, true);
+        GameTooltip:Show();
+    end);
+
+	frame:SetScript("OnLeave", function(self)
+        GameTooltip:Hide()
+    end);
+
+    frame:SetScript("OnClick", function()
+        View:HideOptionsFrame();
+        View:HideRaidFrame();
+        View:HideTdkpAdminsFrame()
+        View:ToggleDKPHistoryFrame();
+	end);
+end
 
 local function CreateMainFrame(isAddonAdmin)
     local mainFrameWidth;
@@ -293,6 +315,18 @@ local function CreateMainFrame(isAddonAdmin)
         MainFrame.dkpAdminsBtn:RegisterForClicks("AnyUp");
 
         AttachDKPAdminsBtnScripts(MainFrame.dkpAdminsBtn);
+
+
+        -- dkp history button
+        MainFrame.dkpHistoryBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
+        MainFrame.dkpHistoryBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame.dkpAdminsBtn, Const.TOP_RIGHT_POINT, 0, 0);
+        MainFrame.dkpHistoryBtn:SetSize(80, Const.ButtonHeight);
+        MainFrame.dkpHistoryBtn:SetText("History");
+        MainFrame.dkpHistoryBtn:SetNormalFontObject("GameFontNormal");
+        MainFrame.dkpHistoryBtn:SetHighlightFontObject("GameFontHighlight");
+        MainFrame.dkpHistoryBtn:RegisterForClicks("AnyUp");
+
+        AttachDKPHistoryBtnScripts(MainFrame.dkpHistoryBtn);
     end
 end
 
@@ -319,7 +353,8 @@ function View:Initialize()
     if isAddonAdmin then
         View:CreateOptionsFrame(MainFrame);
 		View:CreateRaidFrame(MainFrame);
-		View:CreateTdkpAdminsFrame(MainFrame);
+        View:CreateTdkpAdminsFrame(MainFrame);
+        View:CreateDKPHistoryFrame(MainFrame);
     end
 
 	Initialized = true;

@@ -10,34 +10,120 @@ local SORT_DESCENDING = "Descending"
 function DAL:InitializeOptions()
 	if not ThirtyDKP_Database_Options then
 		ThirtyDKP_Database_Options = {
-			dkpGainPerKill = 0,
-			onTimeBonus = 0,
-			raidCompletionBonus = 0,
-			decay = 0,
-			itemCosts = {
-				head = 0,
-				neck = 0,
-				shoulders = 0,
-				back = 0,
-				chest = 0,
-				bracers = 0,
-				gloves = 0,
-				belt = 0,
-				legs = 0,
-				boots = 0,
-				ring = 0,
-				trinket = 0,
-				oneHandedWeapon = 0,
-				twoHandedWeapon = 0,
-				rangedWeapon = 0,
-				default = 10,
-			},
 			dkpTableSorting = {
 				column = "player",
 				mode = "Ascending"
 			},
 			addonAdmins = {},
-			bidTime = 20
+			bidTime = 20,
+			decay = 0,
+			onTimeBonus = 0,
+			raidCompletionBonus = 0,
+			naxxramas = {
+				dkpGainPerKill = 0,
+				itemCosts = {
+					head = 0,
+					neck = 0,
+					shoulders = 0,
+					back = 0,
+					chest = 0,
+					bracers = 0,
+					gloves = 0,
+					belt = 0,
+					legs = 0,
+					boots = 0,
+					ring = 0,
+					trinket = 0,
+					oneHandedWeapon = 0,
+					twoHandedWeapon = 0,
+					rangedWeapon = 0,
+					default = 10,
+				},
+			},
+			aq40 = {
+				dkpGainPerKill = 0,
+				itemCosts = {
+					head = 0,
+					neck = 0,
+					shoulders = 0,
+					back = 0,
+					chest = 0,
+					bracers = 0,
+					gloves = 0,
+					belt = 0,
+					legs = 0,
+					boots = 0,
+					ring = 0,
+					trinket = 0,
+					oneHandedWeapon = 0,
+					twoHandedWeapon = 0,
+					rangedWeapon = 0,
+					default = 10,
+				},
+			},
+			bwl = {
+				dkpGainPerKill = 0,
+				itemCosts = {
+					head = 0,
+					neck = 0,
+					shoulders = 0,
+					back = 0,
+					chest = 0,
+					bracers = 0,
+					gloves = 0,
+					belt = 0,
+					legs = 0,
+					boots = 0,
+					ring = 0,
+					trinket = 0,
+					oneHandedWeapon = 0,
+					twoHandedWeapon = 0,
+					rangedWeapon = 0,
+					default = 10,
+				},
+			},
+			mc = {
+				dkpGainPerKill = 0,
+				itemCosts = {
+					head = 0,
+					neck = 0,
+					shoulders = 0,
+					back = 0,
+					chest = 0,
+					bracers = 0,
+					gloves = 0,
+					belt = 0,
+					legs = 0,
+					boots = 0,
+					ring = 0,
+					trinket = 0,
+					oneHandedWeapon = 0,
+					twoHandedWeapon = 0,
+					rangedWeapon = 0,
+					default = 10,
+				},
+			},
+			onyxia = {
+				dkpGainPerKill = 0,
+				itemCosts = {
+					head = 0,
+					neck = 0,
+					shoulders = 0,
+					back = 0,
+					chest = 0,
+					bracers = 0,
+					gloves = 0,
+					belt = 0,
+					legs = 0,
+					boots = 0,
+					ring = 0,
+					trinket = 0,
+					oneHandedWeapon = 0,
+					twoHandedWeapon = 0,
+					rangedWeapon = 0,
+					default = 10,
+				},
+			},
 		};
 	end
 end
@@ -69,6 +155,10 @@ end
 
 function DAL:GetOptions()
 	return ThirtyDKP_Database_Options;
+end
+
+function DAL:GetRaidOptions(raidName)
+	return ThirtyDKP_Database_Options[raidName];
 end
 
 function DAL:GetDKPTableSorting()

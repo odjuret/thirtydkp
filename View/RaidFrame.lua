@@ -155,6 +155,10 @@ function View:CreateRaidFrame(parentFrame)
 		DAL:AddToHistory(listOfAdjustedPlayers, DkpAdjustAmount, DkpAdjustReason);
 		DAL:UpdateDKPHistoryVersion()
 		DAL:UpdateDKPTableVersion()
+		View:UpdateDKPTable();
+
+		amountInput.input:SetText("");
+		reasonInput.input:SetText("");
 	end);
 
 	local applyDecayBtn = CreateFrame("Button", nil, RaidFrame, "GameMenuButtonTemplate");

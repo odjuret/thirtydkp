@@ -64,9 +64,6 @@ function View:CreateTextInputFrame(parent, label, value, valueChangedCallback)
     wrapper.input:SetScript("OnEscapePressed", function(self)
         self:ClearFocus();
     end);
-    wrapper.input:SetScript("OnSpacePressed", function(self)
-        self:ClearFocus();
-    end);
 
     local tex = wrapper.input:CreateTexture(nil, "BACKGROUND");
     tex:SetAllPoints();

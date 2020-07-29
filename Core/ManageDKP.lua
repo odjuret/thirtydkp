@@ -2,6 +2,7 @@ local addonName, ThirtyDKP = ...
 
 local Core = ThirtyDKP.Core
 local DAL = ThirtyDKP.DAL
+local View = ThirtyDKP.View;
 
 local bossEventIds = {  
         -- MC 
@@ -31,50 +32,68 @@ local bossEventIds = {
         1084
 }
 
+
+local function GetRaidNameFromId(raidId)
+	if raidId == 531 then
+		return "aq40";
+	elseif raidId == 469 then
+		return "bwl";
+	elseif raidId == 409 then
+		return "mc";
+	elseif raidId == 249 then
+		return "onyxia";
+	else
+		Core:Print("Could not find raid name for raid id "..raidId);
+		return "";
+	end
+end
+
 local function GetDKPCostByEquipLocation(itemEquipLoc)
-    local thirtyDkpOptions = DAL:GetOptions();
+	local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo()
+    local options = DAL:GetRaidOptions(GetRaidNameFromId(instanceMapId));
+
     if not itemEquipLoc then
-        return thirtyDkpOptions.itemCosts.default
+        return options.itemCosts.default
     end
 
     if itemEquipLoc == "INVTYPE_HEAD" then
-        return thirtyDkpOptions.itemCosts.head
+        return options.itemCosts.head
     elseif itemEquipLoc == "INVTYPE_NECK" then
-        return thirtyDkpOptions.itemCosts.neck
+        return options.itemCosts.neck
     elseif itemEquipLoc == "INVTYPE_SHOULDER" then
-        return thirtyDkpOptions.itemCosts.shoulders
+        return options.itemCosts.shoulders
     elseif itemEquipLoc == "INVTYPE_CHEST" or itemEquipLoc == "INVTYPE_ROBE" then
-        return thirtyDkpOptions.itemCosts.chest
+        return options.itemCosts.chest
     elseif itemEquipLoc == "INVTYPE_WAIST" then
-        return thirtyDkpOptions.itemCosts.belt
+        return options.itemCosts.belt
     elseif itemEquipLoc == "INVTYPE_HAND" then
-        return thirtyDkpOptions.itemCosts.gloves
+        return options.itemCosts.gloves
     elseif itemEquipLoc == "INVTYPE_LEGS" then
-        return thirtyDkpOptions.itemCosts.legs
+        return options.itemCosts.legs
     elseif itemEquipLoc == "INVTYPE_FEET" then
-        return thirtyDkpOptions.itemCosts.boots
+        return options.itemCosts.boots
     elseif itemEquipLoc == "INVTYPE_WRIST" then
-        return thirtyDkpOptions.itemCosts.bracers
+        return options.itemCosts.bracers
     elseif itemEquipLoc == "INVTYPE_FINGER" then
-        return thirtyDkpOptions.itemCosts.ring
+        return options.itemCosts.ring
     elseif itemEquipLoc == "INVTYPE_TRINKET" then
-        return thirtyDkpOptions.itemCosts.trinket
+        return options.itemCosts.trinket
     elseif itemEquipLoc == "INVTYPE_CLOAK" then
-        return thirtyDkpOptions.itemCosts.back
+        return options.itemCosts.back
     elseif itemEquipLoc == "INVTYPE_WEAPON" then
-        return thirtyDkpOptions.itemCosts.oneHandedWeapon
+        return options.itemCosts.oneHandedWeapon
     elseif itemEquipLoc == "INVTYPE_SHIELD" then
     elseif itemEquipLoc == "INVTYPE_2HWEAPON" then
-        return thirtyDkpOptions.itemCosts.twoHandedWeapon
+        return options.itemCosts.twoHandedWeapon
     elseif itemEquipLoc == "INVTYPE_WEAPONMAINHAND" then
-        return thirtyDkpOptions.itemCosts.oneHandedWeapon
+        return options.itemCosts.oneHandedWeapon
     elseif itemEquipLoc == "INVTYPE_WEAPONOFFHAND" then
-        return thirtyDkpOptions.itemCosts.oneHandedWeapon
+        return options.itemCosts.oneHandedWeapon
     elseif itemEquipLoc == "INVTYPE_HOLDABLE" then
     elseif itemEquipLoc == "INVTYPE_RANGED" or itemEquipLoc == "INVTYPE_THROWN" or itemEquipLoc == "INVTYPE_RANGEDRIGHT"then
-        return thirtyDkpOptions.itemCosts.rangedWeapon
+        return options.itemCosts.rangedWeapon
     else 
-        return thirtyDkpOptions.itemCosts.default
+        return options.itemCosts.default
     end
 end
 
@@ -112,9 +131,9 @@ function Core:HandleBossKill(eventId, ...)
         end
     end
     if not shouldAwardDKP then return end
-    -- todo: add options check if raid zone should award dkp
 
-    local bossKillDKPAward = DAL:GetOptions().dkpGainPerKill;
+	local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo()
+    local bossKillDKPAward = DAL:GetRaidOptions(GetRaidNameFromId(instanceMapId)).dkpGainPerKill;
     local playerName, playerClass;
     local listOfAwardedPlayers = "";
     -- for every person in the raid
@@ -140,6 +159,7 @@ function Core:HandleBossKill(eventId, ...)
     DAL:UpdateDKPTableVersion()
     -- broadcast event
     Core:SendDKPEventMessage(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
+	View:UpdateDKPTable();
 end
 
 local function IsInSameGuild(playerName)
@@ -178,7 +198,7 @@ function Core:AddGuildToDKPTable()
         nameFromGuild = strsub(nameFromGuild, 1, string.find(nameFromGuild, "-")-1) -- required to remove server name from player (can remove in classic if this is not an issue)
         
         -- TODO: user be able to choose rank
-        if rankIndex < 2 then
+        if rankIndex <= 4 then
             if DAL:AddToDKPTable(nameFromGuild, tempClass) then
                 Core:Print("added "..nameFromGuild.." successfully to table.")
             end
@@ -208,6 +228,7 @@ function Core:ApplyOnTimeBonus()
 	DAL:UpdateDKPHistoryVersion()
 	DAL:UpdateDKPTableVersion()
 	Core:SendDKPEventMessage(listOfAwardedPlayers, onTimeBonus, "On Time Bonus")
+	View:UpdateDKPTable();
 end
 
 
@@ -226,12 +247,13 @@ function Core:ApplyRaidEndBonus()
 				listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
             end
 		end
-
-		DAL:AddToHistory(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus");
-		DAL:UpdateDKPHistoryVersion()
-		DAL:UpdateDKPTableVersion()
-		Core:SendDKPEventMessage(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
 	end
+
+	DAL:AddToHistory(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus");
+	DAL:UpdateDKPHistoryVersion()
+	DAL:UpdateDKPTableVersion()
+	Core:SendDKPEventMessage(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
+	View:UpdateDKPTable();
 end
 
 function Core:ApplyDecay()
@@ -244,7 +266,13 @@ function Core:ApplyDecay()
 
 		if dkpEntry then
 			local decayAmount = math.floor(dkpEntry.dkp * decay);
-			DAL:AdjustPlayerDKP(playerName, -decayAmount);
+			if DAL:AdjustPlayerDKP(playerName, -decayAmount) then
+				DAL:AddToHistory(playerName, decay, "Decay");
+			end
 		end
 	end
+
+	DAL:UpdateDKPHistoryVersion()
+	DAL:UpdateDKPTableVersion()
+	View:UpdateDKPTable();
 end

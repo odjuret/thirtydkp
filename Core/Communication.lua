@@ -37,6 +37,7 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
                     DAL:WipeAndSetNewOptions(deserialized.options)
                     DAL:WipeAndSetNewHistory(deserialized.history)
                     View:UpdateDKPTable()
+					View:UpdateOptionsFrame();
                 end,
                 timeout = 0,
                 whileDead = true,

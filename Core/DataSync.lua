@@ -9,9 +9,14 @@ local knownLatestVersionDate = nil
 
 local function InitializeLatestKnownVersion()
     local dkpTableVersion = DAL:GetDKPTableVersion()
-    local localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion)
-    knownLatestVersionOwner = localVersionOwner
-    knownLatestVersionDate = localVersionDate
+	if dkpTableVersion then
+		local localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion)
+		knownLatestVersionOwner = localVersionOwner
+		knownLatestVersionDate = localVersionDate
+	else
+		knownLatestVersionDate = "";
+		knownLatestVersionOwner = "";
+	end
 end
 
 function Core:GetLatestKnownVersion()

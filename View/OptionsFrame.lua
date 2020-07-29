@@ -8,11 +8,27 @@ local OptionsFrame = nil;
 
 local OPTIONS_FRAME_TITLE = "Options"
 
+local RAID_NAXX = "naxxramas";
+local RAID_AQ40 = "aq40";
+local RAID_BWL = "bwl";
+local RAID_MC = "mc";
+local RAID_ONYXIA = "onyxia";
+
+local SelectedRaid = RAID_NAXX;
+
+
+local RAID_DISPLAY_NAME = {
+	naxxramas = "Naxxramas",
+	aq40 = "Ahn'Qiraj",
+	bwl = "Blackwing Lair",
+	mc = "Molten Core",
+	onyxia = "Onyxia",
+};
 
 local function CreateDkpCostInputFrame(text, itemName, parent)
-    local options = DAL:GetOptions();
+    local options = DAL:GetRaidOptions(SelectedRaid);
     local frame = View:CreateNumericInputFrame(parent, text, options.itemCosts[itemName], function(input)
-        options.itemCosts[itemName] = input:GetNumber();
+		DAL:GetRaidOptions(SelectedRaid).itemCosts[itemName] = input:GetNumber();
     end);
 
     return frame;
@@ -24,10 +40,70 @@ local function CreateAndAttachDkpCostFrame(text, itemName, parent, attachTarget)
     return frame;
 end
 
-function View:CreateOptionsFrame(parentFrame, savedOptions)
+function View:UpdateOptionsFrame()
+	local options = DAL:GetRaidOptions(SelectedRaid);
+	OptionsFrame.dkpGainPerKill.input:SetNumber(options.dkpGainPerKill);
+	OptionsFrame.headCostInput.input:SetNumber(options.itemCosts.head);
+	OptionsFrame.neckCostInput.input:SetNumber(options.itemCosts.neck);
+	OptionsFrame.shouldersCostInput.input:SetNumber(options.itemCosts.shoulders);
+	OptionsFrame.chestCostInput.input:SetNumber(options.itemCosts.chest);
+	OptionsFrame.bracersCostInput.input:SetNumber(options.itemCosts.bracers);
+	OptionsFrame.glovesCostInput.input:SetNumber(options.itemCosts.gloves);
+	OptionsFrame.beltCostInput.input:SetNumber(options.itemCosts.belt);
+	OptionsFrame.legsCostInput.input:SetNumber(options.itemCosts.legs);
+	OptionsFrame.bootsCostInput.input:SetNumber(options.itemCosts.boots);
+	OptionsFrame.ringCostInput.input:SetNumber(options.itemCosts.ring);
+	OptionsFrame.trinketCostInput.input:SetNumber(options.itemCosts.trinket);
+	OptionsFrame.oneHandedWeaponCostInput.input:SetNumber(options.itemCosts.oneHandedWeapon);
+	OptionsFrame.twoHandedWeaponCostInput.input:SetNumber(options.itemCosts.twoHandedWeapon);
+	OptionsFrame.rangedWeaponCostInput.input:SetNumber(options.itemCosts.rangedWeapon);
+end
+
+local function RaidDropdownOnClick(self, arg1, arg2, checked)
+	SelectedRaid = arg1;
+	UIDropDownMenu_SetText(OptionsFrame.raidDropdown, RAID_DISPLAY_NAME[arg1]);
+	View:UpdateOptionsFrame();
+end
+
+local function InitializeRaidDropdown(frame, level, menuList)
+	local info = UIDropDownMenu_CreateInfo();
+	info.func = RaidDropdownOnClick;
+
+	info.text = "Naxxramas";
+	info.arg1 = RAID_NAXX;
+	info.arg2 = info.text;
+	info.checked = SelectedRaid == RAID_NAXX;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = "Ahn'Qiraj";
+	info.arg1 = RAID_AQ40;
+	info.arg2 = info.text;
+	info.checked = SelectedRaid == RAID_AQ40;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = "Blackwing Lair";
+	info.arg1 = RAID_BWL;
+	info.arg2 = info.text;
+	info.checked = SelectedRaid == RAID_BWL;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = "Molten Core";
+	info.arg1 = RAID_MC;
+	info.arg2 = info.text;
+	info.checked = SelectedRaid == RAID_MC;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = "Onyxia";
+	info.arg1 = RAID_ONYXIA;
+	info.arg2 = info.text;
+	info.checked = selectedRaid == RAID_ONYXIA;
+	UIDropDownMenu_AddButton(info);
+end
+
+function View:CreateOptionsFrame(parentFrame)
 	OptionsFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", parentFrame, "TooltipBorderedFrameTemplate"); 
 	OptionsFrame:SetShown(false);
-	OptionsFrame:SetSize(370, 375);
+	OptionsFrame:SetSize(370, 420);
 	OptionsFrame:SetFrameStrata("HIGH");
 	OptionsFrame:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
     OptionsFrame:EnableMouse(true);
@@ -38,46 +114,63 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
     title:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 15, -10);
     title:SetText(OPTIONS_FRAME_TITLE);
 
-    local options = DAL:GetOptions();
+	local options = DAL:GetOptions();
+    local raidOptions = DAL:GetRaidOptions(SelectedRaid);
 
-	local miscSectionHeader = OptionsFrame:CreateFontString(nil, OVERLAY_LAYER);
-	miscSectionHeader:SetFontObject("GameFontWhite");
-	miscSectionHeader:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 10, -35);
-	miscSectionHeader:SetText("Miscellaneous");
+	local globalOptionsHeader = OptionsFrame:CreateFontString(nil, OVERLAY_LAYER);
+	globalOptionsHeader:SetFontObject("GameFontWhite");
+	globalOptionsHeader:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 10, -35);
+	globalOptionsHeader:SetText("Global Options");
 
-    -- Misc settings, two sections
-    local miscSectionLeft = CreateFrame("Frame", nil, OptionsFrame, nil);
-    miscSectionLeft:SetSize(135, 70);
-    miscSectionLeft:SetPoint(Const.TOP_LEFT_POINT, miscSectionHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
 
-    local miscSectionRight = CreateFrame("Frame", nil, OptionsFrame, nil);
-    miscSectionRight:SetSize(180, 70);
-    miscSectionRight:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.TOP_RIGHT_POINT, 20, 0);
+    -- global settings, two sections
+    local globalSectionLeft = CreateFrame("Frame", nil, OptionsFrame, nil);
+    globalSectionLeft:SetSize(180, 70);
+    globalSectionLeft:SetPoint(Const.TOP_LEFT_POINT, globalOptionsHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
 
-	local dkpGainPerKill = View:CreateNumericInputFrame(miscSectionLeft, "DKP Per Kill:", options.dkpGainPerKill, function(input)
-        options.dkpGainPerKill = input:GetNumber();
-    end);
-    dkpGainPerKill:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.TOP_LEFT_POINT, 0, 0);
+    local globalSectionRight = CreateFrame("Frame", nil, OptionsFrame, nil);
+    globalSectionRight:SetSize(135, 70);
+    globalSectionRight:SetPoint(Const.TOP_LEFT_POINT, globalSectionLeft, Const.TOP_RIGHT_POINT, 20, 0);
 
-    local onTimeBonus = View:CreateNumericInputFrame(miscSectionLeft, "On Time Bonus:", options.onTimeBonus, function(input)
+    OptionsFrame.onTimeBonus = View:CreateNumericInputFrame(globalSectionLeft, "On Time Bonus:", options.onTimeBonus, function(input)
         options.onTimeBonus = input:GetNumber();
     end);
-	onTimeBonus:SetPoint(Const.TOP_LEFT_POINT, dkpGainPerKill, Const.BOTTOM_LEFT_POINT, 0, 0);
+	OptionsFrame.onTimeBonus:SetPoint(Const.TOP_LEFT_POINT, globalSectionLeft, Const.TOP_LEFT_POINT, 0, 0);
 
-	local raidCompletionBonus = View:CreateNumericInputFrame(miscSectionRight, "Raid Completion Bonus:", options.raidCompletionBonus, function(input)
+	OptionsFrame.raidCompletionBonus = View:CreateNumericInputFrame(globalSectionLeft, "Raid Completion Bonus:", options.raidCompletionBonus, function(input)
         options.raidCompletionBonus = input:GetNumber();
     end);
-	raidCompletionBonus:SetPoint(Const.TOP_LEFT_POINT, miscSectionRight, Const.TOP_LEFT_POINT, 0, 0);
+	OptionsFrame.raidCompletionBonus:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame.onTimeBonus, Const.BOTTOM_LEFT_POINT, 0, 0);
 
-	local decay = View:CreateNumericInputFrame(miscSectionRight, "Decay Percent:", options.decay, function(input)
+	OptionsFrame.decay = View:CreateNumericInputFrame(globalSectionRight, "Decay Percent:", options.decay, function(input)
         options.decay = input:GetNumber();
     end);
-	decay:SetPoint(Const.TOP_LEFT_POINT, raidCompletionBonus, Const.BOTTOM_LEFT_POINT, 0, 0);
+	OptionsFrame.decay:SetPoint(Const.TOP_LEFT_POINT);
 
+
+	local raidOptionsHeader = OptionsFrame:CreateFontString(nil, OVERLAY_LAYER);
+	raidOptionsHeader:SetFontObject("GameFontWhite");
+	raidOptionsHeader:SetPoint(Const.TOP_LEFT_POINT, globalSectionLeft, Const.BOTTOM_LEFT_POINT, -10, 0);
+	raidOptionsHeader:SetText("Raid Specific Options for: ");
+
+	OptionsFrame.raidDropdown = CreateFrame("Frame", "ThirtyDKP_RaidOptionsDropdown", OptionsFrame, "UIDropDownMenuTemplate");
+	OptionsFrame.raidDropdown:SetPoint(Const.LEFT_POINT, raidOptionsHeader, Const.RIGHT_POINT, 0, -4);
+	UIDropDownMenu_SetWidth(OptionsFrame.raidDropdown, 110);
+	UIDropDownMenu_Initialize(OptionsFrame.raidDropdown, InitializeRaidDropdown);
+	UIDropDownMenu_SetText(OptionsFrame.raidDropdown, RAID_DISPLAY_NAME[SelectedRaid]);
+
+
+	local dkpGainSection = CreateFrame("Frame", nil, OptionsFrame, nil);
+	dkpGainSection:SetSize(115, 30);
+	dkpGainSection:SetPoint(Const.TOP_LEFT_POINT, raidOptionsHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
+	OptionsFrame.dkpGainPerKill = View:CreateNumericInputFrame(dkpGainSection, "DKP Per Kill:", raidOptions.dkpGainPerKill, function(input)
+		DAL:GetRaidOptions(SelectedRaid).dkpGainPerKill = input:GetNumber();
+    end);
+    OptionsFrame.dkpGainPerKill:SetAllPoints();
 
 	local itemCostHeader = OptionsFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
-	itemCostHeader:SetFontObject("GameFontWhite");
-	itemCostHeader:SetPoint(Const.TOP_LEFT_POINT, miscSectionLeft, Const.BOTTOM_LEFT_POINT, -10, -10);
+	itemCostHeader:SetFontObject("GameFontNormal");
+	itemCostHeader:SetPoint(Const.TOP_LEFT_POINT, dkpGainSection, Const.BOTTOM_LEFT_POINT, 0, -10);
 	itemCostHeader:SetText("Item Costs");
 
     -- Item cost setting, two sections
@@ -90,25 +183,25 @@ function View:CreateOptionsFrame(parentFrame, savedOptions)
     itemCostSectionRight:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionLeft, Const.TOP_RIGHT_POINT, 20, 0);
 
     -- Left section
-    local headCostInput = CreateDkpCostInputFrame("Head:", "head", itemCostSectionLeft);
-    headCostInput:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionLeft, Const.TOP_LEFT_POINT, 0, 0);
+    OptionsFrame.headCostInput = CreateDkpCostInputFrame("Head:", "head", itemCostSectionLeft);
+    OptionsFrame.headCostInput:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionLeft, Const.TOP_LEFT_POINT, 0, 0);
 
-    local neckCostInput = CreateAndAttachDkpCostFrame("Neck:", "neck", itemCostSectionLeft, headCostInput);
-    local shouldersCostInput = CreateAndAttachDkpCostFrame("Shoulders:", "shoulders", itemCostSectionLeft, neckCostInput);
-    local chestCostInput = CreateAndAttachDkpCostFrame("Chest:", "chest", itemCostSectionLeft, shouldersCostInput);
-    local bracersCostInput = CreateAndAttachDkpCostFrame("Bracers:", "bracers", itemCostSectionLeft, chestCostInput);
-    local glovesCostInput = CreateAndAttachDkpCostFrame("Gloves:", "gloves", itemCostSectionLeft, bracersCostInput);
-    local beltCostInput = CreateAndAttachDkpCostFrame("Belt:", "belt", itemCostSectionLeft, glovesCostInput);
+    OptionsFrame.neckCostInput = CreateAndAttachDkpCostFrame("Neck:", "neck", itemCostSectionLeft, OptionsFrame.headCostInput);
+    OptionsFrame.shouldersCostInput = CreateAndAttachDkpCostFrame("Shoulders:", "shoulders", itemCostSectionLeft, OptionsFrame.neckCostInput);
+    OptionsFrame.chestCostInput = CreateAndAttachDkpCostFrame("Chest:", "chest", itemCostSectionLeft, OptionsFrame.shouldersCostInput);
+    OptionsFrame.bracersCostInput = CreateAndAttachDkpCostFrame("Bracers:", "bracers", itemCostSectionLeft, OptionsFrame.chestCostInput);
+    OptionsFrame.glovesCostInput = CreateAndAttachDkpCostFrame("Gloves:", "gloves", itemCostSectionLeft, OptionsFrame.bracersCostInput);
+    OptionsFrame.beltCostInput = CreateAndAttachDkpCostFrame("Belt:", "belt", itemCostSectionLeft, OptionsFrame.glovesCostInput);
 
     -- Right section
-    local legsCostInput = CreateDkpCostInputFrame("Legs:", "legs", itemCostSectionRight, itemCostSectionRight);
-    legsCostInput:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionRight, Const.TOP_LEFT_POINT, 0, 0);
-    local bootsCostInput = CreateAndAttachDkpCostFrame("Boots:", "boots", itemCostSectionRight, legsCostInput);
-    local ringCostInput = CreateAndAttachDkpCostFrame("Ring:", "ring", itemCostSectionRight, bootsCostInput);
-    local trinketCostInput = CreateAndAttachDkpCostFrame("Trinket:", "trinket", itemCostSectionRight, ringCostInput);
-    local oneHandedWeaponCostInput = CreateAndAttachDkpCostFrame("One-handed:", "oneHandedWeapon", itemCostSectionRight, trinketCostInput);
-    local twoHandedWeaponCostInput = CreateAndAttachDkpCostFrame("Two-handed:", "twoHandedWeapon", itemCostSectionRight, oneHandedWeaponCostInput);
-    local rangedWeaponCostInput = CreateAndAttachDkpCostFrame("Ranged:", "rangedWeapon", itemCostSectionRight, twoHandedWeaponCostInput);
+    OptionsFrame.legsCostInput = CreateDkpCostInputFrame("Legs:", "legs", itemCostSectionRight, itemCostSectionRight);
+    OptionsFrame.legsCostInput:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionRight, Const.TOP_LEFT_POINT, 0, 0);
+    OptionsFrame.bootsCostInput = CreateAndAttachDkpCostFrame("Boots:", "boots", itemCostSectionRight, OptionsFrame.legsCostInput);
+    OptionsFrame.ringCostInput = CreateAndAttachDkpCostFrame("Ring:", "ring", itemCostSectionRight, OptionsFrame.bootsCostInput);
+    OptionsFrame.trinketCostInput = CreateAndAttachDkpCostFrame("Trinket:", "trinket", itemCostSectionRight, OptionsFrame.ringCostInput);
+    OptionsFrame.oneHandedWeaponCostInput = CreateAndAttachDkpCostFrame("One-handed:", "oneHandedWeapon", itemCostSectionRight, OptionsFrame.trinketCostInput);
+    OptionsFrame.twoHandedWeaponCostInput = CreateAndAttachDkpCostFrame("Two-handed:", "twoHandedWeapon", itemCostSectionRight, OptionsFrame.oneHandedWeaponCostInput);
+    OptionsFrame.rangedWeaponCostInput = CreateAndAttachDkpCostFrame("Ranged:", "rangedWeapon", itemCostSectionRight, OptionsFrame.twoHandedWeaponCostInput);
 
 
     -- Buttons
@@ -124,3 +217,4 @@ end
 function View:HideOptionsFrame()
     OptionsFrame:SetShown(false);
 end
+

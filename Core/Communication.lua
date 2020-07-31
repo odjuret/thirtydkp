@@ -27,7 +27,6 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
         local decoded = LibDeflate:DecompressDeflate(LibDeflate:DecodeForWoWAddonChannel(message))
         local success, deserialized = LibAceSerializer:Deserialize(decoded);
         if success then
-
             StaticPopupDialogs["FULL_BROADCAST_WARNING"] = {
                 text = "Warning! Incoming DKP Table broadcast. Do you trust the sender "..sender.."?",
                 button1 = "Yes",
@@ -45,7 +44,6 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
                 preferredIndex = 3,
             }
             StaticPopup_Show ("FULL_BROADCAST_WARNING")
-
         else
             Core:Print("DKP Table broadcasting message recieved but something went wrong... Contact Authors.")
         end
@@ -70,6 +68,11 @@ local function HandleDKPEventMessage(prefix, message, distribution, sender)
         local decoded = LibDeflate:DecompressDeflate(LibDeflate:DecodeForWoWAddonChannel(message))
         local success, deserialized = LibAceSerializer:Deserialize(decoded);
         if success then
+            if not Core:DoesDataBelongToSameGuild(deserialized.updatedTable.version) then
+                -- todo: turn off events for this raid
+                Core:Print("Incoming DKP events from different guild.")
+            end
+            
             DAL:WipeAndSetNewDKPTable(deserialized.updatedTable)
 
             -- add event to history

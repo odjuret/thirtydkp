@@ -17,7 +17,6 @@ local function SortTable()
 	end
 end
 
-
 function DAL:InitializeDKPTable()
     -- saved variables starts as nil. we want a empty tables
     if not ThirtyDKP_Database_DKPTable then ThirtyDKP_Database_DKPTable = {} end;
@@ -32,14 +31,12 @@ function DAL:GetDKPTable()
 end
 
 function DAL:GetNumberOfRowsInDKPTable()
-	
     return #ThirtyDKP_Database_DKPTable;
 end
 
 function DAL:WipeAndSetNewDKPTable(newTable)
 	ThirtyDKP_Database_DKPTable = {}
 	ThirtyDKP_Database_DKPTable = newTable
-
 end
 
 -- todo: move table search out of this file
@@ -154,10 +151,12 @@ end
 
 function DAL:UpdateDKPTableVersion()
 	local currentTime = time();
-	local index = UnitName("player").."-"..currentTime
-	ThirtyDKP_Database_DKPTable.version = index
+	local guildName = GetGuildInfo("player");
+	local dkpDataVersion = guildName.."-"..UnitName("player").."-"..currentTime;
+	ThirtyDKP_Database_DKPTable.version = dkpDataVersion
 end
 
+-- dkp data version example: "Essential-Ligre-1595774827"
 function DAL:GetDKPTableVersion()
 	return ThirtyDKP_Database_DKPTable.version
 end

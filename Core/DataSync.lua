@@ -4,13 +4,18 @@ local Core = ThirtyDKP.Core
 local DAL = ThirtyDKP.DAL
 
 local isUpToDate = false
+local recievedUpdates = 0
 local knownLatestVersionOwner = nil
 local knownLatestVersionDate = nil
+
+function Core:IsDataUpToDate()
+    return isUpToDate
+end
 
 local function InitializeLatestKnownVersion()
     local dkpTableVersion = DAL:GetDKPTableVersion()
 	if dkpTableVersion then
-		local localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion)
+		local _, localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion)
 		knownLatestVersionOwner = localVersionOwner
 		knownLatestVersionDate = localVersionDate
 	else
@@ -28,7 +33,12 @@ end
 
 
 function Core:TryUpdateKnownVersion(incomingVersionIndex)
-    local incomingVersionOwner, incomingVersionDate = strsplit("-", incomingVersionIndex)
+    local incomingGuildname, incomingVersionOwner, incomingVersionDate = strsplit("-", incomingVersionIndex)
+    local guildname = strsplit("-", DAL:GetDKPTableVersion()) 
+    if not incomingGuildname == guildname then
+        return;
+    end
+    recievedUpdates = recievedUpdates +1
 
     if knownLatestVersionOwner == nil then
         InitializeLatestKnownVersion()
@@ -44,16 +54,28 @@ local function CompareDataVersions()
     local dkpTableVersion = DAL:GetDKPTableVersion()
 
     if dkpTableVersion ~= nil then
-        local localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion) 
+        local dataGuildname = strsplit("-", DAL:GetDKPTableVersion())
+        local currentGuildName = GetGuildInfo("player");
+        if not currentGuildName == dataGuildname then
+            Core:Print("Actual guild: "..currentGuildName.." mismatches with ThirtyDKP data guild name: "..dataGuildname..".")
+            return;
+        end
+
+        if recievedUpdates < 4 then
+            Core:Print("Not enough updates recieved. Try again when more guildies are online.")
+            return;
+        end
+
+        local _, localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion) 
 
         if tonumber(knownLatestVersionDate) <= tonumber(localVersionDate) then
             isUpToDate = true
-            Core:Print("Up-to-date. The reliability of this statement is directly related to number of guildies online.")
+            Core:Print("Up-to-date.");
         end
 
         if not isUpToDate then
             local formattedDate = Core:FormatTimestamp(knownLatestVersionDate)
-            Core:Print("Newer dkp data found from "..formattedDate..". By "..knownLatestVersionOwner..".")
+            Core:Print("Newer DKP data found from "..formattedDate..". By "..knownLatestVersionOwner..".");
         end
     else
         -- No history or version to check, so probably brand new install.
@@ -63,10 +85,25 @@ end
 
 
 function Core:CheckDataVersion()
-    Core:Print("Attempting to sync DKP data with online guildies.")
-    -- Request data versions from online members
-    local latestKnownVersion = Core:GetLatestKnownVersion()
-    Core:RequestDataVersionSync(latestKnownVersion)
+    if not IsInGuild() then
+        Core:Print("No guild to sync data with.")
+    else
+        Core:Print("Attempting to sync DKP data with online guildies.")
+        -- Request data versions from online members
+        local latestKnownVersion = Core:GetLatestKnownVersion()
+        Core:RequestDataVersionSync(latestKnownVersion)
 
-    C_Timer.After(6, CompareDataVersions)
+        C_Timer.After(6, CompareDataVersions)
+    end
+end
+
+function Core:DoesDataBelongToSameGuild(incomingDKPTableDataVersion)
+    local results = false
+    local incomingGuildname = strsplit("-", incomingDKPTableDataVersion)
+    local guildname = strsplit("-", DAL:GetDKPTableVersion()) 
+
+    if guildname == incomingGuildname then
+        results = true
+    end
+    return results
 end

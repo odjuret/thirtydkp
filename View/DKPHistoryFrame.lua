@@ -30,11 +30,11 @@ local function CreateDKPHistoryListRow(parent, id, dkpHistory, hasDateHeader)
         b.dateHeader:SetText(dkpHistory[id].timestamp);
 
         b.dateHeader:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT)   
-        b.reason:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT, 0, -10)
-        b.affectedPlayers:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT, 0, -20)
+        b.reason:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT, 10, -10)
+        b.affectedPlayers:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT, 10, -20)
     else
-        b.reason:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT)
-        b.affectedPlayers:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT, 0, -10)
+        b.reason:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT, 10, 0)
+        b.affectedPlayers:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT, 10, -10)
     end
 
 	b:RegisterForClicks("AnyUp");
@@ -72,7 +72,7 @@ local function PopulateDKPHistoryList(scrollChild, dkpHistory)
 end
 
 function View:CreateDKPHistoryFrame(parentFrame)
-	DKPHistoryFrame = View:CreateContainerFrame(parentFrame, DKPHISTORY_FRAME_TITLE, 170, 190)
+	DKPHistoryFrame = View:CreateContainerFrame(parentFrame, DKPHISTORY_FRAME_TITLE, 272, 385)
 
     local dkpHistory = DAL:GetDKPHistory()
 
@@ -81,13 +81,13 @@ function View:CreateDKPHistoryFrame(parentFrame)
 	f:SetFrameStrata("HIGH");
 	f:SetFrameLevel(9);
 
-	f:SetSize( 130, 100 );
-	f:SetPoint( Const.TOP_LEFT_POINT, 10, -30 );
+	f:SetSize( 240, 350 );
+	f:SetPoint( Const.TOP_LEFT_POINT, 5, -30 );
 	f.scrollBar = _G["DKPHistoryScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 
     f.scrollChild = CreateFrame( "Frame", "$parent_ScrollChild", f );
 	f.scrollChild:SetHeight( (45*#dkpHistory)+3 );
-    f.scrollChild:SetWidth( 130 );
+    f.scrollChild:SetWidth( 240 );
 	f.scrollChild:SetAllPoints( f );
 	f.scrollChild.bg = f.scrollChild:CreateTexture(nil, Const.BACKGROUND_LAYER)
 	f.scrollChild.bg:SetAllPoints(true)

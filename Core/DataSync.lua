@@ -85,7 +85,8 @@ end
 
 
 function Core:CheckDataVersion()
-    if not IsInGuild() then
+    local currentGuildName = GetGuildInfo("player");
+    if currentGuildName == nil then
         Core:Print("No guild to sync data with.")
     else
         Core:Print("Attempting to sync DKP data with online guildies.")

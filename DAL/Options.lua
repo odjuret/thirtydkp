@@ -14,6 +14,7 @@ function DAL:InitializeOptions()
 				column = "player",
 				mode = "Ascending"
 			},
+			lastKnownRaid = "mc",
 			addonAdmins = {},
 			bidTime = 20,
 			decay = 0,
@@ -147,11 +148,9 @@ function DAL:RemoveAddonAdmin(playerName)
     end
 end
 
-
 function DAL:GetAddonAdmins()
 	return ThirtyDKP_Database_Options.addonAdmins;
 end
-
 
 function DAL:GetOptions()
 	return ThirtyDKP_Database_Options;
@@ -159,6 +158,14 @@ end
 
 function DAL:GetRaidOptions(raidName)
 	return ThirtyDKP_Database_Options[raidName];
+end
+
+function DAL:GetLastOrDefaultRaid()
+	return ThirtyDKP_Database_Options.lastKnownRaid;
+end
+
+function DAL:SetLastKnownRaid(raidName)
+	ThirtyDKP_Database_Options.lastKnownRaid = raidName;
 end
 
 function DAL:GetDKPTableSorting()

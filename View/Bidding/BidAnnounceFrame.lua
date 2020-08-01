@@ -162,7 +162,7 @@ end
 ----------------------
 local function UpdateLootTableRowsTextures()
     for i,row in ipairs(BidAnnounceFrame.LootTable.scrollChild.Rows) do 
-        if selectedItem and row.item.index == selectedItem.item.index then
+        if selectedItem and row.item.index == selectedItem.item.index and row.item.loot == selectedItem.item.loot then
             row:SetNormalTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
             row:GetNormalTexture():SetAlpha(1)
         else

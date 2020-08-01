@@ -43,14 +43,27 @@ local function GetRaidNameFromId(raidId)
 	elseif raidId == 249 then
 		return "onyxia";
 	else
-		Core:Print("Could not find raid name for raid id "..raidId);
 		return "";
 	end
 end
 
+function Core:CheckRaid()
+    local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo();
+    local raidName = GetRaidNameFromId(instanceMapId);
+    if raidName ~= "" then
+        DAL:SetLastKnownRaid(raidName);
+    end
+end
+
+
 local function GetDKPCostByEquipLocation(itemEquipLoc)
-	local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo()
-    local options = DAL:GetRaidOptions(GetRaidNameFromId(instanceMapId));
+    local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo();
+    local raidName = GetRaidNameFromId(instanceMapId);
+    if raidName == "" then
+        raidName = DAL:GetLastOrDefaultRaid();
+    end
+    
+    local options = DAL:GetRaidOptions(raidName);
 
     if not itemEquipLoc then
         return options.itemCosts.default
@@ -114,6 +127,8 @@ function Core:AwardItem(dkpTableEntry, itemLink, itemDKPCost)
         DAL:UpdateDKPTableVersion()
         -- broadcast event
         Core:SendDKPEventMessage(dkpTableEntry.player, tonumber("-"..itemDKPCost), "Loot: "..itemLink)
+        -- update view
+        View:UpdateDKPTable();
     else
         Core:RaidAnnounce("Could not award "..dkpTableEntry.player.." with "..itemLink.." ");
     end 

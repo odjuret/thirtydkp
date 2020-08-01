@@ -1,0 +1,46 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+
+	<FontFamily  name="ThirtyDKPTiny" virtual="true">
+		<Member alphabet="roman">
+			<Font font="Interface\AddOns\ThirtyDKP\Media\Fonts\homizio_bold.ttf" height="8"/>
+		</Member>
+        <Member alphabet="korean">
+			<Font font="Fonts\2002.TTF" height="8" outline="NORMAL"/>
+		</Member>
+		<Member alphabet="simplifiedchinese">
+			<Font font="Fonts\ARKai_C.ttf" height="8" outline="NORMAL"/>
+		</Member>
+		<Member alphabet="traditionalchinese">
+			<Font font="Fonts\bHEI01B.TTF" height="8" outline="NORMAL"/>
+		</Member>
+		<Member alphabet="russian">
+			<Font font="Fonts\ARIALN.TTF" height="8" outline="NORMAL"/>
+		</Member>
+	</FontFamily>
+	<FontFamily  name="ThirtyDKPNormal" virtual="true">
+		<Member alphabet="roman">
+			<Font font="Interface\AddOns\ThirtyDKP\Media\Fonts\homizio_bold.ttf" height="13"/>
+		</Member>
+        <Member alphabet="korean">
+			<Font font="Fonts\2002.TTF" height="13" outline="NORMAL"/>
+		</Member>
+		<Member alphabet="simplifiedchinese">
+			<Font font="Fonts\ARKai_C.ttf" height="13" outline="NORMAL"/>
+		</Member>
+		<Member alphabet="traditionalchinese">
+			<Font font="Fonts\bHEI01B.TTF" height="13" outline="NORMAL"/>
+		</Member>
+		<Member alphabet="russian">
+			<Font font="Fonts\ARIALN.TTF" height="13" outline="NORMAL"/>
+		</Member>
+	</FontFamily>
+	<Font name="ThirtyDKPTinyCenter" inherits="ThirtyDKPTiny" justifyH="CENTER" virtual="true"/>
+	<Font name="ThirtyDKPTinyLeft" inherits="ThirtyDKPTiny" justifyH="LEFT" virtual="true"/>
+	<Font name="ThirtyDKPTinyRight" inherits="ThirtyDKPTiny" justifyH="RIGHT" virtual="true"/>
+	<Font name="ThirtyDKPNormalCenter" inherits="ThirtyDKPNormal" justifyH="CENTER" virtual="true"/>
+	<Font name="ThirtyDKPNormalLeft" inherits="ThirtyDKPNormal" justifyH="LEFT" virtual="true"/>
+	<Font name="ThirtyDKPNormalRight" inherits="ThirtyDKPNormal" justifyH="RIGHT" virtual="true"/>
+
+</Ui>

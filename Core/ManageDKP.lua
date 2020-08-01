@@ -141,12 +141,20 @@ function Core:HandleBossKill(eventId, ...)
         playerName, _, _, _, playerClass  = GetRaidRosterInfo(i)
         
         if DAL:AdjustPlayerDKP(playerName, tonumber(bossKillDKPAward)) then
-            listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName
+            if i == 1 then
+                listOfAwardedPlayers = playerName;
+            else
+                listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+            end
         else
             -- could not adjust player dkp, add player to dkp table first
             DAL:AddToDKPTable(playerName, playerClass)
             if DAL:AdjustPlayerDKP(playerName, tonumber(bossKillDKPAward)) then
-                listOfAwardedPlayers = listOfAwardedPlayers..playerName..","
+                if i == 1 then
+                    listOfAwardedPlayers = playerName;
+                else
+                    listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+                end
             else
                 Core:Print("Could not award "..playerName.." boss kill DKP. Contact authors.")
             end
@@ -191,6 +199,7 @@ end
 function Core:AddGuildToDKPTable()
     local guildSize = GetNumGuildMembers();
     local nameFromGuild, rank, rankIndex, tempClass;
+    local playersAdded = "";
     
     -- for every person in the guild
     for i=1, guildSize do
@@ -200,9 +209,18 @@ function Core:AddGuildToDKPTable()
         -- TODO: user be able to choose rank
         if rankIndex <= 4 then
             if DAL:AddToDKPTable(nameFromGuild, tempClass) then
-                Core:Print("added "..nameFromGuild.." successfully to table.")
+                if playersAdded == "" then
+                    playersAdded = Core:AddClassColor(nameFromGuild, tempClass)
+                else
+                    playersAdded = playersAdded..", "..Core:AddClassColor(nameFromGuild, tempClass)
+                end
             end
         end
+    end
+    if playersAdded == "" then
+        Core:Print("No more players above "..rank.." found.")
+    else
+        Core:Print("added "..playersAdded.." successfully to table.")
     end
 end
 
@@ -215,11 +233,19 @@ function Core:ApplyOnTimeBonus()
         local playerName, _, _, _, playerClass = GetRaidRosterInfo(i)
 
 		if DAL:AdjustPlayerDKP(playerName, onTimeBonus) then
-            listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+            if i == 1 then
+                listOfAwardedPlayers = playerName;
+            else
+                listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+            end
 		elseif IsInSameGuild(playerName) then
             if DAL:AddToDKPTable(playerName, playerClass) then
                 Core:Print("added "..playerName.." successfully to table.")
-				listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+				if i == 1 then
+                    listOfAwardedPlayers = playerName;
+                else
+                    listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+                end
             end
 		end
 	end
@@ -240,11 +266,20 @@ function Core:ApplyRaidEndBonus()
         local playerName, _, _, _, playerClass = GetRaidRosterInfo(i)
 
 		if DAL:AdjustPlayerDKP(playerName, raidCompletionBonus) then
-            listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+            if i == 1 then
+                listOfAwardedPlayers = playerName;
+            else
+                listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+            end
+            
 		elseif IsInSameGuild(playerName) then
             if DAL:AddToDKPTable(playerName, playerClass) then
                 Core:Print("added "..playerName.." successfully to table.")
-				listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+				if i == 1 then
+                    listOfAwardedPlayers = playerName;
+                else
+                    listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+                end
             end
 		end
 	end

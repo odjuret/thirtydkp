@@ -6,18 +6,6 @@ local Core = ThirtyDKP.Core
 
 local isAddonAdmin = nil
 
-local classColors = {
-	["Druid"] = "FF7D0A",
-	["Hunter"] =  "ABD473",
-	["Mage"] = "40C7EB",
-	["Priest"] = "FFFFFF",
-	["Rogue"] = "FFF569",
-	["Shaman"] = "F58CBA",
-	["Paladin"] = "F58CBA",
-	["Warlock"] = "8787ED",
-	["Warrior"] = "C79C6E"
-}
-
 local function GetGuildRankIndex(player)
 	if IsInGuild() then
 	local name, rank;
@@ -61,22 +49,9 @@ function Core:IsAddonAdmin()
     return isAddonAdmin
 end
 
-
-function Core:Print(args)
-    print("|cffffcc00[ThirtyDKP]:|r |cffa30f2d"..args.."|r")
-end
-
 function Core:FormatTimestamp(timestamp)
-	local str = date("%y/%m/%d %H:%M:%S", timestamp)
+	local str = date("%d/%m/%Y %H:%M:%S", timestamp)
 	return str;
-end
-
-function Core:GetDateAndTimeArray(timestamp)
-    local year, month, day, timeofday
-    local currentDateAndTime = Core:FormatTimestamp(timestamp)
-    timeofday = strsub(currentDateAndTime, 10)
-    year, month, day = strsplit("/", strsub(currentDateAndTime, 1, 8))
-    return year, month, day, timeofday
 end
 
 -- This also returns false if not in raid
@@ -92,12 +67,6 @@ function Core:IsPlayerMasterLooter()
     return false
 end
 
-function Core:AddClassColor(stringToColorize, class)
-    local classColor = classColors[class]
-    
-    return "|cff"..classColor..stringToColorize.."|r"
-end
-
 function Core:RoundNumber(number, decimals)
     return tonumber((("%%.%df"):format(decimals)):format(number))
 end
@@ -111,6 +80,11 @@ function ThirtyDKP_OnEvent(self, event, arg1, ...)
     if event == "ADDON_LOADED" then
 		ThirtyDKP_OnInitialize(event, arg1)
         self:UnregisterEvent("ADDON_LOADED")
+
+    elseif event == "GUILD_ROSTER_UPDATE" or event == "PLAYER_GUILD_UPDATE" then 
+        self:UnregisterEvent("GUILD_ROSTER_UPDATE");
+        self:UnregisterEvent("PLAYER_GUILD_UPDATE"); 
+        Core:CheckDataVersion();   
 
     elseif event == "LOOT_OPENED" then
         Core:HandleLootWindow()
@@ -171,7 +145,6 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
     DAL:InitializeCurrentLootTable();
     DAL:InitializeDKPHistory();
     Core:InitializeComms();
-    Core:CheckDataVersion(); 
 
     if not View:IsInitialized() then
         View:Initialize();
@@ -187,6 +160,8 @@ local events = CreateFrame("Frame", "TDKPEventsFrame");
 events:RegisterEvent("ADDON_LOADED");
 events:RegisterEvent("LOOT_OPENED");
 events:RegisterEvent("BOSS_KILL");
+events:RegisterEvent("GUILD_ROSTER_UPDATE");
+events:RegisterEvent("PLAYER_GUILD_UPDATE");
 events:SetScript("OnEvent", ThirtyDKP_OnEvent);
 
 function Core:RegisterForRaidMessageEvents()

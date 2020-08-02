@@ -17,20 +17,16 @@ function DAL:GetLatestDKPHistoryEntry()
 end
 
 function DAL:AddToHistory(affectedPlayers, amount, reason)
-    if(type(amount) == "string") then
-        -- todo: percentage 
-    else
-        local currentTime = time();
-        local index = UnitName("player").."-"..currentTime
-        if not index == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].index and not reason == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].reason then
-            tinsert(ThirtyDKP_Database_DKPHistory, {
-                players=affectedPlayers,
-                dkp=amount,
-                timestamp=currentTime,
-                index=index,
-                reason=reason
-            });
-        end
+    local currentTime = time();
+    local index = UnitName("player").."-"..currentTime
+    if not index == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].index and not reason == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].reason then
+        tinsert(ThirtyDKP_Database_DKPHistory, {
+            players=affectedPlayers,
+            dkp=amount,
+            timestamp=currentTime,
+            index=index,
+            reason=reason
+        });
     end
 end
 
@@ -51,7 +47,6 @@ function DAL:DeleteHistoryEntry(entry)
         end
     end
 end
-
 
 function DAL:WipeAndSetNewHistory(newHistory)
     ThirtyDKP_Database_DKPHistory = {}

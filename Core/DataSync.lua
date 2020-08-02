@@ -31,7 +31,6 @@ function Core:GetLatestKnownVersion()
     return knownLatestVersionOwner.."-"..knownLatestVersionDate
 end
 
-
 function Core:TryUpdateKnownVersion(incomingVersionIndex)
     local incomingGuildname, incomingVersionOwner, incomingVersionDate = strsplit("-", incomingVersionIndex)
     local guildname = strsplit("-", DAL:GetDKPTableVersion()) 
@@ -82,7 +81,6 @@ local function CompareDataVersions()
         Core:Print("No ThirtyDKP data found. If new installation, go raiding or request broadcast from admins.")
     end
 end
-
 
 function Core:CheckDataVersion()
     local currentGuildName = GetGuildInfo("player");

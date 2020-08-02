@@ -59,7 +59,7 @@ local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 			if Core:IsAddonAdmin() then
 				View:CreateRightClickMenu(self, headerText, "Delete Entry", function() 
 					StaticPopupDialogs["REMOVE_HISTORY_ENTRY"] = {
-						text = "Are you sure you want to delete this entry and refund/remove affected players DKP?",
+						text = "Are you sure you want to delete\n"..headerText.."\nand refund/remove affected players DKP?",
 						button1 = "Yes",
 						button2 = "No",
 						OnAccept = function()
@@ -85,12 +85,12 @@ local function PopulateDKPHistoryList(scrollChild, dkpHistory)
 	if #dkpHistory > 0 then
 		local totalScrollChildIndex = 0;
 		local lastDate, lastTimeOfDay = strsplit(" ", Core:FormatTimestamp(dkpHistory[#dkpHistory].timestamp));
-		for i, historyEntry in ipairs(dkpHistory) do 
+		for i = 0, (#dkpHistory-1) do
 			if i > DEFAULT_MAX_HISTORY_ROWS then
 				return;
 			end
 			
-			local entryDate, entryTimeOfDay = strsplit(" ", Core:FormatTimestamp(historyEntry.timestamp));
+			local entryDate, entryTimeOfDay = strsplit(" ", Core:FormatTimestamp(dkpHistory[(#dkpHistory-i)].timestamp));
 			if totalScrollChildIndex == 0 or (lastDate ~= entryDate) then
 				-- insert and "attach" date header
 				scrollChild.Rows[totalScrollChildIndex] = CreateDKPHistoryListDateHeader(scrollChild, entryDate)
@@ -103,7 +103,7 @@ local function PopulateDKPHistoryList(scrollChild, dkpHistory)
 				totalScrollChildIndex = totalScrollChildIndex + 1;
 			end
 
-			scrollChild.Rows[totalScrollChildIndex] = CreateDKPHistoryListEntry(scrollChild, (#dkpHistory + 1) - i, dkpHistory)
+			scrollChild.Rows[totalScrollChildIndex] = CreateDKPHistoryListEntry(scrollChild, (#dkpHistory - i), dkpHistory)
 			
 			if totalScrollChildIndex == 0 then
 				scrollChild.Rows[totalScrollChildIndex]:SetPoint(Const.TOP_LEFT_POINT, scrollChild, Const.TOP_LEFT_POINT, 0, -2)
@@ -150,6 +150,9 @@ function View:UpdateDKPHistoryFrame()
 	DKPHistoryFrame:Hide()
 	DKPHistoryFrame:SetParent(nil)
 	DKPHistoryFrame = nil;
+
+	DEFAULT_MAX_HISTORY_ROWS = 50;
+ 	dkpHistoryScrollChildHeight = 0;
 
 	View:CreateDKPHistoryFrame(mainFrame)
 	DKPHistoryFrame:Show()

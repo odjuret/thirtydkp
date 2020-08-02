@@ -31,9 +31,10 @@ local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 	local colorizedDKPAdjust = Core:ColorizePositiveOrNegative(dkpHistory[id].dkp, tostring(dkpHistory[id].dkp).." DKP")
 	local colorizedHeader = Core:ColorizeListHeader(dkpHistory[id].reason)
 	local madeBy = Core:TryToAddClassColor(string.split("-", dkpHistory[id].index))
+	local headerText = colorizedDKPAdjust.." - "..colorizedHeader.." by "..madeBy
 	b.entryHeader = b:CreateFontString(nil, Const.OVERLAY_LAYER)
 	b.entryHeader:SetFontObject("ThirtyDKPNormal")
-	b.entryHeader:SetText(colorizedDKPAdjust.." - "..colorizedHeader.." by "..madeBy);
+	b.entryHeader:SetText(headerText);
 	b.entryHeader:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT, 15, 0)
     
 	-- player string
@@ -52,10 +53,14 @@ local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 	b:SetSize(parent:GetWidth(), totalEntryHeight);
 	dkpHistoryScrollChildHeight = dkpHistoryScrollChildHeight + totalEntryHeight;
 
-	b:RegisterForClicks("AnyUp");
+	b:RegisterForClicks("AnyDown");
 	b:SetScript("OnClick", function (self, button, down)
 		if button == "RightButton" then
-            print("insert right click menu for "..tostring(id))
+			if Core:IsAddonAdmin() then
+				View:CreateRightClickMenu(self, headerText, "Delete Entry", function() 
+					DAL:DeleteHistoryEntry(dkpHistory[id])
+				end)
+			end
 		end
 	end);
 	

@@ -253,6 +253,7 @@ local function CreateMainFrame(isAddonAdmin)
         MainFrame.optionsButton:SetScript("OnClick", function (self, button, down)
             View:HideRaidFrame();
             View:HideTdkpAdminsFrame();
+            View:HideDKPHistoryFrame();
             View:ToggleOptionsFrame();
         end);
 

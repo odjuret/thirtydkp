@@ -173,7 +173,7 @@ function Core:HandleBossKill(eventId, ...)
             else
                 Core:Print("Could not award "..playerName.." boss kill DKP. Contact authors.")
             end
-        end 
+        end
     end
     -- add event to history
     DAL:AddToHistory(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)

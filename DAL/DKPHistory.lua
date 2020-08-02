@@ -21,15 +21,37 @@ function DAL:AddToHistory(affectedPlayers, amount, reason)
     else
         local currentTime = time();
         local index = UnitName("player").."-"..currentTime
-        tinsert(ThirtyDKP_Database_DKPHistory, {
-            players=affectedPlayers,
-            dkp=amount,
-            timestamp=currentTime,
-            index=index,
-            reason=reason
-        });
+        if not index == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].index and not reason == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].reason then
+            tinsert(ThirtyDKP_Database_DKPHistory, {
+                players=affectedPlayers,
+                dkp=amount,
+                timestamp=currentTime,
+                index=index,
+                reason=reason
+            });
+        end
     end
 end
+
+function DAL:DeleteHistoryEntry(entry)
+    if #ThirtyDKP_Database_DKPHistory > 0 then
+        local entryExists = DAL:Table_Search(ThirtyDKP_Database_DKPHistory, entry.index, 'index')
+        local results = nil;
+
+        if entryExists == false then
+            return false 
+        end
+        
+        -- Entries can have same index
+        for i, matchingEntry in ipairs(entryExists) do
+            print(ThirtyDKP_Database_DKPHistory[matchingEntry[1]].reason)
+            -- todo finish
+            
+            
+        end
+    end
+end
+
 
 function DAL:WipeAndSetNewHistory(newHistory)
     ThirtyDKP_Database_DKPHistory = {}

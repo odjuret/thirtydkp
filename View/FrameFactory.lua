@@ -2,6 +2,8 @@ local addonName, ThirtyDKP = ...
 local View = ThirtyDKP.View;
 local Const = ThirtyDKP.View.Constants;
 
+local menuFrame = CreateFrame("Frame", "ThirtyDKPRightClickMenuFrame", UIParent, "UIDropDownMenuTemplate")
+
 function View:CreateNumericInputFrame(parent, label, value, valueChangedCallback)
     local wrapper = CreateFrame("Frame", nil, parent, nil);
     wrapper:SetSize(parent:GetWidth(), 30);
@@ -86,5 +88,16 @@ function View:CreateContainerFrame(parentFrame, title, width, height)
     f.title:SetPoint(Const.TOP_LEFT_POINT, f, Const.TOP_LEFT_POINT, 15, -10);
     f.title:SetText(title);
 
+    f.closeBtn = CreateFrame("Button", nil, f, "UIPanelCloseButton")
+    f.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, f, Const.TOP_RIGHT_POINT)
+
     return f
+end
+
+function View:CreateRightClickMenu(self, title, actionHeader, actionFunction)
+    local menu = {
+    { text = title, isTitle = true},
+    { text = actionHeader, func = actionFunction },
+    }
+    EasyMenu(menu, menuFrame, "cursor", 0 , 0, "MENU", 2);
 end

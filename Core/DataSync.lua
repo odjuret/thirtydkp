@@ -83,17 +83,19 @@ local function CompareDataVersions()
 end
 
 function Core:CheckDataVersion()
-    local currentGuildName = GetGuildInfo("player");
-    if currentGuildName == nil then
-        Core:Print("No guild to sync data with.")
-    else
-        Core:Print("Attempting to sync DKP data with online guildies.")
-        -- Request data versions from online members
-        local latestKnownVersion = Core:GetLatestKnownVersion()
-        Core:RequestDataVersionSync(latestKnownVersion)
+    C_Timer.After(2, function() 
+        local currentGuildName = GetGuildInfo("player");
+        if currentGuildName == nil then
+            Core:Print("No guild to sync data with.")
+        else
+            Core:Print("Attempting to sync DKP data with online guildies.")
+            -- Request data versions from online members
+            local latestKnownVersion = Core:GetLatestKnownVersion()
+            Core:RequestDataVersionSync(latestKnownVersion)
 
-        C_Timer.After(6, CompareDataVersions)
-    end
+            C_Timer.After(6, CompareDataVersions)
+        end
+    end)
 end
 
 function Core:DoesDataBelongToSameGuild(incomingDKPTableDataVersion)

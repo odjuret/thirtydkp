@@ -1,6 +1,7 @@
 local addonName, ThirtyDKP = ... 
 
 local DAL = ThirtyDKP.DAL
+local Core = ThirtyDKP.Core;
 
 function DAL:InitializeDKPHistory()
     -- saved variables starts as nil. we want a empty tables
@@ -43,11 +44,10 @@ function DAL:DeleteHistoryEntry(entry)
         end
         
         -- Entries can have same index
-        for i, matchingEntry in ipairs(entryExists) do
-            print(ThirtyDKP_Database_DKPHistory[matchingEntry[1]].reason)
-            -- todo finish
-            
-            
+        for _, matchingEntry in ipairs(entryExists) do
+            if ThirtyDKP_Database_DKPHistory[matchingEntry[1]].reason == entry.reason then
+                local removed = table.remove(ThirtyDKP_Database_DKPHistory, matchingEntry[1])
+            end
         end
     end
 end

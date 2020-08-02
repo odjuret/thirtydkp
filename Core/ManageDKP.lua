@@ -326,3 +326,15 @@ function Core:ApplyDecay()
 	DAL:UpdateDKPTableVersion()
 	View:UpdateDKPTable();
 end
+
+function Core:RevertHistory(historyEntry)
+    for i, player in ipairs({string.split(", ", historyEntry.players)}) do
+        if player ~= nil and player ~= "" then
+            DAL:AdjustPlayerDKP(player, -historyEntry.dkp);
+        end
+    end
+    
+    DAL:DeleteHistoryEntry(historyEntry);
+    View:UpdateDKPHistoryFrame();
+    View:UpdateDKPTable();
+end

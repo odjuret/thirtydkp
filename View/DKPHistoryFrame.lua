@@ -58,7 +58,19 @@ local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 		if button == "RightButton" then
 			if Core:IsAddonAdmin() then
 				View:CreateRightClickMenu(self, headerText, "Delete Entry", function() 
-					DAL:DeleteHistoryEntry(dkpHistory[id])
+					StaticPopupDialogs["REMOVE_HISTORY_ENTRY"] = {
+						text = "Are you sure you want to delete this entry and refund/remove affected players DKP?",
+						button1 = "Yes",
+						button2 = "No",
+						OnAccept = function()
+							Core:RevertHistory(dkpHistory[id]);
+						end,
+						timeout = 0,
+						whileDead = true,
+						hideOnEscape = true,
+						preferredIndex = 3,
+					}
+					StaticPopup_Show("REMOVE_HISTORY_ENTRY")
 				end)
 			end
 		end

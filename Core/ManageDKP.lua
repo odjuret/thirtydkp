@@ -188,7 +188,6 @@ end
 local function IsInSameGuild(playerName)
 	for i=1, GetNumGuildMembers() do
 		nameFromGuild, _, _, _, _ = GetGuildRosterInfo(i)
-
 		nameFromGuild = strsub(nameFromGuild, 1, string.find(nameFromGuild, "-")-1) -- required to remove server name from player (can remove in classic if this is not an issue)
 		if nameFromGuild == playerName then
 			return true;
@@ -256,6 +255,7 @@ function Core:ApplyOnTimeBonus()
 		elseif IsInSameGuild(playerName) then
             if DAL:AddToDKPTable(playerName, playerClass) then
                 Core:Print("added "..playerName.." successfully to table.")
+				DAL:AdjustPlayerDKP(playerName, raidCompletionBonus);
 				if i == 1 then
                     listOfAwardedPlayers = playerName;
                 else
@@ -290,6 +290,8 @@ function Core:ApplyRaidEndBonus()
 		elseif IsInSameGuild(playerName) then
             if DAL:AddToDKPTable(playerName, playerClass) then
                 Core:Print("added "..playerName.." successfully to table.")
+				DAL:AdjustPlayerDKP(playerName, raidCompletionBonus);
+
 				if i == 1 then
                     listOfAwardedPlayers = playerName;
                 else

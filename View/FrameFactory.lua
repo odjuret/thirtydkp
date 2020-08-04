@@ -74,18 +74,28 @@ function View:CreateTextInputFrame(parent, label, value, valueChangedCallback)
     return wrapper;
 end
 
-function View:CreateContainerFrame(parentFrame, title, width, height)
-    local f = CreateFrame("Frame", "ThirtyDKP_HistoryFrame", parentFrame, "TooltipBorderedFrameTemplate");
+function View:CreateContainerFrame(frameName, parentFrame, title, width, height)
+    local f 
+    if parentFrame == nil then
+        f = CreateFrame("Frame", frameName, UIParent, "TooltipBorderedFrameTemplate");
+        f:SetPoint(Const.CENTER_POINT, UIParent, Const.CENTER_POINT, 0, 60); -- point, relative frame, relative point on relative frame
+    else
+        f = CreateFrame("Frame", frameName, parentFrame, "TooltipBorderedFrameTemplate");
+        f:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
+    end
 	f:SetShown(false);
 	f:SetSize(width, height);
-	f:SetFrameStrata("HIGH");
-	f:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
+    f:SetFrameStrata("HIGH");
+    f:SetFrameLevel(8);
+
     f:EnableMouse(true);
+
+    tinsert(UISpecialFrames, f:GetName());
 
     -- title
     f.title = f:CreateFontString(nil, Const.OVERLAY_LAYER);
-    f.title:SetFontObject("GameFontNormal");
-    f.title:SetPoint(Const.TOP_LEFT_POINT, f, Const.TOP_LEFT_POINT, 15, -10);
+    f.title:SetFontObject("ThirtyDKPHeader");
+    f.title:SetPoint(Const.TOP_LEFT_POINT, f, Const.TOP_LEFT_POINT, Const.Margin, -10);
     f.title:SetText(title);
 
     f.closeBtn = CreateFrame("Button", nil, f, "UIPanelCloseButton")
@@ -100,4 +110,26 @@ function View:CreateRightClickMenu(self, title, actionHeader, actionFunction)
     { text = actionHeader, func = actionFunction },
     }
     EasyMenu(menu, menuFrame, "cursor", 0 , 0, "MENU", 2);
+end
+
+function View:AttachHoverOverTooltip(frame, titleText, textContent)
+    frame:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+        GameTooltip:SetText(titleText, 0.25, 0.75, 0.90, 1, true);
+        if textContent ~= nil and textContent ~= "" then
+            GameTooltip:AddLine(textContent, 1.0, 1.0, 1.0, true);
+        end
+        GameTooltip:Show();
+    end);
+
+    frame:SetScript("OnLeave", function(self)
+        GameTooltip:Hide()
+    end);
+end
+
+function View:AttachHoverOverTooltipAndOnclick(frame, tooltipHeader, tooltipContent, onClickFunction)
+    View:AttachHoverOverTooltip(frame, tooltipHeader, tooltipContent)
+
+    frame:RegisterForClicks("AnyUp");
+    frame:SetScript("OnClick", onClickFunction);
 end

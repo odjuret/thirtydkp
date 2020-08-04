@@ -2,12 +2,22 @@ local addonName, ThirtyDKP = ...
 
 local Core = ThirtyDKP.Core
 local DAL = ThirtyDKP.DAL
+local View = ThirtyDKP.View
 
 local isUpToDate = false
 local recievedUpdates = 0
 local knownLatestVersionGuild = nil
 local knownLatestVersionOwner = nil
 local knownLatestVersionDate = nil
+
+function Core:GetLatestKnownVersionOwner()
+    if knownLatestVersionOwner == nil then
+        return "Unknown"
+    else
+        return knownLatestVersionOwner
+    end
+end
+
 
 function Core:IsDataUpToDate()
     return isUpToDate
@@ -52,7 +62,7 @@ local function CompareDataVersions()
     local dkpTableVersion = DAL:GetDKPTableVersion()
 
     if dkpTableVersion ~= nil then
-        local dataGuildname = strsplit("-", DAL:GetDKPTableVersion())
+        local dataGuildname = strsplit("-", dkpTableVersion)
         local currentGuildName = GetGuildInfo("player");
         if not currentGuildName == dataGuildname then
             Core:Print("Actual guild: "..currentGuildName.." mismatches with ThirtyDKP data guild name: "..dataGuildname..".")
@@ -68,7 +78,7 @@ local function CompareDataVersions()
 
         if tonumber(knownLatestVersionDate) <= tonumber(localVersionDate) then
             isUpToDate = true
-            Core:Print("Up-to-date.");
+            Core:Print("Data up-to-date.");
         end
 
         if not isUpToDate then
@@ -79,6 +89,7 @@ local function CompareDataVersions()
         -- No history or version to check, so probably brand new install.
         Core:Print("No ThirtyDKP data found. If new installation, go raiding or request broadcast from admins.")
     end
+    View:UpdateDataUpToDateFrame()
 end
 
 function Core:CheckDataVersion()
@@ -107,3 +118,16 @@ function Core:DoesDataBelongToSameGuild(incomingDKPTableDataVersion)
     end
     return results
 end
+
+function Core:GetGuildName()
+    local currentGuildName = GetGuildInfo("player");
+    if currentGuildName == nil then
+        C_Timer.After(2, function() 
+            currentGuildName = GetGuildInfo("player");
+            return currentGuildName
+        end)
+    else
+        return currentGuildName
+    end
+end
+

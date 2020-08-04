@@ -9,24 +9,40 @@ local Const = ThirtyDKP.View.Constants;
 local Initialized = false;
 local MainFrame = nil;
 
-
 -- Titles related constants
 local MAIN_FRAME_TITLE = "Thirty DKP"
 
 
-local function AttachAddRaidToTableScripts(frame)
-    -- add raid to dkp table if they don't exist
+function View:UpdateDataUpToDateFrame()
+    local colorizedText = ""
+    local hoverOverText = ""
+    local latestKnownVersionOwner = Core:GetLatestKnownVersionOwner()
+    
+    if Core:IsDataUpToDate() then
+        colorizedText = Core:ColorizePositiveOrNegative(1, " Up-to-date")
+    else
+        latestKnownVersionOwner = Core:TryToAddClassColor(latestKnownVersionOwner)
+        colorizedText = Core:ColorizePositiveOrNegative(-1, " Outdated")
+        hoverOverText = "Seems like "..latestKnownVersionOwner.." has newer data. \nRequest a broadcast from "..latestKnownVersionOwner.."."
+    end
+    MainFrame.upToDateFrame.text:SetText("Data:"..colorizedText);
 
-	frame:SetScript("OnEnter", function(self)
-		GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-		GameTooltip:SetText("Add raid members to DKP table", 0.25, 0.75, 0.90, 1, true);
-		GameTooltip:AddLine("Given that theyre in the guild obviously", 1.0, 1.0, 1.0, true);
-		GameTooltip:Show();
-	end)
-	frame:SetScript("OnLeave", function(self)
-		GameTooltip:Hide()
-	end)
-    frame:SetScript("OnClick", function ()
+    View:AttachHoverOverTooltip(MainFrame.upToDateFrame, "Your local data is"..colorizedText, hoverOverText)
+end
+
+local function CreateMainFrameButton(text, relativePoint, parentFrame, relativePointOnParentFrame)
+    local b = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
+    b:SetPoint(relativePoint, parentFrame, relativePointOnParentFrame, 0, 0);
+    b:SetSize(80, Const.ButtonHeight);
+    b:SetText(text);
+    b:SetNormalFontObject("GameFontNormal");
+    b:SetHighlightFontObject("GameFontHighlight");
+    return b
+end
+
+local function CreateAddRaidToDKPTableButton()
+    MainFrame.addRaidToTableBtn = CreateMainFrameButton("Add Raid", Const.BOTTOM_LEFT_POINT, MainFrame.optionsButton, Const.TOP_LEFT_POINT)
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.addRaidToTableBtn, "Add raid members to DKP table", "Given that theyre in the guild obviously", function()
         -- If you aint in raid
         if not IsInRaid() then
             StaticPopupDialogs["NOT_IN_RAID"] = {
@@ -36,8 +52,8 @@ local function AttachAddRaidToTableScripts(frame)
                 whileDead = true,
                 hideOnEscape = true,
                 preferredIndex = 3,
-              }
-              StaticPopup_Show ("NOT_IN_RAID")
+            }
+            StaticPopup_Show ("NOT_IN_RAID")
         else
             -- confirmation dialog to remove user(s)
             local selected = "Sure you want to add the entire raid to the DKP table?";
@@ -56,24 +72,13 @@ local function AttachAddRaidToTableScripts(frame)
             }
             StaticPopup_Show ("ADD_RAID_ENTRIES")
         end
-	end);
+    end);
 end
 
-local function AttachAddGuildToTableScript(frame)
-    -- add guild to dkp table if entry doesn't exist
+local function CreateAddGuildToDKPTableButton()
+    MainFrame.addGuildToTableBtn = CreateMainFrameButton("Add Guild", Const.BOTTOM_LEFT_POINT, MainFrame.addRaidToTableBtn, Const.TOP_LEFT_POINT)
 
-    frame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-        GameTooltip:SetText("Add guild members to DKP table", 0.25, 0.75, 0.90, 1, true);
-        GameTooltip:AddLine("Adds guild members that aren't in the dkp table", 1.0, 1.0, 1.0, true);
-        GameTooltip:Show();
-    end);
-
-    frame:SetScript("OnLeave", function(self)
-        GameTooltip:Hide()
-    end);
-
-    frame:SetScript("OnClick", function ()
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.addGuildToTableBtn, "Add guild members to DKP table", "Adds guild members that aren't in the dkp table", function()
         -- If not in guild
         if not IsInGuild() then
             StaticPopupDialogs["NOT_IN_GUILD"] = {
@@ -105,20 +110,10 @@ local function AttachAddGuildToTableScript(frame)
     end);
 end
 
-local function AttachBroadcastDKPTableScript(frame)
-    frame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-        GameTooltip:SetText("Broadcasts ThirtyDKP data", 0.25, 0.75, 0.90, 1, true);
-        GameTooltip:AddLine("Attempts to broadcast out the latest ThirtyDKP data to other online members:", 1.0, 1.0, 1.0, true);
-        GameTooltip:AddLine("dkp table, dkp history and addon options", 1.0, 1.0, 1.0, true);
-        GameTooltip:Show();
-    end);
+local function CreateBroadcastDKPDataButton()
+    MainFrame.broadcastBtn = CreateMainFrameButton("Broadcast", Const.BOTTOM_RIGHT_POINT, MainFrame.addGuildToTableBtn, Const.TOP_RIGHT_POINT)
 
-    frame:SetScript("OnLeave", function(self)
-        GameTooltip:Hide()
-    end);
-
-    frame:SetScript("OnClick", function ()
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.broadcastBtn, "Broadcasts ThirtyDKP data", "Attempts to broadcast out your dkp data to other online members:\ndkp table, dkp history and addon options", function ()
         StaticPopupDialogs["BROADCAST_THIRTYDKPDATA"] = {
             text = "Are you sure you want to broadcast your ThirtyDKP data?",
             button1 = "Yes",
@@ -133,70 +128,58 @@ local function AttachBroadcastDKPTableScript(frame)
             preferredIndex = 3,
         }
         StaticPopup_Show("BROADCAST_THIRTYDKPDATA")
-    end);
+    end)
 end
 
+local function CreateRaidManagementButton()
+    MainFrame.raidBtn = CreateMainFrameButton("Raid", Const.BOTTOM_RIGHT_POINT, MainFrame.broadcastBtn, Const.TOP_RIGHT_POINT)
 
-local function AttachRaidScript(frame)
-    frame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-        GameTooltip:SetText("Raid Management", 0.25, 0.75, 0.90, 1, true);
-        GameTooltip:AddLine("Manage raids and handle manual DKP adjustments", 1.0, 1.0, 1.0, true);
-        GameTooltip:Show();
-    end);
-
-	frame:SetScript("OnLeave", function(self)
-        GameTooltip:Hide()
-    end);
-
-	frame:SetScript("OnClick", function()
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.raidBtn, "Raid Management", "Manage raids and handle manual DKP adjustments", function()
         View:HideOptionsFrame();
         View:HideTdkpAdminsFrame()
         View:HideDKPHistoryFrame();
-		View:ToggleRaidFrame();
-	end);
+        View:ToggleRaidFrame();
+    end)
 end
 
-local function AttachDKPAdminsBtnScripts(frame)
-    frame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-        GameTooltip:SetText("Admins Management", 0.25, 0.75, 0.90, 1, true);
-        GameTooltip:AddLine("Manage DKP admins for your guild. Admins can change dkp options, adjust dkp, start dkp awarding raids, etc", 1.0, 1.0, 1.0, true);
-        GameTooltip:Show();
-    end);
+local function CreateDKPAdminsButton()
+    MainFrame.dkpAdminsBtn = CreateMainFrameButton("Admins", Const.BOTTOM_RIGHT_POINT, MainFrame.raidBtn, Const.TOP_RIGHT_POINT)
 
-	frame:SetScript("OnLeave", function(self)
-        GameTooltip:Hide()
-    end);
-
-    frame:SetScript("OnClick", function()
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.dkpAdminsBtn, "Admins Management", "Manage DKP admins for your guild. Admins can change dkp options, adjust dkp, start dkp awarding raids, etc", function()
         View:HideOptionsFrame();
         View:HideRaidFrame();
         View:HideDKPHistoryFrame();
         View:ToggleTdkpAdminsFrame()
-	end);
+    end)
 end
 
+local function CreateDKPHistoryButton()
+    MainFrame.dkpHistoryBtn = CreateMainFrameButton("History", Const.BOTTOM_RIGHT_POINT, MainFrame.dkpAdminsBtn, Const.TOP_RIGHT_POINT)
 
-local function AttachDKPHistoryBtnScripts(frame)
-    frame:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-        GameTooltip:SetText("DKP History", 0.25, 0.75, 0.90, 1, true);
-        GameTooltip:AddLine("Manage DKP history for your guild.", 1.0, 1.0, 1.0, true);
-        GameTooltip:Show();
-    end);
-
-	frame:SetScript("OnLeave", function(self)
-        GameTooltip:Hide()
-    end);
-
-    frame:SetScript("OnClick", function()
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.dkpHistoryBtn, "DKP History", "Manage DKP history for your guild.", function()
         View:HideOptionsFrame();
         View:HideRaidFrame();
         View:HideTdkpAdminsFrame()
         View:ToggleDKPHistoryFrame();
-	end);
+    end)
 end
+
+local function CreateDKPOptionsButton()
+    MainFrame.optionsButton = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
+    MainFrame.optionsButton:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame, Const.BOTTOM_RIGHT_POINT, -10, 10);
+    MainFrame.optionsButton:SetSize(80, Const.ButtonHeight);
+    MainFrame.optionsButton:SetText("Options");
+    MainFrame.optionsButton:SetNormalFontObject("GameFontNormal");
+    MainFrame.optionsButton:SetHighlightFontObject("GameFontHighlight");
+    MainFrame.optionsButton:RegisterForClicks("AnyUp");
+    MainFrame.optionsButton:SetScript("OnClick", function (self, button, down)
+        View:HideRaidFrame();
+        View:HideTdkpAdminsFrame();
+        View:HideDKPHistoryFrame();
+        View:ToggleOptionsFrame();
+    end);
+end
+
 
 local function CreateMainFrame(isAddonAdmin)
     local mainFrameWidth;
@@ -207,17 +190,7 @@ local function CreateMainFrame(isAddonAdmin)
     end
     
 
-	MainFrame = CreateFrame('Frame', 'ThirtyDKP_MainFrame', UIParent, "TooltipBorderedFrameTemplate");
-	MainFrame:SetShown(false);
-    MainFrame:SetSize(mainFrameWidth, Const.DKPTableRowHeight*14); -- width, height
-	MainFrame:SetPoint(Const.CENTER_POINT, UIParent, Const.CENTER_POINT, 0, 60); -- point, relative frame, relative point on relative frame
-	MainFrame:SetFrameStrata("HIGH");
-    MainFrame:SetFrameLevel(8);
-    MainFrame:SetBackdropColor(0,0,0,.1)
-    MainFrame:SetBackdropBorderColor(0,0,0,.1)
-
-	tinsert(UISpecialFrames, MainFrame:GetName()); -- Sets frame to close on "Escape"
-
+    MainFrame = View:CreateContainerFrame('ThirtyDKP_MainFrame', nil, MAIN_FRAME_TITLE, mainFrameWidth, Const.DKPTableRowHeight*14)
 	MainFrame:SetClampedToScreen(true);
 	MainFrame:SetMovable(true);
 	MainFrame:EnableMouse(true);
@@ -231,103 +204,34 @@ local function CreateMainFrame(isAddonAdmin)
         end
 	end);
 
-    -- title
-    MainFrame.Title = MainFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
-	MainFrame.Title:SetFontObject("GameFontNormal");
-    MainFrame.Title:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, Const.Margin, -10);
-    MainFrame.Title:SetText(MAIN_FRAME_TITLE);
+
+    -- up-to-date frame
+    MainFrame.upToDateFrame = CreateFrame('Frame', nil, MainFrame);
+    MainFrame.upToDateFrame:SetSize(100, 30);
+	MainFrame.upToDateFrame:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 110, 0);
+    MainFrame.upToDateFrame.text = MainFrame.upToDateFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
+	MainFrame.upToDateFrame.text:SetFontObject("ThirtyDKPTiny");
+    MainFrame.upToDateFrame.text:SetPoint(Const.LEFT_POINT, MainFrame.upToDateFrame, Const.LEFT_POINT, 0, -5);
+    
+    View:UpdateDataUpToDateFrame()
 
 	-- Buttons
-	MainFrame.closeBtn = CreateFrame("Button", nil, MainFrame, "UIPanelCloseButton")
-	MainFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, MainFrame, Const.TOP_RIGHT_POINT)
-
 
     if isAddonAdmin then
-        MainFrame.optionsButton = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-        MainFrame.optionsButton:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame, Const.BOTTOM_RIGHT_POINT, -10, 10);
-        MainFrame.optionsButton:SetSize(80, Const.ButtonHeight);
-        MainFrame.optionsButton:SetText("Options");
-        MainFrame.optionsButton:SetNormalFontObject("GameFontNormal");
-        MainFrame.optionsButton:SetHighlightFontObject("GameFontHighlight");
-        MainFrame.optionsButton:RegisterForClicks("AnyUp");
-        MainFrame.optionsButton:SetScript("OnClick", function (self, button, down)
-            View:HideRaidFrame();
-            View:HideTdkpAdminsFrame();
-            View:HideDKPHistoryFrame();
-            View:ToggleOptionsFrame();
-        end);
+        CreateDKPOptionsButton()
 
+        CreateAddRaidToDKPTableButton()
 
-        --  add raid to dkp table button
-        MainFrame.addRaidToTableBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-        MainFrame.addRaidToTableBtn:SetPoint(Const.BOTTOM_LEFT_POINT, MainFrame.optionsButton, Const.TOP_LEFT_POINT, 0, 0);
-        MainFrame.addRaidToTableBtn:SetSize(80, Const.ButtonHeight);
-        MainFrame.addRaidToTableBtn:SetText("Add Raid");
-        MainFrame.addRaidToTableBtn:SetNormalFontObject("GameFontNormal");
-        MainFrame.addRaidToTableBtn:SetHighlightFontObject("GameFontHighlight");
-        MainFrame.addRaidToTableBtn:RegisterForClicks("AnyUp");
+        CreateAddGuildToDKPTableButton()
 
-        AttachAddRaidToTableScripts(MainFrame.addRaidToTableBtn)
+        CreateBroadcastDKPDataButton()
 
+        CreateRaidManagementButton()
 
-        --  add guild to dkp table button
-        MainFrame.addGuildToTableBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-        MainFrame.addGuildToTableBtn:SetPoint(Const.BOTTOM_LEFT_POINT, MainFrame.addRaidToTableBtn, Const.TOP_LEFT_POINT, 0, 0);
-        MainFrame.addGuildToTableBtn:SetSize(80, Const.ButtonHeight);
-        MainFrame.addGuildToTableBtn:SetText("Add Guild");
-        MainFrame.addGuildToTableBtn:SetNormalFontObject("GameFontNormal");
-        MainFrame.addGuildToTableBtn:SetHighlightFontObject("GameFontHighlight");
-        MainFrame.addGuildToTableBtn:RegisterForClicks("AnyUp");
+        CreateDKPAdminsButton()
 
-        AttachAddGuildToTableScript(MainFrame.addGuildToTableBtn);
-
-
-        --  broadcast dkp table to online members button
-        MainFrame.broadcastBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-        MainFrame.broadcastBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame.addGuildToTableBtn, Const.TOP_RIGHT_POINT, 0, 0);
-        MainFrame.broadcastBtn:SetSize(80, Const.ButtonHeight);
-        MainFrame.broadcastBtn:SetText("Broadcast");
-        MainFrame.broadcastBtn:SetNormalFontObject("GameFontNormal");
-        MainFrame.broadcastBtn:SetHighlightFontObject("GameFontHighlight");
-        MainFrame.broadcastBtn:RegisterForClicks("AnyUp");
-
-        AttachBroadcastDKPTableScript(MainFrame.broadcastBtn);
-
-
-        -- raid management button
-		MainFrame.raidBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-        MainFrame.raidBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame.broadcastBtn, Const.TOP_RIGHT_POINT, 0, 0);
-        MainFrame.raidBtn:SetSize(80, Const.ButtonHeight);
-        MainFrame.raidBtn:SetText("Raid");
-        MainFrame.raidBtn:SetNormalFontObject("GameFontNormal");
-        MainFrame.raidBtn:SetHighlightFontObject("GameFontHighlight");
-        MainFrame.raidBtn:RegisterForClicks("AnyUp");
-
-        AttachRaidScript(MainFrame.raidBtn);
+        CreateDKPHistoryButton()
         
-
-        -- dkp admins button
-        MainFrame.dkpAdminsBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-        MainFrame.dkpAdminsBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame.raidBtn, Const.TOP_RIGHT_POINT, 0, 0);
-        MainFrame.dkpAdminsBtn:SetSize(80, Const.ButtonHeight);
-        MainFrame.dkpAdminsBtn:SetText("Admins");
-        MainFrame.dkpAdminsBtn:SetNormalFontObject("GameFontNormal");
-        MainFrame.dkpAdminsBtn:SetHighlightFontObject("GameFontHighlight");
-        MainFrame.dkpAdminsBtn:RegisterForClicks("AnyUp");
-
-        AttachDKPAdminsBtnScripts(MainFrame.dkpAdminsBtn);
-
-
-        -- dkp history button
-        MainFrame.dkpHistoryBtn = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-        MainFrame.dkpHistoryBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame.dkpAdminsBtn, Const.TOP_RIGHT_POINT, 0, 0);
-        MainFrame.dkpHistoryBtn:SetSize(80, Const.ButtonHeight);
-        MainFrame.dkpHistoryBtn:SetText("History");
-        MainFrame.dkpHistoryBtn:SetNormalFontObject("GameFontNormal");
-        MainFrame.dkpHistoryBtn:SetHighlightFontObject("GameFontHighlight");
-        MainFrame.dkpHistoryBtn:RegisterForClicks("AnyUp");
-
-        AttachDKPHistoryBtnScripts(MainFrame.dkpHistoryBtn);
     end
 end
 

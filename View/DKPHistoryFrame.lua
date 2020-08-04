@@ -116,7 +116,7 @@ local function PopulateDKPHistoryList(scrollChild, dkpHistory)
 end
 
 function View:CreateDKPHistoryFrame(parentFrame)
-	DKPHistoryFrame = View:CreateContainerFrame(parentFrame, DKPHISTORY_FRAME_TITLE, 432, 385)
+	DKPHistoryFrame = View:CreateContainerFrame("ThirtyDKP_HistoryFrame", parentFrame, DKPHISTORY_FRAME_TITLE, 432, 385)
 
     local dkpHistory = DAL:GetDKPHistory()
 

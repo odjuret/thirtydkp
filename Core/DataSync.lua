@@ -5,6 +5,7 @@ local DAL = ThirtyDKP.DAL
 
 local isUpToDate = false
 local recievedUpdates = 0
+local knownLatestVersionGuild = nil
 local knownLatestVersionOwner = nil
 local knownLatestVersionDate = nil
 
@@ -13,22 +14,19 @@ function Core:IsDataUpToDate()
 end
 
 local function InitializeLatestKnownVersion()
+    DAL:InitializeDKPTableVersion();
     local dkpTableVersion = DAL:GetDKPTableVersion()
-	if dkpTableVersion then
-		local _, localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion)
-		knownLatestVersionOwner = localVersionOwner
-		knownLatestVersionDate = localVersionDate
-	else
-		knownLatestVersionDate = "";
-		knownLatestVersionOwner = "";
-	end
+    local localVersionGuild, localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion)
+    knownLatestVersionGuild = localVersionGuild
+    knownLatestVersionOwner = localVersionOwner
+    knownLatestVersionDate = localVersionDate
 end
 
 function Core:GetLatestKnownVersion()
-    if knownLatestVersionOwner == nil then
+    if knownLatestVersionOwner == nil or knownLatestVersionDate == nil or knownLatestVersionGuild == nil then
         InitializeLatestKnownVersion()
     end
-    return knownLatestVersionOwner.."-"..knownLatestVersionDate
+    return knownLatestVersionGuild.."-"..knownLatestVersionOwner.."-"..knownLatestVersionDate
 end
 
 function Core:TryUpdateKnownVersion(incomingVersionIndex)
@@ -39,11 +37,12 @@ function Core:TryUpdateKnownVersion(incomingVersionIndex)
     end
     recievedUpdates = recievedUpdates +1
 
-    if knownLatestVersionOwner == nil then
+    if knownLatestVersionOwner == nil or knownLatestVersionDate == nil or knownLatestVersionGuild == nil then
         InitializeLatestKnownVersion()
     end
 
     if (incomingVersionDate > knownLatestVersionDate) then
+        knownLatestVersionGuild = incomingGuildname
         knownLatestVersionOwner = incomingVersionOwner
         knownLatestVersionDate = incomingVersionDate
     end
@@ -83,7 +82,7 @@ local function CompareDataVersions()
 end
 
 function Core:CheckDataVersion()
-    C_Timer.After(2, function() 
+    C_Timer.After(1, function() 
         local currentGuildName = GetGuildInfo("player");
         if currentGuildName == nil then
             Core:Print("No guild to sync data with.")

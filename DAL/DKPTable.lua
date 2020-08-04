@@ -24,6 +24,15 @@ function DAL:InitializeDKPTable()
 	SortTable()
 end
 
+function DAL:InitializeDKPTableVersion()
+	if not ThirtyDKP_Database_DKPTable.version then
+		local guildName = GetGuildInfo("player");
+		local dkpDataVersion = guildName.."-"..UnitName("player").."-"..0;
+		ThirtyDKP_Database_DKPTable.version = dkpDataVersion
+	end
+end
+
+
 function DAL:GetDKPTable()
     SortTable()
 	

@@ -146,9 +146,11 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
     DAL:InitializeDKPHistory();
     Core:InitializeComms();
 
-    if not View:IsInitialized() then
-        View:Initialize();
-    end
+    C_Timer.After(1, function()
+        if not View:IsInitialized() then
+            View:Initialize();
+        end
+    end)
 
     Core:Print("Loaded. Type /tdkp to view dkp table and options.")
 end

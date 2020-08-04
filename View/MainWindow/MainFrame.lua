@@ -13,7 +13,7 @@ local MainFrame = nil;
 local MAIN_FRAME_TITLE = "Thirty DKP"
 
 
-function View:UpdateDataUpToDateFrame()
+function View:UpdateDataUpToDateFrame(incHoverOverText)
     local colorizedText = ""
     local hoverOverText = ""
     local latestKnownVersionOwner = Core:GetLatestKnownVersionOwner()
@@ -21,13 +21,31 @@ function View:UpdateDataUpToDateFrame()
     if Core:IsDataUpToDate() then
         colorizedText = Core:ColorizePositiveOrNegative(1, " Up-to-date")
     else
-        latestKnownVersionOwner = Core:TryToAddClassColor(latestKnownVersionOwner)
+        if incHoverOverText ~= nil and incHoverOverText ~= "" then
+            hoverOverText = incHoverOverText
+        else
+            latestKnownVersionOwner = Core:TryToAddClassColor(latestKnownVersionOwner)
+            hoverOverText = "Seems like "..latestKnownVersionOwner.." has newer data. \nRequest a broadcast from "..latestKnownVersionOwner.."."
+        end
         colorizedText = Core:ColorizePositiveOrNegative(-1, " Outdated")
-        hoverOverText = "Seems like "..latestKnownVersionOwner.." has newer data. \nRequest a broadcast from "..latestKnownVersionOwner.."."
     end
     MainFrame.upToDateFrame.text:SetText("Data:"..colorizedText);
 
-    View:AttachHoverOverTooltip(MainFrame.upToDateFrame, "Your local data is"..colorizedText, hoverOverText)
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.upToDateFrame, "Your local data is"..colorizedText, hoverOverText, function ()
+        StaticPopupDialogs["TDKP_DATA_STATUS_FRAME_CLICK"] = {
+            text = "Do you want to re-sync data with guild?",
+            button1 = "Yes",
+            button2 = "No",
+            OnAccept = function()
+                Core:CheckDataVersion();
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+        }
+        StaticPopup_Show("TDKP_DATA_STATUS_FRAME_CLICK")
+    end)
 end
 
 local function CreateMainFrameButton(text, relativePoint, parentFrame, relativePointOnParentFrame)
@@ -113,7 +131,7 @@ end
 local function CreateBroadcastDKPDataButton()
     MainFrame.broadcastBtn = CreateMainFrameButton("Broadcast", Const.BOTTOM_RIGHT_POINT, MainFrame.addGuildToTableBtn, Const.TOP_RIGHT_POINT)
 
-    View:AttachHoverOverTooltipAndOnclick(MainFrame.broadcastBtn, "Broadcasts ThirtyDKP data", "Attempts to broadcast out your dkp data to other online members:\ndkp table, dkp history and addon options", function ()
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.broadcastBtn, "Broadcasts ThirtyDKP data", "Attempts to broadcast out your dkp data to other online members:\ndkp table, dkp history and addon options", function()
         StaticPopupDialogs["BROADCAST_THIRTYDKPDATA"] = {
             text = "Are you sure you want to broadcast your ThirtyDKP data?",
             button1 = "Yes",
@@ -206,12 +224,13 @@ local function CreateMainFrame(isAddonAdmin)
 
 
     -- up-to-date frame
-    MainFrame.upToDateFrame = CreateFrame('Frame', nil, MainFrame);
+    MainFrame.upToDateFrame = CreateFrame('Button', nil, MainFrame);
     MainFrame.upToDateFrame:SetSize(100, 30);
-	MainFrame.upToDateFrame:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 110, 0);
+    MainFrame.upToDateFrame:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 110, 0);
+    MainFrame.upToDateFrame:RegisterForClicks("AnyUp");
     MainFrame.upToDateFrame.text = MainFrame.upToDateFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
 	MainFrame.upToDateFrame.text:SetFontObject("ThirtyDKPTiny");
-    MainFrame.upToDateFrame.text:SetPoint(Const.LEFT_POINT, MainFrame.upToDateFrame, Const.LEFT_POINT, 0, -5);
+    MainFrame.upToDateFrame.text:SetPoint(Const.LEFT_POINT, MainFrame.upToDateFrame, Const.LEFT_POINT, 0, 5);
     
     View:UpdateDataUpToDateFrame()
 

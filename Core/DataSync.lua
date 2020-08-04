@@ -60,36 +60,34 @@ end
 
 local function CompareDataVersions()
     local dkpTableVersion = DAL:GetDKPTableVersion()
+    local dataStatusText = ""
 
     if dkpTableVersion ~= nil then
-        local dataGuildname = strsplit("-", dkpTableVersion)
+        local dataGuildname, localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion)
         local currentGuildName = GetGuildInfo("player");
+
         if not currentGuildName == dataGuildname then
             Core:Print("Actual guild: "..currentGuildName.." mismatches with ThirtyDKP data guild name: "..dataGuildname..".")
-            return;
-        end
-
-        if recievedUpdates < 4 then
+            dataStatusText = "Actual guild: "..currentGuildName.." mismatches with ThirtyDKP data guild name: "..dataGuildname.."."
+        
+        elseif recievedUpdates < 4 then
             Core:Print("Not enough updates recieved. Try again when more guildies are online.")
-            return;
-        end
+            dataStatusText = "Not enough updates recieved. Try again when more guildies are online."
 
-        local _, localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion) 
-
-        if tonumber(knownLatestVersionDate) <= tonumber(localVersionDate) then
+        elseif tonumber(knownLatestVersionDate) <= tonumber(localVersionDate) then
             isUpToDate = true
             Core:Print("Data up-to-date.");
-        end
 
-        if not isUpToDate then
+        elseif not isUpToDate then
             local formattedDate = Core:FormatTimestamp(knownLatestVersionDate)
             Core:Print("Newer DKP data found from "..formattedDate..". By "..knownLatestVersionOwner..".");
+            dataStatusText = "Newer DKP data found from "..formattedDate..". By "..knownLatestVersionOwner.."."
         end
     else
         -- No history or version to check, so probably brand new install.
         Core:Print("No ThirtyDKP data found. If new installation, go raiding or request broadcast from admins.")
     end
-    View:UpdateDataUpToDateFrame()
+    View:UpdateDataUpToDateFrame(dataStatusText)
 end
 
 function Core:CheckDataVersion()

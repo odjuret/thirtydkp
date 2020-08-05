@@ -89,7 +89,7 @@ end
 function View:CreateOptionsFrame(parentFrame)
 	OptionsFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", parentFrame, "TooltipBorderedFrameTemplate"); 
 	OptionsFrame:SetShown(false);
-	OptionsFrame:SetSize(370, 420);
+	OptionsFrame:SetSize(370, 450);
 	OptionsFrame:SetFrameStrata("HIGH");
 	OptionsFrame:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
     OptionsFrame:EnableMouse(true);
@@ -178,16 +178,17 @@ function View:CreateOptionsFrame(parentFrame)
     OptionsFrame.bracersCostInput = CreateAndAttachDkpCostFrame("Bracers:", "bracers", itemCostSectionLeft, OptionsFrame.chestCostInput);
     OptionsFrame.glovesCostInput = CreateAndAttachDkpCostFrame("Gloves:", "gloves", itemCostSectionLeft, OptionsFrame.bracersCostInput);
     OptionsFrame.beltCostInput = CreateAndAttachDkpCostFrame("Belt:", "belt", itemCostSectionLeft, OptionsFrame.glovesCostInput);
+    OptionsFrame.legsCostInput = CreateAndAttachDkpCostFrame("Legs:", "legs", itemCostSectionLeft, OptionsFrame.beltCostInput);
 
     -- Right section
-    OptionsFrame.legsCostInput = CreateDkpCostInputFrame("Legs:", "legs", itemCostSectionRight, itemCostSectionRight);
-    OptionsFrame.legsCostInput:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionRight, Const.TOP_LEFT_POINT, 0, 0);
-    OptionsFrame.bootsCostInput = CreateAndAttachDkpCostFrame("Boots:", "boots", itemCostSectionRight, OptionsFrame.legsCostInput);
+    OptionsFrame.bootsCostInput = CreateDkpCostInputFrame("Boots:", "boots", itemCostSectionRight);
+    OptionsFrame.bootsCostInput:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionRight, Const.TOP_LEFT_POINT, 0, 0);
     OptionsFrame.ringCostInput = CreateAndAttachDkpCostFrame("Ring:", "ring", itemCostSectionRight, OptionsFrame.bootsCostInput);
     OptionsFrame.trinketCostInput = CreateAndAttachDkpCostFrame("Trinket:", "trinket", itemCostSectionRight, OptionsFrame.ringCostInput);
     OptionsFrame.oneHandedWeaponCostInput = CreateAndAttachDkpCostFrame("One-handed:", "oneHandedWeapon", itemCostSectionRight, OptionsFrame.trinketCostInput);
     OptionsFrame.twoHandedWeaponCostInput = CreateAndAttachDkpCostFrame("Two-handed:", "twoHandedWeapon", itemCostSectionRight, OptionsFrame.oneHandedWeaponCostInput);
     OptionsFrame.rangedWeaponCostInput = CreateAndAttachDkpCostFrame("Ranged:", "rangedWeapon", itemCostSectionRight, OptionsFrame.twoHandedWeaponCostInput);
+    OptionsFrame.offhandCostInput = CreateAndAttachDkpCostFrame("Offhand:", "offhand", itemCostSectionRight, OptionsFrame.rangedWeaponCostInput);
 
 
     -- Buttons

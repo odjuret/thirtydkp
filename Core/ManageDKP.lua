@@ -88,6 +88,7 @@ local function GetDKPCostByEquipLocation(itemEquipLoc, raidName)
     elseif itemEquipLoc == "INVTYPE_WEAPON" then
         return options.itemCosts.oneHandedWeapon
     elseif itemEquipLoc == "INVTYPE_SHIELD" then
+		return options.itemCosts.offhand;
     elseif itemEquipLoc == "INVTYPE_2HWEAPON" then
         return options.itemCosts.twoHandedWeapon
     elseif itemEquipLoc == "INVTYPE_WEAPONMAINHAND" then
@@ -95,6 +96,7 @@ local function GetDKPCostByEquipLocation(itemEquipLoc, raidName)
     elseif itemEquipLoc == "INVTYPE_WEAPONOFFHAND" then
         return options.itemCosts.oneHandedWeapon
     elseif itemEquipLoc == "INVTYPE_HOLDABLE" then
+		return options.itemCosts.offhand;
     elseif itemEquipLoc == "INVTYPE_RANGED" or itemEquipLoc == "INVTYPE_THROWN" or itemEquipLoc == "INVTYPE_RANGEDRIGHT"then
         return options.itemCosts.rangedWeapon
     else 

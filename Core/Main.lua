@@ -6,6 +6,18 @@ local Core = ThirtyDKP.Core
 
 local isAddonAdmin = nil
 
+function Core:IsInSameGuild(playerName)
+	for i=1, GetNumGuildMembers() do
+		nameFromGuild, _, _, _, _ = GetGuildRosterInfo(i)
+		nameFromGuild = strsub(nameFromGuild, 1, string.find(nameFromGuild, "-")-1) -- required to remove server name from player (can remove in classic if this is not an issue)
+		if nameFromGuild == playerName then
+			return true;
+		end
+	end
+
+	return false;
+end
+
 local function GetGuildRankIndex(player)
 	if IsInGuild() then
 	local name, rank;

@@ -32,7 +32,6 @@ local bossEventIds = {
         1084
 }
 
-
 local function GetRaidNameFromId(raidId)
 	if raidId == 531 then
 		return "aq40";
@@ -54,7 +53,6 @@ function Core:CheckRaid()
         DAL:SetLastKnownRaid(raidName);
     end
 end
-
 
 local function GetDKPCostByEquipLocation(itemEquipLoc)
     local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo();
@@ -116,7 +114,6 @@ function Core:GetDKPCostByItemlink(itemLink)
     return itemDKPCost
 end
 
-
 function Core:AwardItem(dkpTableEntry, itemLink, itemDKPCost)
     if DAL:AdjustPlayerDKP(dkpTableEntry.player, tonumber("-"..itemDKPCost)) then
         Core:RaidAnnounce(dkpTableEntry.player.." won "..itemLink.." ");
@@ -129,6 +126,7 @@ function Core:AwardItem(dkpTableEntry, itemLink, itemDKPCost)
         Core:SendDKPEventMessage(dkpTableEntry.player, tonumber("-"..itemDKPCost), "Loot: "..itemLink)
         -- update view
         View:UpdateDKPTable();
+        View:UpdateDKPHistoryFrame()
     else
         Core:RaidAnnounce("Could not award "..dkpTableEntry.player.." with "..itemLink.." ");
     end 
@@ -182,62 +180,9 @@ function Core:HandleBossKill(eventId, ...)
     DAL:UpdateDKPTableVersion()
     -- broadcast event
     Core:SendDKPEventMessage(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
-	View:UpdateDKPTable();
+    View:UpdateDKPTable();
+    View:UpdateDKPHistoryFrame()
 end
-
-local function IsInSameGuild(playerName)
-	for i=1, GetNumGuildMembers() do
-		nameFromGuild, _, _, _, _ = GetGuildRosterInfo(i)
-		nameFromGuild = strsub(nameFromGuild, 1, string.find(nameFromGuild, "-")-1) -- required to remove server name from player (can remove in classic if this is not an issue)
-		if nameFromGuild == playerName then
-			return true;
-		end
-	end
-
-	return false;
-end
-
-
-function Core:AddRaidToDKPTable()
-    for i=1, GetNumGroupMembers() do
-        local playerName, _, _, _, playerClass = GetRaidRosterInfo(i)
-        
-		if playerName and IsInSameGuild(playerName) then
-            if DAL:AddToDKPTable(playerName, playerClass) then
-                Core:Print("added "..playerName.." successfully to table.")
-            end
-		end
-    end
-end
-
-function Core:AddGuildToDKPTable()
-    local guildSize = GetNumGuildMembers();
-    local nameFromGuild, rank, rankIndex, tempClass;
-    local playersAdded = "";
-    
-    -- for every person in the guild
-    for i=1, guildSize do
-        nameFromGuild, rank, rankIndex, _, tempClass = GetGuildRosterInfo(i)
-        nameFromGuild = strsub(nameFromGuild, 1, string.find(nameFromGuild, "-")-1) -- required to remove server name from player (can remove in classic if this is not an issue)
-        
-        -- TODO: user be able to choose rank
-        if rankIndex <= 4 then
-            if DAL:AddToDKPTable(nameFromGuild, tempClass) then
-                if playersAdded == "" then
-                    playersAdded = Core:AddClassColor(nameFromGuild, tempClass)
-                else
-                    playersAdded = playersAdded..", "..Core:AddClassColor(nameFromGuild, tempClass)
-                end
-            end
-        end
-    end
-    if playersAdded == "" then
-        Core:Print("No more players above "..rank.." found.")
-    else
-        Core:Print("added "..playersAdded.." successfully to table.")
-    end
-end
-
 
 function Core:ApplyOnTimeBonus()
 	local listOfAwardedPlayers = "";
@@ -252,7 +197,7 @@ function Core:ApplyOnTimeBonus()
             else
                 listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
             end
-		elseif IsInSameGuild(playerName) then
+		elseif Core:IsInSameGuild(playerName) then
             if DAL:AddToDKPTable(playerName, playerClass) then
                 Core:Print("added "..playerName.." successfully to table.")
 				DAL:AdjustPlayerDKP(playerName, raidCompletionBonus);
@@ -269,9 +214,9 @@ function Core:ApplyOnTimeBonus()
 	DAL:UpdateDKPHistoryVersion()
 	DAL:UpdateDKPTableVersion()
 	Core:SendDKPEventMessage(listOfAwardedPlayers, onTimeBonus, "On Time Bonus")
-	View:UpdateDKPTable();
+    View:UpdateDKPTable();
+    View:UpdateDKPHistoryFrame()
 end
-
 
 function Core:ApplyRaidEndBonus()
 	local listOfAwardedPlayers = "";
@@ -287,7 +232,7 @@ function Core:ApplyRaidEndBonus()
                 listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
             end
             
-		elseif IsInSameGuild(playerName) then
+		elseif Core:IsInSameGuild(playerName) then
             if DAL:AddToDKPTable(playerName, playerClass) then
                 Core:Print("added "..playerName.." successfully to table.")
 				DAL:AdjustPlayerDKP(playerName, raidCompletionBonus);
@@ -305,7 +250,8 @@ function Core:ApplyRaidEndBonus()
 	DAL:UpdateDKPHistoryVersion()
 	DAL:UpdateDKPTableVersion()
 	Core:SendDKPEventMessage(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
-	View:UpdateDKPTable();
+    View:UpdateDKPTable();
+    View:UpdateDKPHistoryFrame()
 end
 
 function Core:ApplyDecay()
@@ -326,7 +272,8 @@ function Core:ApplyDecay()
 
 	DAL:UpdateDKPHistoryVersion()
 	DAL:UpdateDKPTableVersion()
-	View:UpdateDKPTable();
+    View:UpdateDKPTable();
+    View:UpdateDKPHistoryFrame()
 end
 
 function Core:RevertHistory(historyEntry)
@@ -337,6 +284,22 @@ function Core:RevertHistory(historyEntry)
     end
     
     DAL:DeleteHistoryEntry(historyEntry);
-    View:UpdateDKPHistoryFrame();
     View:UpdateDKPTable();
+    View:UpdateDKPHistoryFrame();
+end
+
+function Core:AdjustPlayersDKP(selectedPlayers, DkpAdjustAmount, DkpAdjustReason)
+    local listOfAdjustedPlayers = "";
+
+    for i, selectedPlayer in ipairs(selectedPlayers) do
+        if DAL:AdjustPlayerDKP(selectedPlayer, DkpAdjustAmount) then
+            listOfAdjustedPlayers = listOfAdjustedPlayers..", "..selectedPlayer;
+        end
+    end
+
+    DAL:AddToHistory(listOfAdjustedPlayers, DkpAdjustAmount, DkpAdjustReason);
+    DAL:UpdateDKPHistoryVersion()
+    DAL:UpdateDKPTableVersion()
+    View:UpdateDKPTable();
+    View:UpdateDKPHistoryFrame();
 end

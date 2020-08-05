@@ -8,6 +8,14 @@ function DAL:InitializeDKPHistory()
     if not ThirtyDKP_Database_DKPHistory then ThirtyDKP_Database_DKPHistory = {} end;
 end
 
+function DAL:InitializeHistoryVersion()
+	if not ThirtyDKP_Database_DKPHistory.version then
+		local guildName = GetGuildInfo("player");
+		local historyDataVersion = guildName.."-"..UnitName("player").."-"..0;
+		ThirtyDKP_Database_DKPHistory.version = historyDataVersion
+	end
+end
+
 function DAL:GetDKPHistory()
     return ThirtyDKP_Database_DKPHistory
 end
@@ -19,7 +27,17 @@ end
 function DAL:AddToHistory(affectedPlayers, amount, reason)
     local currentTime = time();
     local index = UnitName("player").."-"..currentTime
-    if not index == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].index and not reason == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].reason then
+    if #ThirtyDKP_Database_DKPHistory > 0 then
+        if not (index == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].index and reason == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].reason) then
+            tinsert(ThirtyDKP_Database_DKPHistory, {
+                players=affectedPlayers,
+                dkp=amount,
+                timestamp=currentTime,
+                index=index,
+                reason=reason
+            });
+        end
+    else
         tinsert(ThirtyDKP_Database_DKPHistory, {
             players=affectedPlayers,
             dkp=amount,
@@ -57,4 +75,8 @@ function DAL:UpdateDKPHistoryVersion()
 	local currentTime = time();
 	local index = UnitName("player").."-"..currentTime
 	ThirtyDKP_Database_DKPHistory.version = index
+end
+
+function DAL:GetDKPHistoryVersion()
+    return ThirtyDKP_Database_DKPHistory.version;
 end

@@ -160,7 +160,6 @@ function View:UpdateDKPHistoryFrame()
  	dkpHistoryScrollChildHeight = 0;
 
 	View:CreateDKPHistoryFrame(mainFrame)
-	DKPHistoryFrame:Show()
 end
 
 function View:ToggleDKPHistoryFrame()

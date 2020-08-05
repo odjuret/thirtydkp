@@ -6,65 +6,83 @@ local View = ThirtyDKP.View
 
 local isUpToDate = false
 local recievedUpdates = 0
-local knownLatestVersionGuild = nil
-local knownLatestVersionOwner = nil
-local knownLatestVersionDate = nil
+
+local latestKnownDKPTableVersion = nil
+local latestKnownHistoryVersion = nil
 
 function Core:GetLatestKnownVersionOwner()
-    if knownLatestVersionOwner == nil then
+    if latestKnownDKPTableVersion == nil then
         return "Unknown"
     else
-        return knownLatestVersionOwner
+        local _, latestKnownVersionOwner, _ = strsplit("-", latestKnownDKPTableVersion)
+        return latestKnownVersionOwner
     end
 end
-
 
 function Core:IsDataUpToDate()
     return isUpToDate
 end
 
-local function InitializeLatestKnownVersion()
+local function InitializeLatestKnownVersions()
     DAL:InitializeDKPTableVersion();
-    local dkpTableVersion = DAL:GetDKPTableVersion()
-    local localVersionGuild, localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion)
-    knownLatestVersionGuild = localVersionGuild
-    knownLatestVersionOwner = localVersionOwner
-    knownLatestVersionDate = localVersionDate
+    DAL:InitializeHistoryVersion();
+
+    latestKnownDKPTableVersion = DAL:GetDKPTableVersion()
+    latestKnownHistoryVersion = DAL:GetDKPHistoryVersion()
 end
 
-function Core:GetLatestKnownVersion()
-    if knownLatestVersionOwner == nil or knownLatestVersionDate == nil or knownLatestVersionGuild == nil then
-        InitializeLatestKnownVersion()
+function Core:GetLatestKnownVersions()
+    if latestKnownDKPTableVersion == nil or latestKnownHistoryVersion == nil then
+        InitializeLatestKnownVersions()
     end
-    return knownLatestVersionGuild.."-"..knownLatestVersionOwner.."-"..knownLatestVersionDate
+    return latestKnownDKPTableVersion, latestKnownHistoryVersion
 end
 
-function Core:TryUpdateKnownVersion(incomingVersionIndex)
-    local incomingGuildname, incomingVersionOwner, incomingVersionDate = strsplit("-", incomingVersionIndex)
-    local guildname = strsplit("-", DAL:GetDKPTableVersion()) 
-    if not incomingGuildname == guildname then
+
+local function TryUpdateKnownDKPTableVersion(incomingDKPTableVersion)
+    local _, _, latestKnownDate = string.split("-", latestKnownDKPTableVersion)
+    local _, _, incomingDate = string.split("-", incomingDKPTableVersion)
+
+    if (incomingDate > latestKnownDate) then
+        latestKnownDKPTableVersion = incomingDKPTableVersion
+    end
+end
+
+local function TryUpdateKnownHistoryVersion(incomingHistoryVersion)
+    local _, _, latestKnownDate = string.split("-", latestKnownHistoryVersion)
+    local _, _, incomingDate = string.split("-", incomingHistoryVersion)
+
+    if (incomingDate > latestKnownDate) then
+        latestKnownDKPTableVersion = incomingHistoryVersion
+    end
+end
+
+function Core:TryUpdateKnownVersions(incomingVersionsMessage)
+    if latestKnownDKPTableVersion == nil or latestKnownHistoryVersion == nil then
+        InitializeLatestKnownVersions()
+    end
+    local incomingDKPTableVersion, incomingHistoryVersion = string.split("/", incomingVersionsMessage)
+
+    if not Core:DoesDataBelongToSameGuild(incomingDKPTableVersion, incomingHistoryVersion) then
         return;
     end
+
+    TryUpdateKnownDKPTableVersion(incomingDKPTableVersion)
+    TryUpdateKnownHistoryVersion(incomingHistoryVersion)
+
     recievedUpdates = recievedUpdates +1
-
-    if knownLatestVersionOwner == nil or knownLatestVersionDate == nil or knownLatestVersionGuild == nil then
-        InitializeLatestKnownVersion()
-    end
-
-    if (incomingVersionDate > knownLatestVersionDate) then
-        knownLatestVersionGuild = incomingGuildname
-        knownLatestVersionOwner = incomingVersionOwner
-        knownLatestVersionDate = incomingVersionDate
-    end
 end
 
+
 local function CompareDataVersions()
-    local dkpTableVersion = DAL:GetDKPTableVersion()
+    local dataGuildname, _, dataVersionDate = strsplit("-", DAL:GetDKPTableVersion())
+    local _, _, historyVersionDate = strsplit("-", DAL:GetDKPHistoryVersion())
     local dataStatusText = ""
 
-    if dkpTableVersion ~= nil then
-        local dataGuildname, localVersionOwner, localVersionDate = strsplit("-", dkpTableVersion)
+    if tonumber(dataVersionDate) > 0 then
         local currentGuildName = GetGuildInfo("player");
+        local _, _, latestKnownDKPTableDate = string.split("-", latestKnownDKPTableVersion)
+        local _, _, latestKnownHistoryDate = string.split("-", latestKnownHistoryVersion)
 
         if not currentGuildName == dataGuildname then
             Core:Print("Actual guild: "..currentGuildName.." mismatches with ThirtyDKP data guild name: "..dataGuildname..".")
@@ -74,12 +92,12 @@ local function CompareDataVersions()
             Core:Print("Not enough updates recieved. Try again when more guildies are online.")
             dataStatusText = "Not enough updates recieved. Try again when more guildies are online."
 
-        elseif tonumber(knownLatestVersionDate) <= tonumber(localVersionDate) then
+        elseif tonumber(latestKnownDKPTableDate) <= tonumber(dataVersionDate) and tonumber(latestKnownHistoryDate) <= tonumber(historyVersionDate) then
             isUpToDate = true
             Core:Print("Data up-to-date.");
 
         elseif not isUpToDate then
-            local formattedDate = Core:FormatTimestamp(knownLatestVersionDate)
+            local formattedDate = Core:FormatTimestamp(latestKnownDKPTableDate)
             Core:Print("Newer DKP data found from "..formattedDate..". By "..knownLatestVersionOwner..".");
             dataStatusText = "Newer DKP data found from "..formattedDate..". By "..knownLatestVersionOwner.."."
         end
@@ -98,15 +116,16 @@ function Core:CheckDataVersion()
         else
             Core:Print("Attempting to sync DKP data with online guildies.")
             -- Request data versions from online members
-            local latestKnownVersion = Core:GetLatestKnownVersion()
-            Core:RequestDataVersionSync(latestKnownVersion)
+
+            local dkpTableVersion, historyVersion = Core:GetLatestKnownVersions();
+            Core:RequestDataVersionSync(dkpTableVersion.."/"..historyVersion)
 
             C_Timer.After(6, CompareDataVersions)
         end
     end)
 end
 
-function Core:DoesDataBelongToSameGuild(incomingDKPTableDataVersion)
+function Core:DoesDataBelongToSameGuild(incomingDKPTableDataVersion, incomingHistoryDataVersion)
     local results = false
     local incomingGuildname = strsplit("-", incomingDKPTableDataVersion)
     local guildname = strsplit("-", DAL:GetDKPTableVersion()) 
@@ -114,6 +133,13 @@ function Core:DoesDataBelongToSameGuild(incomingDKPTableDataVersion)
     if guildname == incomingGuildname then
         results = true
     end
+    if incomingHistoryDataVersion ~= nil then
+        local incomingHistoryGuildname = strsplit("-", incomingHistoryDataVersion)
+        if not guildname == incomingHistoryGuildname then
+            results = false
+        end
+    end
+    
     return results
 end
 

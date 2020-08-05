@@ -144,18 +144,7 @@ function View:CreateRaidFrame(parentFrame)
 			return;
 		end
 
-		local listOfAdjustedPlayers = "";
-
-        for i, selectedPlayer in ipairs(selectedPlayers) do
-            if DAL:AdjustPlayerDKP(selectedPlayer, DkpAdjustAmount) then
-				listOfAdjustedPlayers = listOfAdjustedPlayers..", "..selectedPlayer;
-			end
-        end
-
-		DAL:AddToHistory(listOfAdjustedPlayers, DkpAdjustAmount, DkpAdjustReason);
-		DAL:UpdateDKPHistoryVersion()
-		DAL:UpdateDKPTableVersion()
-		View:UpdateDKPTable();
+		Core:AdjustPlayersDKP(selectedPlayers, DkpAdjustAmount, DkpAdjustReason)
 
 		amountInput.input:SetText("");
 		reasonInput.input:SetText("");

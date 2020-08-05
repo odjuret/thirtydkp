@@ -71,6 +71,8 @@ local function HandleDKPEventMessage(prefix, message, distribution, sender)
             if not Core:DoesDataBelongToSameGuild(deserialized.updatedTable.version) then
                 -- todo: turn off events for this raid
                 Core:Print("Incoming DKP events from different guild.")
+                Core:Print("Request a broadcast from admin to remove these messages.")
+                return;
             end
             
             DAL:WipeAndSetNewDKPTable(deserialized.updatedTable)
@@ -84,21 +86,21 @@ end
 local function HandleDataVersionSyncMessage(prefix, message, distribution, sender)
     if (sender ~= UnitName("player")) then
         Core:TryUpdateKnownVersion(message)
-        local latestKnownVersion = Core:GetLatestKnownVersion();
+        local latestKnownDKPTableVersion, latestKnownHistoryVersion = Core:GetLatestKnownVersions()
     
         Communicator:SendCommMessage(DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX, latestKnownVersion, "WHISPER", sender)
     end
 end
 
 local function HandleDataVersionSyncResponseMessage(prefix, message, distribution, sender)
-    Core:TryUpdateKnownVersion(message)
+    Core:TryUpdateKnownVersions(message)
 end
 
 ------------------------------
 -- Outgoing communication below
 
-function Core:RequestDataVersionSync(currentVersionIndex)
-    Communicator:SendCommMessage(DATA_VERSION_SYNC_CHANNEL_PREFIX, currentVersionIndex, "GUILD")
+function Core:RequestDataVersionSync(currentKnownVersions)
+    Communicator:SendCommMessage(DATA_VERSION_SYNC_CHANNEL_PREFIX, currentKnownVersions, "GUILD")
 end
 
 function Core:SendDKPEventMessage(listOfAdjustedPlayers, dkpAdjustment, reason)

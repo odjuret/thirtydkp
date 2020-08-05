@@ -47,7 +47,7 @@ end
 
 local function RaidDropdownOnClick(self, arg1, arg2, checked)
 	SelectedRaid = arg1;
-	UIDropDownMenu_SetText(OptionsFrame.raidDropdown, RAID_DISPLAY_NAME[arg1]);
+	UIDropDownMenu_SetText(OptionsFrame.raidDropdown, Const.RAID_DISPLAY_NAME[arg1]);
 	View:UpdateOptionsFrame();
 end
 

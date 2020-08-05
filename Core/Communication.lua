@@ -85,7 +85,7 @@ end
 
 local function HandleDataVersionSyncMessage(prefix, message, distribution, sender)
     if (sender ~= UnitName("player")) then
-        Core:TryUpdateKnownVersion(message)
+        Core:TryUpdateKnownVersions(message)
         local latestKnownDKPTableVersion, latestKnownHistoryVersion = Core:GetLatestKnownVersions()
     
         Communicator:SendCommMessage(DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX, latestKnownVersion, "WHISPER", sender)

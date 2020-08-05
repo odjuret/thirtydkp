@@ -29,3 +29,18 @@ ThirtyDKP.View.Constants.LootTableRowHeight = 18;
 
 ThirtyDKP.View.Constants.Margin = 15;
 ThirtyDKP.View.Constants.ButtonHeight = 20;
+
+-- Raid names
+ThirtyDKP.View.Constants.RAID_NAXX = "naxxramas";
+ThirtyDKP.View.Constants.RAID_AQ40 = "aq40";
+ThirtyDKP.View.Constants.RAID_BWL = "bwl";
+ThirtyDKP.View.Constants.RAID_MC = "mc";
+ThirtyDKP.View.Constants.RAID_ONYXIA = "onyxia";
+
+ThirtyDKP.View.Constants.RAID_DISPLAY_NAME = {
+	naxxramas = "Naxxramas",
+	aq40 = "Ahn'Qiraj",
+	bwl = "Blackwing Lair",
+	mc = "Molten Core",
+	onyxia = "Onyxia",
+};

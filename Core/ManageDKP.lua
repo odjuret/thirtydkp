@@ -54,13 +54,7 @@ function Core:CheckRaid()
     end
 end
 
-local function GetDKPCostByEquipLocation(itemEquipLoc)
-    local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo();
-    local raidName = GetRaidNameFromId(instanceMapId);
-    if raidName == "" then
-        raidName = DAL:GetLastOrDefaultRaid();
-    end
-    
+local function GetDKPCostByEquipLocation(itemEquipLoc, raidName)
     local options = DAL:GetRaidOptions(raidName);
 
     if not itemEquipLoc then
@@ -108,9 +102,9 @@ local function GetDKPCostByEquipLocation(itemEquipLoc)
     end
 end
 
-function Core:GetDKPCostByItemlink(itemLink)
+function Core:GetDKPCostByItemlink(itemLink, raidName)
     local _, _, _, _, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink);
-    local itemDKPCost = GetDKPCostByEquipLocation(itemEquipLoc);
+    local itemDKPCost = GetDKPCostByEquipLocation(itemEquipLoc, raidName);
     return itemDKPCost
 end
 

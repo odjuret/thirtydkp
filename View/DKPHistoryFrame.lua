@@ -118,6 +118,11 @@ end
 function View:CreateDKPHistoryFrame(parentFrame)
 	DKPHistoryFrame = View:CreateContainerFrame("ThirtyDKP_HistoryFrame", parentFrame, DKPHISTORY_FRAME_TITLE, 432, 385)
 
+	DKPHistoryFrame.helpText = DKPHistoryFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
+	DKPHistoryFrame.helpText:SetFontObject("ThirtyDKPTiny");
+    DKPHistoryFrame.helpText:SetPoint(Const.TOP_LEFT_POINT, DKPHistoryFrame, Const.TOP_LEFT_POINT, 180, -20);
+    DKPHistoryFrame.helpText:SetText(Core:ColorizeGrey("Right click to delete entry."))
+
     local dkpHistory = DAL:GetDKPHistory()
 
     DKPHistoryFrame.HistoryScrollFrame = CreateFrame("ScrollFrame", 'DKPHistoryScrollFrame', DKPHistoryFrame, "UIPanelScrollFrameTemplate");

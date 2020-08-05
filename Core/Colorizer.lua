@@ -80,3 +80,7 @@ end
 function Core:ColorizeListHeader(stringToColorize)
     return "|cffaeaedd"..stringToColorize.."|r"
 end
+
+function Core:ColorizeGrey(stringToColorize)
+    return "|cffA0A0A0"..stringToColorize.."|r"
+end

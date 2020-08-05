@@ -200,7 +200,7 @@ function Core:ApplyOnTimeBonus()
 		elseif Core:IsInSameGuild(playerName) then
             if DAL:AddToDKPTable(playerName, playerClass) then
                 Core:Print("added "..playerName.." successfully to table.")
-				DAL:AdjustPlayerDKP(playerName, raidCompletionBonus);
+				DAL:AdjustPlayerDKP(playerName, onTimeBonus);
 				if i == 1 then
                     listOfAwardedPlayers = playerName;
                 else

@@ -24,28 +24,35 @@ function DAL:GetLatestDKPHistoryEntry()
     return ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory]
 end
 
+function DAL:AddEntryToHistory(newHistoryEntry)
+    if #ThirtyDKP_Database_DKPHistory > 0 then
+        if not (newHistoryEntry.index == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].index and newHistoryEntry.reason == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].reason) then
+            tinsert(ThirtyDKP_Database_DKPHistory, newHistoryEntry);
+        end
+    else
+        tinsert(ThirtyDKP_Database_DKPHistory, newHistoryEntry);
+    end
+end
+
+
 function DAL:AddToHistory(affectedPlayers, amount, reason)
     local currentTime = time();
     local index = UnitName("player").."-"..currentTime
+    local newHistoryEntry = {
+        players=affectedPlayers,
+        dkp=amount,
+        timestamp=currentTime,
+        index=index,
+        reason=reason
+    }
     if #ThirtyDKP_Database_DKPHistory > 0 then
         if not (index == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].index and reason == ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory].reason) then
-            tinsert(ThirtyDKP_Database_DKPHistory, {
-                players=affectedPlayers,
-                dkp=amount,
-                timestamp=currentTime,
-                index=index,
-                reason=reason
-            });
+            tinsert(ThirtyDKP_Database_DKPHistory, newHistoryEntry);
         end
     else
-        tinsert(ThirtyDKP_Database_DKPHistory, {
-            players=affectedPlayers,
-            dkp=amount,
-            timestamp=currentTime,
-            index=index,
-            reason=reason
-        });
+        tinsert(ThirtyDKP_Database_DKPHistory, newHistoryEntry);
     end
+    return newHistoryEntry;
 end
 
 function DAL:DeleteHistoryEntry(entry)
@@ -71,10 +78,14 @@ function DAL:WipeAndSetNewHistory(newHistory)
     ThirtyDKP_Database_DKPHistory = newHistory
 end
 
-function DAL:UpdateDKPHistoryVersion()
-	local currentTime = time();
-	local index = UnitName("player").."-"..currentTime
-	ThirtyDKP_Database_DKPHistory.version = index
+function DAL:UpdateDKPHistoryVersion(newHistoryVersion)
+    if (newHistoryVersion == nil or newHistoryVersion == "") then
+        local currentTime = time();
+	    local index = UnitName("player").."-"..currentTime
+	    ThirtyDKP_Database_DKPHistory.version = index 
+    else
+        ThirtyDKP_Database_DKPHistory.version = newHistoryVersion
+    end
 end
 
 function DAL:GetDKPHistoryVersion()

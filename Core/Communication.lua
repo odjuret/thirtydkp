@@ -35,8 +35,7 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
                     DAL:WipeAndSetNewDKPTable(deserialized.dkpTable)
                     DAL:WipeAndSetNewOptions(deserialized.options)
                     DAL:WipeAndSetNewHistory(deserialized.history)
-                    View:UpdateDKPTable()
-					View:UpdateOptionsFrame();
+                    View:UpdateAllViews();
                 end,
                 timeout = 0,
                 whileDead = true,
@@ -47,7 +46,6 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
         else
             Core:Print("DKP Table broadcasting message recieved but something went wrong... Contact Authors.")
         end
-
     end
 end
 
@@ -74,18 +72,24 @@ local function HandleDKPEventMessage(prefix, message, distribution, sender)
                 Core:Print("Request a broadcast from admin to remove these messages.")
                 return;
             end
-            
+
+            -- always use latest incoming dkp table
             DAL:WipeAndSetNewDKPTable(deserialized.updatedTable)
 
-            -- add event to history
-            DAL:AddToHistory(deserialized.players, deserialized.dkpAdjustment, deserialized.reason)
+            -- but dont update other table versions if local data is outdated
+            if not Core:CheckHistoryDataVersion(deserialized.previousHistoryVersion) then
+                return;
+            else
+                DAL:AddEntryToHistory(deserialized.historyEntry)
+                DAL:UpdateDKPHistoryVersion(deserialized.newHistoryVersion)
+            end
         end
     end
 end
 
 local function HandleDataVersionSyncMessage(prefix, message, distribution, sender)
     if (sender ~= UnitName("player")) then
-        Core:TryUpdateKnownVersion(message)
+        Core:TryUpdateKnownVersions(message)
         local latestKnownDKPTableVersion, latestKnownHistoryVersion = Core:GetLatestKnownVersions()
     
         Communicator:SendCommMessage(DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX, latestKnownVersion, "WHISPER", sender)
@@ -103,14 +107,14 @@ function Core:RequestDataVersionSync(currentKnownVersions)
     Communicator:SendCommMessage(DATA_VERSION_SYNC_CHANNEL_PREFIX, currentKnownVersions, "GUILD")
 end
 
-function Core:SendDKPEventMessage(listOfAdjustedPlayers, dkpAdjustment, reason)
+function Core:SendDKPEventMessage(newHistoryEntry, lastHistoryVersion)
     local serialized = nil;
     local packet = nil;
     local unprocessedTable = {
         updatedTable = DAL:GetDKPTable(),
-        players = listOfAdjustedPlayers,
-        dkpAdjustment = dkpAdjustment,
-        reason = reason,
+        historyEntry = newHistoryEntry,
+        previousHistoryVersion = lastHistoryVersion,
+        newHistoryVersion = DAL:GetDKPHistoryVersion(),
     }
 
     if unprocessedTable then

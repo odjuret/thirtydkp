@@ -83,6 +83,13 @@ function Core:RoundNumber(number, decimals)
     return tonumber((("%%.%df"):format(decimals)):format(number))
 end
 
+function View:UpdateAllViews()
+    View:UpdateDKPTable();
+    View:UpdateOptionsFrame();
+    View:UpdateDKPHistoryFrame();
+end
+
+
 -------------------------------------------------------
 -- Main event controller. Delegates all incoming events
 --------------------------------------------------------

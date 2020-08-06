@@ -114,19 +114,26 @@ function Core:GetDKPCostByItemlink(itemLink)
     return itemDKPCost
 end
 
+local function DKPEvent(affectedPlayers, amount, reason)
+    -- add event to local history, since i am admin.
+    local newHistoryEntry = DAL:AddToHistory(affectedPlayers, amount, reason)
+    -- save current (previous) table versions for broadcast
+    local currentHistoryVersion = DAL:GetDKPHistoryVersion();
+    -- update table versions
+    DAL:UpdateDKPHistoryVersion()
+    DAL:UpdateDKPTableVersion()
+    -- broadcast event
+    Core:SendDKPEventMessage(newHistoryEntry, currentHistoryVersion)
+    -- update view
+    View:UpdateAllViews()
+end
+
+
 function Core:AwardItem(dkpTableEntry, itemLink, itemDKPCost)
     if DAL:AdjustPlayerDKP(dkpTableEntry.player, tonumber("-"..itemDKPCost)) then
         Core:RaidAnnounce(dkpTableEntry.player.." won "..itemLink.." ");
-        -- add event to history
-        DAL:AddToHistory(dkpTableEntry.player, tonumber("-"..itemDKPCost), "Loot: "..itemLink)
-        -- update table versions
-        DAL:UpdateDKPHistoryVersion()
-        DAL:UpdateDKPTableVersion()
-        -- broadcast event
-        Core:SendDKPEventMessage(dkpTableEntry.player, tonumber("-"..itemDKPCost), "Loot: "..itemLink)
-        -- update view
-        View:UpdateDKPTable();
-        View:UpdateDKPHistoryFrame()
+
+        DKPEvent(dkpTableEntry.player, tonumber("-"..itemDKPCost), "Loot: "..itemLink)
     else
         Core:RaidAnnounce("Could not award "..dkpTableEntry.player.." with "..itemLink.." ");
     end 
@@ -173,15 +180,8 @@ function Core:HandleBossKill(eventId, ...)
             end
         end
     end
-    -- add event to history
-    DAL:AddToHistory(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
-    -- update table versions (since only master looters get here)
-    DAL:UpdateDKPHistoryVersion()
-    DAL:UpdateDKPTableVersion()
-    -- broadcast event
-    Core:SendDKPEventMessage(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
-    View:UpdateDKPTable();
-    View:UpdateDKPHistoryFrame()
+
+    DKPEvent(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
 end
 
 function Core:ApplyOnTimeBonus()
@@ -210,12 +210,7 @@ function Core:ApplyOnTimeBonus()
 		end
 	end
 
-	DAL:AddToHistory(listOfAwardedPlayers, onTimeBonus, "On Time Bonus");
-	DAL:UpdateDKPHistoryVersion()
-	DAL:UpdateDKPTableVersion()
-	Core:SendDKPEventMessage(listOfAwardedPlayers, onTimeBonus, "On Time Bonus")
-    View:UpdateDKPTable();
-    View:UpdateDKPHistoryFrame()
+    DKPEvent(listOfAwardedPlayers, onTimeBonus, "On Time Bonus")
 end
 
 function Core:ApplyRaidEndBonus()
@@ -246,36 +241,29 @@ function Core:ApplyRaidEndBonus()
 		end
 	end
 
-	DAL:AddToHistory(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus");
-	DAL:UpdateDKPHistoryVersion()
-	DAL:UpdateDKPTableVersion()
-	Core:SendDKPEventMessage(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
-    View:UpdateDKPTable();
-    View:UpdateDKPHistoryFrame()
+    DKPEvent(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
 end
 
 function Core:ApplyDecay()
-	local decay = DAL:GetOptions().decay / 100.0;
+    local listOfAwardedPlayers = "";
+    local decay = DAL:GetOptions().decay / 100.0;
+    
+    for i, dkpEntry in ipairs(DAL:GetDKPTable()) do
+        local decayAmount = math.floor(dkpEntry.dkp * decay);
 
-	for i=1, GetNumGuildMembers() do
-		local playerName = GetGuildRosterInfo(i);
-        playerName = strsub(playerName, 1, string.find(playerName, "-")-1) -- required to remove server name from player (can remove in classic if this is not an issue)
-		local dkpEntry = DAL:GetFromDKPTable(playerName);
+        if DAL:AdjustPlayerDKP(dkpEntry.player, -decayAmount) then
+            if listOfAwardedPlayers == "" then
+                listOfAwardedPlayers = playerName;
+            else
+                listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+            end
+        end
+    end
 
-		if dkpEntry then
-			local decayAmount = math.floor(dkpEntry.dkp * decay);
-			if DAL:AdjustPlayerDKP(playerName, -decayAmount) then
-				DAL:AddToHistory(playerName, decay, "Decay");
-			end
-		end
-	end
-
-	DAL:UpdateDKPHistoryVersion()
-	DAL:UpdateDKPTableVersion()
-    View:UpdateDKPTable();
-    View:UpdateDKPHistoryFrame()
+    DKPEvent(listOfAwardedPlayers, decay, "Decay")
 end
 
+-- todo dkp event for this
 function Core:RevertHistory(historyEntry)
     for i, player in ipairs({string.split(", ", historyEntry.players)}) do
         if player ~= nil and player ~= "" then
@@ -284,8 +272,7 @@ function Core:RevertHistory(historyEntry)
     end
     
     DAL:DeleteHistoryEntry(historyEntry);
-    View:UpdateDKPTable();
-    View:UpdateDKPHistoryFrame();
+    View:UpdateAllViews()
 end
 
 function Core:AdjustPlayersDKP(selectedPlayers, DkpAdjustAmount, DkpAdjustReason)
@@ -297,9 +284,5 @@ function Core:AdjustPlayersDKP(selectedPlayers, DkpAdjustAmount, DkpAdjustReason
         end
     end
 
-    DAL:AddToHistory(listOfAdjustedPlayers, DkpAdjustAmount, DkpAdjustReason);
-    DAL:UpdateDKPHistoryVersion()
-    DAL:UpdateDKPTableVersion()
-    View:UpdateDKPTable();
-    View:UpdateDKPHistoryFrame();
+    DKPEvent(listOfAdjustedPlayers, DkpAdjustAmount, DkpAdjustReason)
 end

@@ -37,8 +37,7 @@ function Core:IncomingBidsHandler(message, sender)
         end
         
         View:AddBidder(player)
-        View:UpdateDKPTable()
-        View:UpdateDKPHistoryFrame()
+        View:UpdateAllViews()
     end
 end
 

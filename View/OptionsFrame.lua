@@ -65,6 +65,7 @@ local function RaidDropdownOnClick(self, arg1, arg2, checked)
 	View:UpdateOptionsFrame();
 end
 
+-- todo save last chosen
 local function InitializeRaidDropdown(frame, level, menuList)
 	local info = UIDropDownMenu_CreateInfo();
 	info.func = RaidDropdownOnClick;

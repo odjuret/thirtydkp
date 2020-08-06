@@ -54,13 +54,7 @@ function Core:CheckRaid()
     end
 end
 
-local function GetDKPCostByEquipLocation(itemEquipLoc)
-    local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo();
-    local raidName = GetRaidNameFromId(instanceMapId);
-    if raidName == "" then
-        raidName = DAL:GetLastOrDefaultRaid();
-    end
-    
+local function GetDKPCostByEquipLocation(itemEquipLoc, raidName)
     local options = DAL:GetRaidOptions(raidName);
 
     if not itemEquipLoc then
@@ -94,6 +88,7 @@ local function GetDKPCostByEquipLocation(itemEquipLoc)
     elseif itemEquipLoc == "INVTYPE_WEAPON" then
         return options.itemCosts.oneHandedWeapon
     elseif itemEquipLoc == "INVTYPE_SHIELD" then
+		return options.itemCosts.offhand;
     elseif itemEquipLoc == "INVTYPE_2HWEAPON" then
         return options.itemCosts.twoHandedWeapon
     elseif itemEquipLoc == "INVTYPE_WEAPONMAINHAND" then
@@ -101,6 +96,7 @@ local function GetDKPCostByEquipLocation(itemEquipLoc)
     elseif itemEquipLoc == "INVTYPE_WEAPONOFFHAND" then
         return options.itemCosts.oneHandedWeapon
     elseif itemEquipLoc == "INVTYPE_HOLDABLE" then
+		return options.itemCosts.offhand;
     elseif itemEquipLoc == "INVTYPE_RANGED" or itemEquipLoc == "INVTYPE_THROWN" or itemEquipLoc == "INVTYPE_RANGEDRIGHT"then
         return options.itemCosts.rangedWeapon
     else 
@@ -108,9 +104,9 @@ local function GetDKPCostByEquipLocation(itemEquipLoc)
     end
 end
 
-function Core:GetDKPCostByItemlink(itemLink)
+function Core:GetDKPCostByItemlink(itemLink, raidName)
     local _, _, _, _, _, _, _, _, itemEquipLoc = GetItemInfo(itemLink);
-    local itemDKPCost = GetDKPCostByEquipLocation(itemEquipLoc);
+    local itemDKPCost = GetDKPCostByEquipLocation(itemEquipLoc, raidName);
     return itemDKPCost
 end
 
@@ -200,7 +196,7 @@ function Core:ApplyOnTimeBonus()
 		elseif Core:IsInSameGuild(playerName) then
             if DAL:AddToDKPTable(playerName, playerClass) then
                 Core:Print("added "..playerName.." successfully to table.")
-				DAL:AdjustPlayerDKP(playerName, raidCompletionBonus);
+				DAL:AdjustPlayerDKP(playerName, onTimeBonus);
 				if i == 1 then
                     listOfAwardedPlayers = playerName;
                 else

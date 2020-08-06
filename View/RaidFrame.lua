@@ -144,10 +144,21 @@ function View:CreateRaidFrame(parentFrame)
 			return;
 		end
 
-		Core:AdjustPlayersDKP(selectedPlayers, DkpAdjustAmount, DkpAdjustReason)
-
-		amountInput.input:SetText("");
-		reasonInput.input:SetText("");
+		StaticPopupDialogs["ADJUST_DKP"] = {
+			text = "Are you you want to award "..DkpAdjustAmount.." DKP?",
+			button1 = "Yes",
+			button2 = "No",
+			OnAccept = function()
+				Core:AdjustPlayersDKP(selectedPlayers, DkpAdjustAmount, DkpAdjustReason)
+				amountInput.input:SetText("");
+				reasonInput.input:SetText("");
+			end,
+			timeout = 0,
+			whileDead = true,
+			hideOnEscape = true,
+			preferredIndex = 3,
+		}
+		StaticPopup_Show("ADJUST_DKP");
 	end);
 
 	local applyDecayBtn = CreateFrame("Button", nil, RaidFrame, "GameMenuButtonTemplate");
@@ -158,7 +169,20 @@ function View:CreateRaidFrame(parentFrame)
 	applyDecayBtn:SetHighlightFontObject("GameFontHighlight");
 	applyDecayBtn:RegisterForClicks("AnyUp");
 	applyDecayBtn:SetScript("OnClick", function (self, button, down)
-		Core:ApplyDecay();
+		StaticPopupDialogs["APPLY_DECAY"] = {
+			text = "Are you sure you want to apply decay?",
+			button1 = "Yes",
+			button2 = "No",
+			OnAccept = function()
+				Core:ApplyDecay();
+			end,
+			timeout = 0,
+			whileDead = true,
+			hideOnEscape = true,
+			preferredIndex = 3,
+		}
+		StaticPopup_Show("APPLY_DECAY");
+
 	end);
 
 end

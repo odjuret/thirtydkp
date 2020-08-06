@@ -38,6 +38,7 @@ function DAL:InitializeOptions()
 					oneHandedWeapon = 0,
 					twoHandedWeapon = 0,
 					rangedWeapon = 0,
+					offhand = 0,
 					default = 10,
 				},
 			},
@@ -59,6 +60,7 @@ function DAL:InitializeOptions()
 					oneHandedWeapon = 0,
 					twoHandedWeapon = 0,
 					rangedWeapon = 0,
+					offhand = 0,
 					default = 10,
 				},
 			},
@@ -80,6 +82,7 @@ function DAL:InitializeOptions()
 					oneHandedWeapon = 0,
 					twoHandedWeapon = 0,
 					rangedWeapon = 0,
+					offhand = 0,
 					default = 10,
 				},
 			},
@@ -101,6 +104,7 @@ function DAL:InitializeOptions()
 					oneHandedWeapon = 0,
 					twoHandedWeapon = 0,
 					rangedWeapon = 0,
+					offhand = 0,
 					default = 10,
 				},
 			},
@@ -122,6 +126,7 @@ function DAL:InitializeOptions()
 					oneHandedWeapon = 0,
 					twoHandedWeapon = 0,
 					rangedWeapon = 0,
+					offhand = 0,
 					default = 10,
 				},
 			},
@@ -180,7 +185,12 @@ function DAL:ToggleDKPTableSorting(column)
 			ThirtyDKP_Database_Options.dkpTableSorting.mode = SORT_ASCENDING
 		end
 	else
-		ThirtyDKP_Database_Options.dkpTableSorting.column = column
+		ThirtyDKP_Database_Options.dkpTableSorting.column = column;
+		if column == "dkp" then
+			ThirtyDKP_Database_Options.dkpTableSorting.mode = SORT_DESCENDING;
+		else
+			ThirtyDKP_Database_Options.dkpTableSorting.mode = SORT_ASCENDING;
+		end
 	end
 end
 

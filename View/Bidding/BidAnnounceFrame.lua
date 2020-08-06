@@ -10,6 +10,7 @@ local IncomingBidsFrame = nil;
 local selectedItem = nil;
 local selectedBidder = nil;
 local selectedItemDKPCost = 0;
+local selectedRaid = Const.RAID_NAXX;
 -- todo: move this logic outside the view folder
 local incomingBids = {};
 
@@ -201,7 +202,7 @@ local function CreateLootTableRow(parent, id, lootTable)
     row:SetScript("OnClick", function(self, button)
         if button == "LeftButton" then
             selectedItem = self
-            selectedItemDKPCost = Core:GetDKPCostByItemlink(selectedItem.item.loot);
+            selectedItemDKPCost = Core:GetDKPCostByItemlink(selectedItem.item.loot, selectedRaid);
             BidAnnounceFrame.CustomDKPCost.input:SetNumber(selectedItemDKPCost);
             UpdateLootTableRowsTextures()
             View:UpdateItemForBidFrame()
@@ -252,6 +253,47 @@ local function CreateLootTableFrame()
 	PopulateLootTable(lootTable, numberOfRowsInLootTable);
 end
 
+local function DkpCostDropdownOnClick(self, arg1, arg2, checked)
+	selectedRaid = arg1;
+	UIDropDownMenu_SetText(BidAnnounceFrame.DkpCostDropdown, Const.RAID_DISPLAY_NAME[arg1]);
+	View:UpdateOptionsFrame();
+end
+
+local function InitializeDkpCostDropdown(frame, level, menuList)
+	local info = UIDropDownMenu_CreateInfo();
+	info.func = DkpCostDropdownOnClick;
+
+	info.text = "Naxxramas";
+	info.arg1 = Const.RAID_NAXX;
+	info.arg2 = info.text;
+	info.checked = selectedRaid == Const.RAID_NAXX;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = "Ahn'Qiraj";
+	info.arg1 = Const.RAID_AQ40;
+	info.arg2 = info.text;
+	info.checked = selectedRaid == Const.RAID_AQ40;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = "Blackwing Lair";
+	info.arg1 = Const.RAID_BWL;
+	info.arg2 = info.text;
+	info.checked = selectedRaid == Const.RAID_BWL;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = "Molten Core";
+	info.arg1 = Const.RAID_MC;
+	info.arg2 = info.text;
+	info.checked = selectedRaid == Const.RAID_MC;
+	UIDropDownMenu_AddButton(info);
+
+	info.text = "Onyxia";
+	info.arg1 = Const.RAID_ONYXIA;
+	info.arg2 = info.text;
+	info.checked = selectedRaid == Const.RAID_ONYXIA;
+	UIDropDownMenu_AddButton(info);
+end
+
 -----------------------------
 -- Bid announce frame and functions
 -----------------------------
@@ -282,10 +324,21 @@ function View:CreateBidAnnounceFrame()
     inputSection:SetSize(Const.LootTableWidth/2, 50);
     inputSection:SetPoint(Const.TOP_LEFT_POINT, f, Const.TOP_LEFT_POINT, 10, -195);
 
+	local dkpCostOptionsLabel = inputSection:CreateFontString(nil, Const.OVERLAY_LAYER);
+	dkpCostOptionsLabel:SetFontObject("GameFontWhite");
+	dkpCostOptionsLabel:SetText("Use prices for:");
+    dkpCostOptionsLabel:SetPoint(Const.TOP_LEFT_POINT, inputSection, Const.TOP_LEFT_POINT, 0, 0);
+
+	f.DkpCostDropdown = CreateFrame("Frame", "ThirtyDKP_RaidDKPCostDropdown", inputSection, "UIDropDownMenuTemplate");
+	UIDropDownMenu_SetWidth(f.DkpCostDropdown, 110);
+	UIDropDownMenu_Initialize(f.DkpCostDropdown, InitializeDkpCostDropdown);
+	UIDropDownMenu_SetText(f.DkpCostDropdown, Const.RAID_DISPLAY_NAME[selectedRaid]);
+	f.DkpCostDropdown:SetPoint(Const.TOP_LEFT_POINT, dkpCostOptionsLabel, Const.TOP_RIGHT_POINT, 0, 5);
+
     f.CustomDKPCost = View:CreateNumericInputFrame(inputSection, "DKP Cost:", selectedItemDKPCost, function(input)
         selectedItemDKPCost = input:GetNumber();
     end);
-    f.CustomDKPCost:SetPoint(Const.TOP_LEFT_POINT, inputSection, Const.TOP_LEFT_POINT, 0, 0);
+    f.CustomDKPCost:SetPoint(Const.TOP_LEFT_POINT, dkpCostOptionsLabel, Const.BOTTOM_LEFT_POINT, 0, -20);
 
     f.BidTimeInput = View:CreateNumericInputFrame(inputSection, "Bid Time:", options.bidTime, function(input)
         options.bidTime = input:GetNumber();
@@ -295,7 +348,7 @@ function View:CreateBidAnnounceFrame()
 
     -- Buttons
     f.AwardItemBtn = CreateFrame("Button", nil, f, "GameMenuButtonTemplate");
-    f.AwardItemBtn:SetPoint(Const.TOP_LEFT_POINT, inputSection, Const.TOP_RIGHT_POINT, Const.Margin, 0);
+    f.AwardItemBtn:SetPoint(Const.TOP_LEFT_POINT, f.CustomDKPCost, Const.TOP_RIGHT_POINT, Const.Margin, 0);
     f.AwardItemBtn:SetSize(100, 22);
     f.AwardItemBtn:SetText("Award Item");
     f.AwardItemBtn:SetNormalFontObject("GameFontNormal");
@@ -314,7 +367,7 @@ function View:CreateBidAnnounceFrame()
     end)
 
     f.StartAndStopBiddingBtn = CreateFrame("Button", nil, f, "GameMenuButtonTemplate");
-    f.StartAndStopBiddingBtn:SetPoint(Const.BOTTOM_LEFT_POINT, inputSection, Const.BOTTOM_RIGHT_POINT, Const.Margin, 0);
+    f.StartAndStopBiddingBtn:SetPoint(Const.TOP_LEFT_POINT, f.BidTimeInput, Const.TOP_RIGHT_POINT, Const.Margin, 0);
     f.StartAndStopBiddingBtn:SetSize(100, 22);
     f.StartAndStopBiddingBtn:SetText("Start Bidding");
     f.StartAndStopBiddingBtn:SetNormalFontObject("GameFontNormal");

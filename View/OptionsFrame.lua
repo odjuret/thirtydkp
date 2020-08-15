@@ -27,6 +27,7 @@ local function CreateAndAttachDkpCostFrame(text, itemName, parent, attachTarget)
 end
 
 function View:UpdateOptionsFrame()
+	SelectedRaid = DAL:GetLastSelectedRaid();
 	local options = DAL:GetRaidOptions(SelectedRaid);
 	OptionsFrame.dkpGainPerKill.input:SetNumber(options.dkpGainPerKill);
 	OptionsFrame.headCostInput.input:SetNumber(options.itemCosts.head);
@@ -47,11 +48,11 @@ end
 
 local function RaidDropdownOnClick(self, arg1, arg2, checked)
 	SelectedRaid = arg1;
+	DAL:SetLastSelectedRaid(arg1)
 	UIDropDownMenu_SetText(OptionsFrame.raidDropdown, Const.RAID_DISPLAY_NAME[arg1]);
 	View:UpdateOptionsFrame();
 end
 
--- todo save last chosen
 local function InitializeRaidDropdown(frame, level, menuList)
 	local info = UIDropDownMenu_CreateInfo();
 	info.func = RaidDropdownOnClick;
@@ -102,6 +103,7 @@ function View:CreateOptionsFrame(parentFrame)
     title:SetText(OPTIONS_FRAME_TITLE);
 
 	local options = DAL:GetOptions();
+	SelectedRaid = options.lastSelectedRaid
     local raidOptions = DAL:GetRaidOptions(SelectedRaid);
 
 	local globalOptionsHeader = OptionsFrame:CreateFontString(nil, OVERLAY_LAYER);

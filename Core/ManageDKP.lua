@@ -46,14 +46,6 @@ local function GetRaidNameFromId(raidId)
 	end
 end
 
-function Core:CheckRaid()
-    local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo();
-    local raidName = GetRaidNameFromId(instanceMapId);
-    if raidName ~= "" then
-        DAL:SetLastKnownRaid(raidName);
-    end
-end
-
 local function GetDKPCostByEquipLocation(itemEquipLoc, raidName)
     local options = DAL:GetRaidOptions(raidName);
 

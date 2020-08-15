@@ -11,7 +11,8 @@ local selectedItem = nil;
 local selectedBidder = nil;
 local selectedItemDKPCost = 0;
 local selectedRaid = Const.RAID_NAXX;
--- todo: move this logic outside the view folder
+
+-- todo: move this (incoming bids) logic outside the view folder
 local incomingBids = {};
 
 
@@ -235,7 +236,7 @@ local function CreateLootTableFrame()
     local lootTable = BidAnnounceFrame.LootTable
 
 	lootTable:SetSize( Const.LootTableWidth, numberOfRowsInLootTable*7);
-	lootTable:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame, Const.TOP_LEFT_POINT, 5, -250 );
+	lootTable:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame, Const.TOP_LEFT_POINT, 5, -290 );
 	lootTable:SetPoint( Const.BOTTOM_RIGHT_POINT, BidAnnounceFrame, Const.BOTTOM_RIGHT_POINT, -27, 5 );
 	lootTable.scrollBar = _G["BidAnnounceFrameScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 
@@ -254,7 +255,8 @@ local function CreateLootTableFrame()
 end
 
 local function DkpCostDropdownOnClick(self, arg1, arg2, checked)
-	selectedRaid = arg1;
+    selectedRaid = arg1;
+    DAL:SetLastSelectedRaid(arg1);
 	UIDropDownMenu_SetText(BidAnnounceFrame.DkpCostDropdown, Const.RAID_DISPLAY_NAME[arg1]);
 	View:UpdateOptionsFrame();
 end
@@ -316,8 +318,9 @@ function View:CreateBidAnnounceFrame()
 	f.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, f, Const.TOP_RIGHT_POINT)
     tinsert(UISpecialFrames, f:GetName()); -- Sets frame to close on "Escape"
 
-
+    
     local options = DAL:GetOptions();
+    selectedRaid = options.lastSelectedRaid
 
     -- Inputs
     local inputSection = CreateFrame("Frame", nil, f, nil);
@@ -416,7 +419,7 @@ function View:OpenBidAnnounceFrame(itemLink)
             end
         end
     
-        selectedItemDKPCost = Core:GetDKPCostByItemlink(selectedItem.item.loot);
+        selectedItemDKPCost = Core:GetDKPCostByItemlink(selectedItem.item.loot, selectedRaid);
         BidAnnounceFrame.CustomDKPCost.input:SetNumber(selectedItemDKPCost);
     end
     

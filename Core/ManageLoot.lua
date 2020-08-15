@@ -29,7 +29,6 @@ function Core:HandleLootWindow()
   end
 
   if foundEpaxx then
-    Core:CheckRaid();
     lootAnnouncedForBoss = true;
     View:ToggleBidAnnounceFrame();
   end

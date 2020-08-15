@@ -267,7 +267,6 @@ function Core:ApplyDecay()
     DKPEvent(listOfAwardedPlayers, listOfAdjustedDecay, "Decay:-"..tostring(decayPercentage).."%")
 end
 
--- todo dkp event for this
 function Core:RevertHistory(historyEntry)
     local maybeDecay, _ = string.split(":", historyEntry.reason)
     local isDecayEntry = maybeDecay == "Decay";

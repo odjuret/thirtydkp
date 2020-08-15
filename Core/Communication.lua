@@ -36,6 +36,7 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
                     DAL:WipeAndSetNewDKPTable(deserialized.dkpTable)
                     DAL:WipeAndSetNewOptions(deserialized.options)
                     DAL:WipeAndSetNewHistory(deserialized.history)
+                    StaticPopup_Hide ("FULL_BROADCAST_WARNING")
                     View:UpdateAllViews();
                 end,
                 timeout = 0,
@@ -78,12 +79,11 @@ local function HandleDKPEventMessage(prefix, message, distribution, sender)
             DAL:WipeAndSetNewDKPTable(deserialized.updatedTable)
 
             -- if data versions mismatch, local data is outdated
-            if not Core:CheckHistoryDataVersion(deserialized.previousHistoryVersion) then
-                return;
-            else
+            if Core:CheckHistoryDataVersion(deserialized.previousHistoryVersion) then
                 DAL:AddEntryToHistory(deserialized.historyEntry)
                 DAL:UpdateDKPHistoryVersion(deserialized.newHistoryVersion)
             end
+            View:UpdateAllViews();
         end
     end
 end
@@ -104,12 +104,11 @@ local function HandleRevertDKPEventMessage(prefix, message, distribution, sender
             DAL:WipeAndSetNewDKPTable(deserialized.updatedTable)
 
             -- if data versions mismatch, local data is outdated
-            if not Core:CheckHistoryDataVersion(deserialized.previousHistoryVersion) then
-                return;
-            else
+            if Core:CheckHistoryDataVersion(deserialized.previousHistoryVersion) then
                 DAL:DeleteHistoryEntry(historyEntry);
                 DAL:UpdateDKPHistoryVersion(deserialized.newHistoryVersion)
             end
+            View:UpdateAllViews();
         end
     end
 end

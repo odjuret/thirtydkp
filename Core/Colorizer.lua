@@ -37,15 +37,15 @@ end
 
 
 function Core:ColorizeAndBreakPlayers(playersString)
-    if string.sub(playersString, 1, 3) == ", " then
+    if string.sub(playersString, 1, 3) == "," then
         playersString = string.sub(playersString, 3)
     end
     
     local colorizedArray = ""
     local breakIndex = 1
-    for i, player in ipairs({strsplit(", ", playersString)}) do
+    for i, player in ipairs({strsplit(",", playersString)}) do
         if player ~= nil and player ~= "" then
-            local separator = ", "
+            local separator = ","
             local columnToAdd = player
             local playerEntry = DAL:GetFromDKPTable(player)
 
@@ -79,6 +79,10 @@ end
 
 function Core:ColorizeListHeader(stringToColorize)
     return "|cffaeaedd"..stringToColorize.."|r"
+end
+
+function Core:ColorizeNegative(stringToColorize)
+    return "|cffDC143C"..stringToColorize.."|r"
 end
 
 function Core:ColorizeGrey(stringToColorize)

@@ -4,7 +4,7 @@ local View = ThirtyDKP.View;
 local Core = ThirtyDKP.Core;
 local Const = ThirtyDKP.View.Constants;
 
-local RaidFrame = nil;
+local RaidManagementFrame = nil;
 
 local RAID_FRAME_TITLE = "Raid";
 local RAID_BUTTON_START = "Start Raid";
@@ -15,36 +15,36 @@ local ADJUST_DKP_REASON_LABEL = "Reason";
 local DkpAdjustReason = "";
 local DkpAdjustAmount = 0;
 
-function View:CreateRaidFrame(parentFrame)
-	RaidFrame = CreateFrame("Frame", "ThirtyDKP_OptionsRaidFrame", parentFrame, "TooltipBorderedFrameTemplate");
-	RaidFrame:SetShown(false);
-	RaidFrame:SetSize(370, 375);
-	RaidFrame:SetFrameStrata("HIGH");
-	RaidFrame:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0);
-    RaidFrame:EnableMouse(true);
+function View:CreateRaidManagementFrame(parentFrame)
+	RaidManagementFrame = CreateFrame("Frame", "ThirtyDKP_OptionsRaidManagementFrame", parentFrame, "TooltipBorderedFrameTemplate");
+	RaidManagementFrame:SetShown(false);
+	RaidManagementFrame:SetSize(370, 375);
+	RaidManagementFrame:SetFrameStrata("HIGH");
+	RaidManagementFrame:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0);
+    RaidManagementFrame:EnableMouse(true);
 
     -- title
-    local title = RaidFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
+    local title = RaidManagementFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
     title:SetFontObject("GameFontNormal");
-    title:SetPoint(Const.TOP_LEFT_POINT, RaidFrame, Const.TOP_LEFT_POINT, 15, -10);
+    title:SetPoint(Const.TOP_LEFT_POINT, RaidManagementFrame, Const.TOP_LEFT_POINT, 15, -10);
     title:SetText(RAID_FRAME_TITLE);
 
 	-- Buttons
-	local closeBtn = CreateFrame("Button", nil, RaidFrame, "UIPanelCloseButton")
-	closeBtn:SetPoint(Const.TOP_RIGHT_POINT, RaidFrame, Const.TOP_RIGHT_POINT)
+	local closeBtn = CreateFrame("Button", nil, RaidManagementFrame, "UIPanelCloseButton")
+	closeBtn:SetPoint(Const.TOP_RIGHT_POINT, RaidManagementFrame, Const.TOP_RIGHT_POINT)
 
 	local raidInfo = DAL:GetRaid();
 
-	local startOrEndRaidBtn = CreateFrame("Button", nil, RaidFrame, "GameMenuButtonTemplate");
+	local startOrEndRaidBtn = CreateFrame("Button", nil, RaidManagementFrame, "GameMenuButtonTemplate");
 	startOrEndRaidBtn:SetSize(100, 45);
-	startOrEndRaidBtn:SetPoint(Const.TOP_LEFT_POINT, RaidFrame, Const.TOP_LEFT_POINT, 10, -35);
+	startOrEndRaidBtn:SetPoint(Const.TOP_LEFT_POINT, RaidManagementFrame, Const.TOP_LEFT_POINT, 10, -35);
 
-	local onTimeBonusButton = CreateFrame("CheckButton", "onTimeBonusButton", RaidFrame, "ChatConfigCheckButtonTemplate");
+	local onTimeBonusButton = CreateFrame("CheckButton", "onTimeBonusButton", RaidManagementFrame, "ChatConfigCheckButtonTemplate");
 	onTimeBonusButton:SetPoint(Const.TOP_LEFT_POINT, startOrEndRaidBtn, Const.TOP_RIGHT_POINT, 10, 0);
 	onTimeBonusButtonText:SetText("Give on-time bonus");
 	onTimeBonusButton:SetChecked(true);
 
-	local raidEndBonusButton = CreateFrame("CheckButton", "raidEndBonusButton", RaidFrame, "ChatConfigCheckButtonTemplate");
+	local raidEndBonusButton = CreateFrame("CheckButton", "raidEndBonusButton", RaidManagementFrame, "ChatConfigCheckButtonTemplate");
 	raidEndBonusButton:SetPoint(Const.TOP_LEFT_POINT, onTimeBonusButton, Const.BOTTOM_LEFT_POINT, 0, 0);
 	raidEndBonusButton:SetChecked(true);
 	raidEndBonusButtonText:SetText("Give raid completion bonus");
@@ -87,8 +87,8 @@ function View:CreateRaidFrame(parentFrame)
 		end
 	end);
 
-	local adjustDkpSection = CreateFrame("Frame", nil, RaidFrame, nil);
-	adjustDkpSection:SetSize(RaidFrame:GetWidth() - 25, 70);
+	local adjustDkpSection = CreateFrame("Frame", nil, RaidManagementFrame, nil);
+	adjustDkpSection:SetSize(RaidManagementFrame:GetWidth() - 25, 70);
 	adjustDkpSection:SetPoint(Const.TOP_LEFT_POINT, startOrEndRaidBtn, Const.BOTTOM_LEFT_POINT, 0, -10);
 
     local adjustDkpLabel = adjustDkpSection:CreateFontString(nil, Const.OVERLAY_LAYER);
@@ -102,7 +102,7 @@ function View:CreateRaidFrame(parentFrame)
 	end);
 	reasonInput:SetPoint(Const.TOP_LEFT_POINT, adjustDkpLabel, Const.BOTTOM_LEFT_POINT, 0, -10);
 
-	local amountWrapper = CreateFrame("Frame", nil, RaidFrame, nil);
+	local amountWrapper = CreateFrame("Frame", nil, RaidManagementFrame, nil);
 	amountWrapper:SetSize(130, 20);
 	amountWrapper:SetPoint(Const.TOP_LEFT_POINT, reasonInput, BOTTOM_LEFT_POINT, 0, 0);
 	local amountInput = View:CreateTextInputFrame(amountWrapper, "Amount:", 0, function(input)
@@ -119,7 +119,7 @@ function View:CreateRaidFrame(parentFrame)
 	end);
 	amountInput:SetPoint(Const.TOP_LEFT_POINT, reasonInput, Const.BOTTOM_LEFT_POINT, 0, 0);
 
-	local dkpAdjustBtn = CreateFrame("Button", nil, RaidFrame, "GameMenuButtonTemplate");
+	local dkpAdjustBtn = CreateFrame("Button", nil, RaidManagementFrame, "GameMenuButtonTemplate");
 	dkpAdjustBtn:SetSize(100, 30);
 	dkpAdjustBtn:SetPoint(Const.TOP_LEFT_POINT, amountInput, Const.BOTTOM_LEFT_POINT, 0, -10);
 	dkpAdjustBtn:SetText("Adjust");
@@ -161,7 +161,7 @@ function View:CreateRaidFrame(parentFrame)
 		StaticPopup_Show("ADJUST_DKP");
 	end);
 
-	local applyDecayBtn = CreateFrame("Button", nil, RaidFrame, "GameMenuButtonTemplate");
+	local applyDecayBtn = CreateFrame("Button", nil, RaidManagementFrame, "GameMenuButtonTemplate");
 	applyDecayBtn:SetSize(100, 30);
 	applyDecayBtn:SetPoint(Const.TOP_LEFT_POINT, dkpAdjustBtn, Const.BOTTOM_LEFT_POINT, 0, -10);
 	applyDecayBtn:SetText("Apply Decay");
@@ -187,10 +187,10 @@ function View:CreateRaidFrame(parentFrame)
 
 end
 
-function View:ToggleRaidFrame()
-    RaidFrame:SetShown(not RaidFrame:IsShown());
+function View:ToggleRaidManagementFrame()
+    RaidManagementFrame:SetShown(not RaidManagementFrame:IsShown());
 end
 
-function View:HideRaidFrame()
-    RaidFrame:SetShown(false);
+function View:HideRaidManagementFrame()
+    RaidManagementFrame:SetShown(false);
 end

@@ -106,8 +106,8 @@ end
 
 function View:CreateRightClickMenu(self, title, actionHeader, actionFunction)
     local menu = {
-    { text = title, isTitle = true},
-    { text = actionHeader, func = actionFunction },
+        { text = title, isTitle = true},
+        { text = actionHeader, func = actionFunction },
     }
     EasyMenu(menu, menuFrame, "cursor", 0 , 0, "MENU", 2);
 end
@@ -132,4 +132,12 @@ function View:AttachHoverOverTooltipAndOnclick(frame, tooltipHeader, tooltipCont
 
     frame:RegisterForClicks("AnyUp");
     frame:SetScript("OnClick", onClickFunction);
+end
+
+function View:SanitizeTextForBlizzFunctions(textToSanitize)
+    local sanitizedText = ""
+	if strfind(textToSanitize, "%%") then
+		sanitizedText = gsub(textToSanitize, "%%", "%%%%")
+    end
+    return sanitizedText
 end

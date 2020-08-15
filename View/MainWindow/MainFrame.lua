@@ -156,7 +156,7 @@ local function CreateRaidManagementButton()
         View:HideOptionsFrame();
         View:HideTdkpAdminsFrame()
         View:HideDKPHistoryFrame();
-        View:ToggleRaidFrame();
+        View:ToggleRaidManagementFrame();
     end)
 end
 
@@ -165,7 +165,7 @@ local function CreateDKPAdminsButton()
 
     View:AttachHoverOverTooltipAndOnclick(MainFrame.dkpAdminsBtn, "Admins Management", "Manage DKP admins for your guild. Admins can change dkp options, adjust dkp, start dkp awarding raids, etc", function()
         View:HideOptionsFrame();
-        View:HideRaidFrame();
+        View:HideRaidManagementFrame();
         View:HideDKPHistoryFrame();
         View:ToggleTdkpAdminsFrame()
     end)
@@ -176,7 +176,7 @@ local function CreateDKPHistoryButton()
 
     View:AttachHoverOverTooltipAndOnclick(MainFrame.dkpHistoryBtn, "DKP History", "Manage DKP history for your guild.", function()
         View:HideOptionsFrame();
-        View:HideRaidFrame();
+        View:HideRaidManagementFrame();
         View:HideTdkpAdminsFrame()
         View:ToggleDKPHistoryFrame();
     end)
@@ -191,7 +191,7 @@ local function CreateDKPOptionsButton()
     MainFrame.optionsButton:SetHighlightFontObject("GameFontHighlight");
     MainFrame.optionsButton:RegisterForClicks("AnyUp");
     MainFrame.optionsButton:SetScript("OnClick", function (self, button, down)
-        View:HideRaidFrame();
+        View:HideRaidManagementFrame();
         View:HideTdkpAdminsFrame();
         View:HideDKPHistoryFrame();
         View:ToggleOptionsFrame();
@@ -218,7 +218,7 @@ local function CreateMainFrame(isAddonAdmin)
     MainFrame:SetScript("OnHide", function(self)
         if isAddonAdmin then
             View:HideOptionsFrame();
-            View:HideRaidFrame();
+            View:HideRaidManagementFrame();
         end
 	end);
 
@@ -276,7 +276,7 @@ function View:Initialize()
     View:CreateBidAnnounceFrame();
     if isAddonAdmin then
         View:CreateOptionsFrame(MainFrame);
-		View:CreateRaidFrame(MainFrame);
+		View:CreateRaidManagementFrame(MainFrame);
         View:CreateTdkpAdminsFrame(MainFrame);
         View:CreateDKPHistoryFrame(MainFrame);
     end

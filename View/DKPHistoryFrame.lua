@@ -26,14 +26,23 @@ end
 
 local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 	local b = CreateFrame("Button", nil, parent);
-    
+
 	-- entry header
-	local colorizedDKPAdjust = Core:ColorizePositiveOrNegative(dkpHistory[id].dkp, tostring(dkpHistory[id].dkp).." DKP")
-	local colorizedHeader = Core:ColorizeListHeader(dkpHistory[id].reason)
+	local colorizedDKPAdjust = "";
+	local colorizedHeader = "";
+	local maybeDecay, maybeDecayAmount = string.split(":", dkpHistory[id].reason)
+	if maybeDecay == "Decay" then
+		colorizedHeader = Core:ColorizeListHeader(maybeDecay)
+		colorizedDKPAdjust = Core:ColorizeNegative(maybeDecayAmount.." DKP")
+	else
+		colorizedHeader = Core:ColorizeListHeader(dkpHistory[id].reason)
+		colorizedDKPAdjust = Core:ColorizePositiveOrNegative(dkpHistory[id].dkp, tostring(dkpHistory[id].dkp).." DKP")
+	end
+	
 	local madeBy = Core:TryToAddClassColor(string.split("-", dkpHistory[id].index))
 	local headerText = colorizedDKPAdjust.." - "..colorizedHeader.." by "..madeBy
 	b.entryHeader = b:CreateFontString(nil, Const.OVERLAY_LAYER)
-	b.entryHeader:SetFontObject("ThirtyDKPNormal")
+	b.entryHeader:SetFontObject("GameFontNormal")
 	b.entryHeader:SetText(headerText);
 	b.entryHeader:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT, 15, 0)
     
@@ -53,13 +62,15 @@ local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 	b:SetSize(parent:GetWidth(), totalEntryHeight);
 	dkpHistoryScrollChildHeight = dkpHistoryScrollChildHeight + totalEntryHeight;
 
+	local sanitizedHeaderText = View:SanitizeTextForBlizzFunctions(headerText)
+
 	b:RegisterForClicks("AnyDown");
 	b:SetScript("OnClick", function (self, button, down)
 		if button == "RightButton" then
 			if Core:IsAddonAdmin() then
 				View:CreateRightClickMenu(self, headerText, "Delete Entry", function() 
-					StaticPopupDialogs["REMOVE_HISTORY_ENTRY"] = {
-						text = "Are you sure you want to delete\n"..headerText.."\nand refund/remove affected players DKP?",
+					StaticPopupDialogs["TDKP_REMOVE_HISTORY_ENTRY"] = {
+						text = "Are you sure you want to delete\n "..sanitizedHeaderText.." \nand refund/remove affected players DKP?",
 						button1 = "Yes",
 						button2 = "No",
 						OnAccept = function()
@@ -69,8 +80,8 @@ local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 						whileDead = true,
 						hideOnEscape = true,
 						preferredIndex = 3,
-					}
-					StaticPopup_Show("REMOVE_HISTORY_ENTRY")
+					};
+					StaticPopup_Show ("TDKP_REMOVE_HISTORY_ENTRY", "", "")
 				end)
 			end
 		end

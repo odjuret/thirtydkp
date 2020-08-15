@@ -110,16 +110,28 @@ function Core:GetDKPCostByItemlink(itemLink, raidName)
     return itemDKPCost
 end
 
-local function DKPEvent(affectedPlayers, amount, reason)
-    -- add event to local history, since i am admin.
-    local newHistoryEntry = DAL:AddToHistory(affectedPlayers, amount, reason)
+local function DKPEvent(affectedPlayers, amount, reason, historyEntry)
+    -- add or delete event to local history, since i am admin.
+    local newHistoryEntry = {}
+    if reason == "RevertHistory" and historyEntry ~= nil then
+        DAL:DeleteHistoryEntry(historyEntry);
+    else
+        newHistoryEntry = DAL:AddToHistory(affectedPlayers, amount, reason)
+    end
+
     -- save current (previous) table versions for broadcast
     local currentHistoryVersion = DAL:GetDKPHistoryVersion();
     -- update table versions
     DAL:UpdateDKPHistoryVersion()
     DAL:UpdateDKPTableVersion()
+
     -- broadcast event
-    Core:SendDKPEventMessage(newHistoryEntry, currentHistoryVersion)
+    if reason == "RevertHistory" and historyEntry ~= nil then
+        Core:SendRevertDKPEventMessage(deletedHistoryEntry, lastHistoryVersion)
+    else
+        Core:SendDKPEventMessage(newHistoryEntry, currentHistoryVersion)
+    end
+
     -- update view
     View:UpdateAllViews()
 end
@@ -160,7 +172,7 @@ function Core:HandleBossKill(eventId, ...)
             if i == 1 then
                 listOfAwardedPlayers = playerName;
             else
-                listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+                listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
             end
         else
             -- could not adjust player dkp, add player to dkp table first
@@ -169,7 +181,7 @@ function Core:HandleBossKill(eventId, ...)
                 if i == 1 then
                     listOfAwardedPlayers = playerName;
                 else
-                    listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+                    listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
                 end
             else
                 Core:Print("Could not award "..playerName.." boss kill DKP. Contact authors.")
@@ -191,7 +203,7 @@ function Core:ApplyOnTimeBonus()
             if i == 1 then
                 listOfAwardedPlayers = playerName;
             else
-                listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+                listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
             end
 		elseif Core:IsInSameGuild(playerName) then
             if DAL:AddToDKPTable(playerName, playerClass) then
@@ -200,7 +212,7 @@ function Core:ApplyOnTimeBonus()
 				if i == 1 then
                     listOfAwardedPlayers = playerName;
                 else
-                    listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+                    listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
                 end
             end
 		end
@@ -220,7 +232,7 @@ function Core:ApplyRaidEndBonus()
             if i == 1 then
                 listOfAwardedPlayers = playerName;
             else
-                listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+                listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
             end
             
 		elseif Core:IsInSameGuild(playerName) then
@@ -231,7 +243,7 @@ function Core:ApplyRaidEndBonus()
 				if i == 1 then
                     listOfAwardedPlayers = playerName;
                 else
-                    listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+                    listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
                 end
             end
 		end
@@ -242,33 +254,51 @@ end
 
 function Core:ApplyDecay()
     local listOfAwardedPlayers = "";
-    local decay = DAL:GetOptions().decay / 100.0;
+    local listOfAdjustedDecay = "";
+    local decayPercentage = DAL:GetOptions().decay;
+    local decay = decayPercentage / 100.0;
     
     for i, dkpEntry in ipairs(DAL:GetDKPTable()) do
         local decayAmount = math.floor(dkpEntry.dkp * decay);
 
         if DAL:AdjustPlayerDKP(dkpEntry.player, -decayAmount) then
             if listOfAwardedPlayers == "" then
-                listOfAwardedPlayers = playerName;
+                listOfAwardedPlayers = dkpEntry.player;
+                listOfAdjustedDecay = tostring(-decayAmount);
             else
-                listOfAwardedPlayers = listOfAwardedPlayers..", "..playerName;
+                listOfAwardedPlayers = listOfAwardedPlayers..","..dkpEntry.player;
+                listOfAdjustedDecay = listOfAdjustedDecay..","..tostring(-decayAmount);
             end
         end
     end
 
-    DKPEvent(listOfAwardedPlayers, decay, "Decay")
+    DKPEvent(listOfAwardedPlayers, listOfAdjustedDecay, "Decay:-"..tostring(decayPercentage).."%")
 end
 
 -- todo dkp event for this
 function Core:RevertHistory(historyEntry)
-    for i, player in ipairs({string.split(", ", historyEntry.players)}) do
+    local maybeDecay, _ = string.split(":", historyEntry.reason)
+    local isDecayEntry = maybeDecay == "Decay";
+    local playerArray = {string.split(",", historyEntry.players)}
+    local dkpAdjust = {}
+
+    if isDecayEntry then
+        dkpAdjust = {string.split(",", historyEntry.dkp)}
+    else
+        table.insert(dkpAdjust, -historyEntry.dkp)
+    end
+    
+    for i, player in ipairs(playerArray) do
         if player ~= nil and player ~= "" then
-            DAL:AdjustPlayerDKP(player, -historyEntry.dkp);
+            if isDecayEntry then
+                DAL:AdjustPlayerDKP(player, -tonumber(dkpAdjust[i]));
+            else
+                DAL:AdjustPlayerDKP(player, dkpAdjust[1]);
+            end
         end
     end
     
-    DAL:DeleteHistoryEntry(historyEntry);
-    View:UpdateAllViews()
+    DKPEvent(historyEntry.players, historyEntry.dkp, "RevertHistory", historyEntry)
 end
 
 function Core:AdjustPlayersDKP(selectedPlayers, DkpAdjustAmount, DkpAdjustReason)
@@ -276,7 +306,7 @@ function Core:AdjustPlayersDKP(selectedPlayers, DkpAdjustAmount, DkpAdjustReason
 
     for i, selectedPlayer in ipairs(selectedPlayers) do
         if DAL:AdjustPlayerDKP(selectedPlayer, DkpAdjustAmount) then
-            listOfAdjustedPlayers = listOfAdjustedPlayers..", "..selectedPlayer;
+            listOfAdjustedPlayers = listOfAdjustedPlayers..","..selectedPlayer;
         end
     end
 

@@ -15,6 +15,7 @@ local PRINT_MSG_CHANNEL_PREFIX = "TDKPPrintMsg";
 local START_BIDDING_CHANNEL_PREFIX = "TDKPStartBid";
 local SUBMIT_BIDDING_CHANNEL_PREFIX = "TDKPSubmitBid";
 local DKP_EVENT_CHANNEL_PREFIX = "TDKPDKPEvent";
+local REVERT_DKP_EVENT_CHANNEL_PREFIX = "TDKPRevEvent";
 local DATA_VERSION_SYNC_CHANNEL_PREFIX = "TDKPDataSync";
 local DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX = "TDKPDataSyncRe";
 
@@ -76,7 +77,7 @@ local function HandleDKPEventMessage(prefix, message, distribution, sender)
             -- always use latest incoming dkp table
             DAL:WipeAndSetNewDKPTable(deserialized.updatedTable)
 
-            -- but dont update other table versions if local data is outdated
+            -- if data versions mismatch, local data is outdated
             if not Core:CheckHistoryDataVersion(deserialized.previousHistoryVersion) then
                 return;
             else
@@ -87,12 +88,38 @@ local function HandleDKPEventMessage(prefix, message, distribution, sender)
     end
 end
 
+local function HandleRevertDKPEventMessage(prefix, message, distribution, sender)
+    if (sender ~= UnitName("player")) then
+        local decoded = LibDeflate:DecompressDeflate(LibDeflate:DecodeForWoWAddonChannel(message))
+        local success, deserialized = LibAceSerializer:Deserialize(decoded);
+        if success then
+            if not Core:DoesDataBelongToSameGuild(deserialized.updatedTable.version) then
+                -- todo: turn off events for this raid
+                Core:Print("Incoming DKP events from different guild.")
+                Core:Print("Request a broadcast from admin to remove these messages.")
+                return;
+            end
+
+            -- always use latest incoming dkp table
+            DAL:WipeAndSetNewDKPTable(deserialized.updatedTable)
+
+            -- if data versions mismatch, local data is outdated
+            if not Core:CheckHistoryDataVersion(deserialized.previousHistoryVersion) then
+                return;
+            else
+                DAL:DeleteHistoryEntry(historyEntry);
+                DAL:UpdateDKPHistoryVersion(deserialized.newHistoryVersion)
+            end
+        end
+    end
+end
+
 local function HandleDataVersionSyncMessage(prefix, message, distribution, sender)
     if (sender ~= UnitName("player")) then
         Core:TryUpdateKnownVersions(message)
-        local latestKnownDKPTableVersion, latestKnownHistoryVersion = Core:GetLatestKnownVersions()
+        local dkpTableVersion, historyVersion = Core:GetLatestKnownVersions()
     
-        Communicator:SendCommMessage(DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX, latestKnownVersion, "WHISPER", sender)
+        Communicator:SendCommMessage(DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX, dkpTableVersion.."/"..historyVersion, "WHISPER", sender)
     end
 end
 
@@ -126,7 +153,29 @@ function Core:SendDKPEventMessage(newHistoryEntry, lastHistoryVersion)
         packet = LibDeflate:EncodeForWoWAddonChannel(compressed)
     end
     
-    Communicator:SendCommMessage(DKP_EVENT_CHANNEL_PREFIX, packet, "RAID", nil, "NORMAL")
+    Communicator:SendCommMessage(DKP_EVENT_CHANNEL_PREFIX, packet, "GUILD", nil, "NORMAL")
+end
+
+function Core:SendRevertDKPEventMessage(deletedHistoryEntry, lastHistoryVersion)
+    local serialized = nil;
+    local packet = nil;
+    local unprocessedTable = {
+        updatedTable = DAL:GetDKPTable(),
+        historyEntry = deletedHistoryEntry,
+        previousHistoryVersion = lastHistoryVersion,
+        newHistoryVersion = DAL:GetDKPHistoryVersion(),
+    }
+
+    if unprocessedTable then
+        serialized = LibAceSerializer:Serialize(unprocessedTable);  -- serializes tables to a string
+    end
+
+    local compressed = LibDeflate:CompressDeflate(serialized, {level = 9})
+    if compressed then
+        packet = LibDeflate:EncodeForWoWAddonChannel(compressed)
+    end
+    
+    Communicator:SendCommMessage(REVERT_DKP_EVENT_CHANNEL_PREFIX, packet, "GUILD", nil, "NORMAL")
 end
 
 function Core:CommunicateSubmitBids(submitBidsMessage)
@@ -182,6 +231,9 @@ function Communicator:OnCommReceived(prefix, message, distribution, sender)
     elseif prefix == DKP_EVENT_CHANNEL_PREFIX then
         HandleDKPEventMessage(prefix, message, distribution, sender)
 
+    elseif prefix == REVERT_DKP_EVENT_CHANNEL_PREFIX then
+        HandleRevertDKPEventMessage(prefix, message, distribution, sender)
+
     elseif prefix == DATA_VERSION_SYNC_CHANNEL_PREFIX then
         HandleDataVersionSyncMessage(prefix, message, distribution, sender)
 
@@ -202,6 +254,7 @@ function Core:InitializeComms()
     Communicator:RegisterComm(PRINT_MSG_CHANNEL_PREFIX, Communicator:OnCommReceived());
     Communicator:RegisterComm(SUBMIT_BIDDING_CHANNEL_PREFIX, Communicator:OnCommReceived());
     Communicator:RegisterComm(DKP_EVENT_CHANNEL_PREFIX, Communicator:OnCommReceived());
+    Communicator:RegisterComm(REVERT_DKP_EVENT_CHANNEL_PREFIX, Communicator:OnCommReceived());
     Communicator:RegisterComm(DATA_VERSION_SYNC_CHANNEL_PREFIX, Communicator:OnCommReceived());
     Communicator:RegisterComm(DATA_VERSION_SYNC_RESPONSE_CHANNEL_PREFIX, Communicator:OnCommReceived());
 

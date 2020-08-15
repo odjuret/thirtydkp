@@ -33,7 +33,7 @@ function Core:AddGuildToDKPTable()
                 if playersAdded == "" then
                     playersAdded = Core:AddClassColor(nameFromGuild, tempClass)
                 else
-                    playersAdded = playersAdded..", "..Core:AddClassColor(nameFromGuild, tempClass)
+                    playersAdded = playersAdded..","..Core:AddClassColor(nameFromGuild, tempClass)
                 end
             end
         end

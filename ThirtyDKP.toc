@@ -13,7 +13,7 @@ View\Constants.lua
 View\MainWindow\MainFrame.lua
 View\MainWindow\DKPTableFrame.lua
 View\OptionsFrame.lua
-View\RaidFrame.lua
+View\RaidManagementFrame.lua
 View\Bidding\BidAnnounceFrame.lua
 View\Bidding\BiddingFrame.lua
 View\BroadcastingStatusFrame.lua

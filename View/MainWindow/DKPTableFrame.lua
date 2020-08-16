@@ -76,10 +76,6 @@ local function CreateDKPTableHeadersRow(parent)
 	return headersFrame
 end
 
-local function ColorizeOwnEntry(text)
-	return "|cff00ff00"..tostring(text).."|r";
-end
-
 local function CreateDKPTableRow(parent, id, dkpTable)
 
 	local b = CreateFrame("Button", nil, parent);
@@ -95,7 +91,7 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 	local originalPlayerNameValue = tostring(dkpTable[id].player);
 	local colorizedName;
 	if isMe then
-		colorizedName = ColorizeOwnEntry(tostring(dkpTable[id].player));
+		colorizedName = Core:ColorizePositive(tostring(dkpTable[id].player));
 	else
 		colorizedName = Core:AddClassColor(originalPlayerNameValue, tostring(dkpTable[id].class));
 	end
@@ -108,7 +104,7 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 	b.DKPInfo.PlayerClass = b:CreateFontString(nil, Const.OVERLAY_LAYER)
 	b.DKPInfo.PlayerClass:SetFontObject("GameFontHighlight")
 	if isMe then
-		b.DKPInfo.PlayerClass:SetText(ColorizeOwnEntry(tostring(dkpTable[id].class)));
+		b.DKPInfo.PlayerClass:SetText(ColorizePositive(tostring(dkpTable[id].class)));
 	else
 		b.DKPInfo.PlayerClass:SetText(tostring(dkpTable[id].class));
 	end
@@ -118,7 +114,7 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 	b.DKPInfo.CurrentDKP:SetFontObject("GameFontHighlight")
 
 	if isMe then
-		b.DKPInfo.CurrentDKP:SetText(ColorizeOwnEntry(tostring(dkpTable[id].dkp)));
+		b.DKPInfo.CurrentDKP:SetText(ColorizePositive(tostring(dkpTable[id].dkp)));
 	else
 		b.DKPInfo.CurrentDKP:SetText(tostring(dkpTable[id].dkp));
 	end

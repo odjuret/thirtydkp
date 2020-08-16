@@ -8,11 +8,19 @@ local function SortTable()
 
 	if sortMode == "Ascending" then
 		table.sort(ThirtyDKP_Database_DKPTable, function(a, b)
-			return a[sortColumn] < b[sortColumn]
+			if a[sortColumn] == b[sortColumn] then
+				return a["dkp"] > b["dkp"];
+			else
+				return a[sortColumn] < b[sortColumn]
+			end
 		end)
 	else
 		table.sort(ThirtyDKP_Database_DKPTable, function(a, b)
-			return a[sortColumn] > b[sortColumn]
+			if a[sortColumn] == b[sortColumn] then
+				return a["dkp"] > b["dkp"];
+			else
+				return a[sortColumn] > b[sortColumn]
+			end
 		end)
 	end
 end

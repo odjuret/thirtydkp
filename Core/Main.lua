@@ -85,8 +85,11 @@ end
 
 function View:UpdateAllViews()
     View:UpdateDKPTable();
-    View:UpdateOptionsFrame();
-    View:UpdateDKPHistoryFrame();
+
+	if Core:IsAddonAdmin() then
+		View:UpdateOptionsFrame();
+		View:UpdateDKPHistoryFrame();
+	end
 end
 
 

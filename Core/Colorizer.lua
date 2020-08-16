@@ -68,13 +68,11 @@ function Core:ColorizeAndBreakPlayers(playersString)
 end
 
 function Core:ColorizePositiveOrNegative(number, stringToColorize)
-    local colorizedString = ""
     if number < 0 then
-        colorizedString = "|cffDC143C"..stringToColorize.."|r"
+		return Core:ColorizeNegative(stringToColorize);
     else
-        colorizedString = "|cff32CD32"..stringToColorize.."|r"
+        return Core:ColorizePositive(stringToColorize);
     end
-    return colorizedString;
 end
 
 function Core:ColorizeListHeader(stringToColorize)
@@ -83,6 +81,10 @@ end
 
 function Core:ColorizeNegative(stringToColorize)
     return "|cffDC143C"..stringToColorize.."|r"
+end
+
+function Core:ColorizePositive(stringToColorize)
+	return "|cff32CD32"..stringToColorize.."|r"
 end
 
 function Core:ColorizeGrey(stringToColorize)

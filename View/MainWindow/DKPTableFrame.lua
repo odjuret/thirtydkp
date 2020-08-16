@@ -204,7 +204,7 @@ function View:CreateDKPTable(parentFrame)
 	DKPTableFrame:SetFrameStrata("HIGH");
 	DKPTableFrame:SetFrameLevel(9);
 
-	DKPTableFrame:SetSize( Const.DKPTableWidth, Const.DKPTableRowHeight*12);
+	DKPTableFrame:SetSize(310, parentFrame:GetHeight() - 40);
 	DKPTableFrame:SetPoint( Const.TOP_LEFT_POINT, 5, -30 );
 	DKPTableFrame.scrollBar = _G["DKPTableScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 

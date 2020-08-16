@@ -210,6 +210,11 @@ local function CreateMainFrame(isAddonAdmin)
 
     MainFrame = View:CreateContainerFrame('ThirtyDKP_MainFrame', nil, MAIN_FRAME_TITLE, mainFrameWidth, Const.DKPTableRowHeight*14)
 	MainFrame:SetClampedToScreen(true);
+	if isAddonAdmin then
+		MainFrame:SetSize(430, 500);
+	else
+		MainFrame:SetSize(350, 500);
+	end
 	MainFrame:SetMovable(true);
 	MainFrame:EnableMouse(true);
 	MainFrame:RegisterForDrag("LeftButton");

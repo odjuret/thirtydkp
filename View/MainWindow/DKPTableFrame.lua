@@ -104,7 +104,7 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 	b.DKPInfo.PlayerClass = b:CreateFontString(nil, Const.OVERLAY_LAYER)
 	b.DKPInfo.PlayerClass:SetFontObject("ThirtyDKPSmall")
 	if isMe then
-		b.DKPInfo.PlayerClass:SetText(ColorizePositive(tostring(dkpTable[id].class)));
+		b.DKPInfo.PlayerClass:SetText(Core:ColorizePositive(tostring(dkpTable[id].class)));
 	else
 		b.DKPInfo.PlayerClass:SetText(tostring(dkpTable[id].class));
 	end
@@ -114,7 +114,7 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 	b.DKPInfo.CurrentDKP:SetFontObject("ThirtyDKPSmall")
 
 	if isMe then
-		b.DKPInfo.CurrentDKP:SetText(ColorizePositive(tostring(dkpTable[id].dkp)));
+		b.DKPInfo.CurrentDKP:SetText(Core:ColorizePositive(tostring(dkpTable[id].dkp)));
 	else
 		b.DKPInfo.CurrentDKP:SetText(tostring(dkpTable[id].dkp));
 	end

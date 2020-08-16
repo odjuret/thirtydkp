@@ -211,9 +211,9 @@ local function CreateMainFrame(isAddonAdmin)
     MainFrame = View:CreateContainerFrame('ThirtyDKP_MainFrame', nil, MAIN_FRAME_TITLE, mainFrameWidth, Const.DKPTableRowHeight*14)
 	MainFrame:SetClampedToScreen(true);
 	if isAddonAdmin then
-		MainFrame:SetSize(430, 500);
+		MainFrame:SetSize(430, 400);
 	else
-		MainFrame:SetSize(350, 500);
+		MainFrame:SetSize(350, 400);
 	end
 	MainFrame:SetMovable(true);
 	MainFrame:EnableMouse(true);

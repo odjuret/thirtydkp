@@ -76,6 +76,10 @@ local function CreateDKPTableHeadersRow(parent)
 	return headersFrame
 end
 
+local function ColorizeOwnEntry(text)
+	return "|cff00ff00"..tostring(text).."|r";
+end
+
 local function CreateDKPTableRow(parent, id, dkpTable)
 
 	local b = CreateFrame("Button", nil, parent);
@@ -85,25 +89,39 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 	b:GetNormalTexture():SetAlpha(0.5)
 	b:GetNormalTexture():SetAllPoints(true)
 
+	local isMe = dkpTable[id].player == UnitName("player");
+
 	b.DKPInfo = {}
 	local originalPlayerNameValue = tostring(dkpTable[id].player);
-	local colorizedName = Core:AddClassColor(originalPlayerNameValue, tostring(dkpTable[id].class))
+	local colorizedName;
+	if isMe then
+		colorizedName = ColorizeOwnEntry(tostring(dkpTable[id].player));
+	else
+		colorizedName = Core:AddClassColor(originalPlayerNameValue, tostring(dkpTable[id].class));
+	end
 	b.DKPInfo.PlayerName = b:CreateFontString(nil, Const.OVERLAY_LAYER)
 	b.DKPInfo.PlayerName:SetFontObject("GameFontHighlight")
 	b.DKPInfo.PlayerName:SetText(colorizedName);
 	b.DKPInfo.PlayerName:SetPoint(Const.LEFT_POINT, Const.Margin, 0)
 	b.DKPInfo.PlayerName.originalValue = originalPlayerNameValue;
 
-	local colorizedClass = Core:AddClassColor(tostring(dkpTable[id].class), tostring(dkpTable[id].class))
 	b.DKPInfo.PlayerClass = b:CreateFontString(nil, Const.OVERLAY_LAYER)
 	b.DKPInfo.PlayerClass:SetFontObject("GameFontHighlight")
-	b.DKPInfo.PlayerClass:SetText(colorizedClass);
+	if isMe then
+		b.DKPInfo.PlayerClass:SetText(ColorizeOwnEntry(tostring(dkpTable[id].class)));
+	else
+		b.DKPInfo.PlayerClass:SetText(tostring(dkpTable[id].class));
+	end
 	b.DKPInfo.PlayerClass:SetPoint(Const.CENTER_POINT, Const.Margin, 0);
 
-	local colorizedDKP = Core:AddClassColor(tostring(dkpTable[id].dkp), tostring(dkpTable[id].class))
 	b.DKPInfo.CurrentDKP = b:CreateFontString(nil, Const.OVERLAY_LAYER)
 	b.DKPInfo.CurrentDKP:SetFontObject("GameFontHighlight")
-	b.DKPInfo.CurrentDKP:SetText(colorizedDKP);
+
+	if isMe then
+		b.DKPInfo.CurrentDKP:SetText(ColorizeOwnEntry(tostring(dkpTable[id].dkp)));
+	else
+		b.DKPInfo.CurrentDKP:SetText(tostring(dkpTable[id].dkp));
+	end
 	b.DKPInfo.CurrentDKP:SetPoint(Const.RIGHT_POINT, -Const.Margin, 0)
 
 	b:RegisterForClicks("AnyUp");

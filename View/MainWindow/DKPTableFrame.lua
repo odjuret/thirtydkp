@@ -100,13 +100,13 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 		colorizedName = Core:AddClassColor(originalPlayerNameValue, tostring(dkpTable[id].class));
 	end
 	b.DKPInfo.PlayerName = b:CreateFontString(nil, Const.OVERLAY_LAYER)
-	b.DKPInfo.PlayerName:SetFontObject("GameFontHighlight")
+	b.DKPInfo.PlayerName:SetFontObject("ThirtyDKPSmall")
 	b.DKPInfo.PlayerName:SetText(colorizedName);
 	b.DKPInfo.PlayerName:SetPoint(Const.LEFT_POINT, Const.Margin, 0)
 	b.DKPInfo.PlayerName.originalValue = originalPlayerNameValue;
 
 	b.DKPInfo.PlayerClass = b:CreateFontString(nil, Const.OVERLAY_LAYER)
-	b.DKPInfo.PlayerClass:SetFontObject("GameFontHighlight")
+	b.DKPInfo.PlayerClass:SetFontObject("ThirtyDKPSmall")
 	if isMe then
 		b.DKPInfo.PlayerClass:SetText(ColorizeOwnEntry(tostring(dkpTable[id].class)));
 	else
@@ -115,7 +115,7 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 	b.DKPInfo.PlayerClass:SetPoint(Const.CENTER_POINT, Const.Margin, 0);
 
 	b.DKPInfo.CurrentDKP = b:CreateFontString(nil, Const.OVERLAY_LAYER)
-	b.DKPInfo.CurrentDKP:SetFontObject("GameFontHighlight")
+	b.DKPInfo.CurrentDKP:SetFontObject("ThirtyDKPSmall")
 
 	if isMe then
 		b.DKPInfo.CurrentDKP:SetText(ColorizeOwnEntry(tostring(dkpTable[id].dkp)));

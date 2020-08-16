@@ -161,7 +161,7 @@ function Core:HandleBossKill(eventId, ...)
         playerName, _, _, _, playerClass  = GetRaidRosterInfo(i)
         
         if DAL:AdjustPlayerDKP(playerName, tonumber(bossKillDKPAward)) then
-            if i == 1 then
+            if listOfAwardedPlayers == "" then
                 listOfAwardedPlayers = playerName;
             else
                 listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
@@ -170,7 +170,7 @@ function Core:HandleBossKill(eventId, ...)
             -- could not adjust player dkp, add player to dkp table first
             DAL:AddToDKPTable(playerName, playerClass)
             if DAL:AdjustPlayerDKP(playerName, tonumber(bossKillDKPAward)) then
-                if i == 1 then
+                if listOfAwardedPlayers == "" then
                     listOfAwardedPlayers = playerName;
                 else
                     listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
@@ -192,7 +192,7 @@ function Core:ApplyOnTimeBonus()
         local playerName, _, _, _, playerClass = GetRaidRosterInfo(i)
 
 		if DAL:AdjustPlayerDKP(playerName, onTimeBonus) then
-            if i == 1 then
+            if listOfAwardedPlayers == "" then
                 listOfAwardedPlayers = playerName;
             else
                 listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
@@ -201,7 +201,7 @@ function Core:ApplyOnTimeBonus()
             if DAL:AddToDKPTable(playerName, playerClass) then
                 Core:Print("added "..playerName.." successfully to table.")
 				DAL:AdjustPlayerDKP(playerName, onTimeBonus);
-				if i == 1 then
+				if listOfAwardedPlayers == "" then
                     listOfAwardedPlayers = playerName;
                 else
                     listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
@@ -221,7 +221,7 @@ function Core:ApplyRaidEndBonus()
         local playerName, _, _, _, playerClass = GetRaidRosterInfo(i)
 
 		if DAL:AdjustPlayerDKP(playerName, raidCompletionBonus) then
-            if i == 1 then
+            if listOfAwardedPlayers == "" then
                 listOfAwardedPlayers = playerName;
             else
                 listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
@@ -232,7 +232,7 @@ function Core:ApplyRaidEndBonus()
                 Core:Print("added "..playerName.." successfully to table.")
 				DAL:AdjustPlayerDKP(playerName, raidCompletionBonus);
 
-				if i == 1 then
+				if listOfAwardedPlayers == "" then
                     listOfAwardedPlayers = playerName;
                 else
                     listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
@@ -297,7 +297,11 @@ function Core:AdjustPlayersDKP(selectedPlayers, DkpAdjustAmount, DkpAdjustReason
 
     for i, selectedPlayer in ipairs(selectedPlayers) do
         if DAL:AdjustPlayerDKP(selectedPlayer, DkpAdjustAmount) then
-            listOfAdjustedPlayers = listOfAdjustedPlayers..","..selectedPlayer;
+            if listOfAwardedPlayers == "" then
+                listOfAwardedPlayers = selectedPlayer;
+            else
+                listOfAwardedPlayers = listOfAwardedPlayers..","..selectedPlayer;
+            end
         end
     end
 

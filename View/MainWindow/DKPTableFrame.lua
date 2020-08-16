@@ -6,7 +6,7 @@ local Core = ThirtyDKP.Core;
 local DAL = ThirtyDKP.DAL;
 local Const = ThirtyDKP.View.Constants;
 
--- Even though its not a "standalone" frame by itself,
+-- Even though its not a "standalone" window by itself,
 -- it deserves its own file since it will grow large as development progresses
 local DKPTableFrame = nil;
 
@@ -15,7 +15,6 @@ local selectedDKPTableEntries = {};
 function View:GetSelectedDKPTableEntries()
 	return selectedDKPTableEntries;
 end
-
 
 local function UpdateDKPTableRowsTextures()
 	for i, row in ipairs(DKPTableFrame.scrollChild.Rows) do 
@@ -30,7 +29,6 @@ local function UpdateDKPTableRowsTextures()
         end
     end
 end
-
 
 local function CreateDKPTableHeadersRow(parent)
 
@@ -123,7 +121,43 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 			UpdateDKPTableRowsTextures();
 		end
 	end);
-	
+
+	-- player history hover over tooltip
+	local playerHistory = DAL:GetDKPHistoryFor(originalPlayerNameValue, 15);
+	if #playerHistory > 0 then	
+		b:SetScript("OnEnter", function(self)
+			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+			local lastDate = strsplit(" ", Core:FormatTimestamp(playerHistory[#playerHistory].timestamp));
+			GameTooltip:SetText("Recent history for "..colorizedName, 0.25, 0.75, 0.90, 1, true);
+			GameTooltip:AddLine(lastDate, 1.0, 1.0, 1.0, true);
+
+			for i = 0, (#playerHistory-1) do
+				local entryDate = strsplit(" ", Core:FormatTimestamp(playerHistory[(#playerHistory-i)].timestamp));
+				if (lastDate ~= entryDate) then
+					GameTooltip:AddLine(entryDate, 1.0, 1.0, 1.0, true);
+					lastDate = entryDate;
+				end
+
+				local maybeDecay, maybeDecayAmount = string.split(":", playerHistory[(#playerHistory-i)].reason)
+				local colorizedReasonText = ""
+				local colorizedDKPText = ""
+				if maybeDecay == "Decay" then
+					colorizedReasonText = Core:ColorizeNegative(maybeDecay)
+					colorizedDKPText = Core:ColorizeNegative(maybeDecayAmount.." DKP")
+				else
+					colorizedReasonText = Core:ColorizePositiveOrNegative(playerHistory[(#playerHistory-i)].dkp, playerHistory[(#playerHistory-i)].reason)
+					colorizedDKPText = Core:ColorizePositiveOrNegative(playerHistory[(#playerHistory-i)].dkp, tostring(playerHistory[(#playerHistory-i)].dkp).." DKP")
+				end
+				GameTooltip:AddDoubleLine("  "..colorizedReasonText, colorizedDKPText, 1.0, 0, 0);
+			end
+			GameTooltip:Show();
+		end);
+
+		b:SetScript("OnLeave", function(self)
+			GameTooltip:Hide()
+		end);
+	end
+
 	return b
 end
 

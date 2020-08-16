@@ -20,6 +20,21 @@ function DAL:GetDKPHistory()
     return ThirtyDKP_Database_DKPHistory
 end
 
+function DAL:GetDKPHistoryFor(playerName, maxNumberOfRecords)
+    local playerHistory = {}
+    for i, historyEntry in ipairs(ThirtyDKP_Database_DKPHistory) do
+        if string.find(historyEntry.players, playerName) then
+            if #playerHistory < maxNumberOfRecords then
+                table.insert(playerHistory, historyEntry)
+            else
+                break;
+            end
+        end
+    end
+
+    return playerHistory
+end
+
 function DAL:GetLatestDKPHistoryEntry()
     return ThirtyDKP_Database_DKPHistory[#ThirtyDKP_Database_DKPHistory]
 end
@@ -80,8 +95,9 @@ end
 
 function DAL:UpdateDKPHistoryVersion(newHistoryVersion)
     if (newHistoryVersion == nil or newHistoryVersion == "") then
+        local guildName = GetGuildInfo("player");
         local currentTime = time();
-	    local index = UnitName("player").."-"..currentTime
+	    local index = guildName.."-"..UnitName("player").."-"..currentTime
 	    ThirtyDKP_Database_DKPHistory.version = index 
     else
         ThirtyDKP_Database_DKPHistory.version = newHistoryVersion

@@ -70,6 +70,10 @@ local function TryUpdateKnownHistoryVersion(incomingHistoryVersion)
     local _, _, latestKnownDate = string.split("-", latestKnownHistoryVersion)
     local _, _, incomingDate = string.split("-", incomingHistoryVersion)
 
+    if incomingDate == nil then
+        return
+    end
+    
     if (incomingDate > latestKnownDate) then
         latestKnownDKPTableVersion = incomingHistoryVersion
     end

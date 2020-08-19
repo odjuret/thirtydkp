@@ -48,9 +48,9 @@ function View:UpdateDataUpToDateFrame(incHoverOverText)
     end)
 end
 
-local function CreateMainFrameButton(text, relativePoint, parentFrame, relativePointOnParentFrame)
+local function CreateMainFrameButton(text, relativePoint, parentFrame, relativePointOnParentFrame, x, y)
     local b = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-    b:SetPoint(relativePoint, parentFrame, relativePointOnParentFrame, 0, 0);
+    b:SetPoint(relativePoint, parentFrame, relativePointOnParentFrame, x, y);
     b:SetSize(80, Const.ButtonHeight);
     b:SetText(text);
     b:SetNormalFontObject("GameFontNormal");
@@ -58,8 +58,74 @@ local function CreateMainFrameButton(text, relativePoint, parentFrame, relativeP
     return b
 end
 
+local function CreateDKPAdjustButton()
+    MainFrame.dkpAdjustBtn = CreateMainFrameButton("Adjust", Const.BOTTOM_RIGHT_POINT, MainFrame.optionsButton, Const.TOP_RIGHT_POINT, 0, 0)
+
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.dkpAdjustBtn, "DKP Adjustments", "Give on-time and raid completion bonuses.\nManually adjust player DKP.\nApply DKP Decay for guild.", function()
+        View:HideOptionsFrame();
+        View:HideTdkpAdminsFrame()
+        View:HideDKPHistoryFrame();
+        View:ToggleDKPAdjustFrame();
+    end)
+end
+
+local function CreateDKPOptionsButton()
+    MainFrame.optionsButton = CreateMainFrameButton("Options", Const.BOTTOM_RIGHT_POINT, MainFrame.dkpHistoryBtn, Const.TOP_RIGHT_POINT, 0, 0)
+
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.optionsButton, "DKP Options", "Manage costs and gains", function()
+        View:HideDKPAdjustFrame();
+        View:HideTdkpAdminsFrame();
+        View:HideDKPHistoryFrame();
+        View:ToggleOptionsFrame();
+    end)
+end
+
+local function CreateDKPHistoryButton()
+    MainFrame.dkpHistoryBtn = CreateMainFrameButton("History", Const.BOTTOM_RIGHT_POINT, MainFrame.broadcastBtn, Const.TOP_RIGHT_POINT, 0, 10)
+
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.dkpHistoryBtn, "DKP History", "Manage DKP history for your guild.", function()
+        View:HideOptionsFrame();
+        View:HideDKPAdjustFrame();
+        View:HideTdkpAdminsFrame()
+        View:ToggleDKPHistoryFrame();
+    end)
+end
+
+local function CreateBroadcastDKPDataButton()
+    MainFrame.broadcastBtn = CreateMainFrameButton("Broadcast", Const.BOTTOM_RIGHT_POINT, MainFrame.dkpAdminsBtn, Const.TOP_RIGHT_POINT, 0, 0)
+
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.broadcastBtn, "Broadcasts ThirtyDKP data", "Attempts to broadcast out your dkp data to other online members:\ndkp table, dkp history and addon options", function()
+        StaticPopupDialogs["BROADCAST_THIRTYDKPDATA"] = {
+            text = "Are you sure you want to broadcast your ThirtyDKP data?",
+            button1 = "Yes",
+            button2 = "No",
+            OnAccept = function()
+                Core:BroadcastThirtyDKPData();
+                View:ShowBroadcastingStatusFrame()
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+        }
+        StaticPopup_Show("BROADCAST_THIRTYDKPDATA")
+    end)
+end
+
+local function CreateDKPAdminsButton()
+    MainFrame.dkpAdminsBtn = CreateMainFrameButton("Admins", Const.BOTTOM_RIGHT_POINT, MainFrame.addRaidToTableBtn, Const.TOP_RIGHT_POINT, 0, 0)
+
+    View:AttachHoverOverTooltipAndOnclick(MainFrame.dkpAdminsBtn, "Admins Management", "Manage DKP admins for your guild. Admins can change dkp options, adjust dkp, start dkp awarding raids, etc", function()
+        View:HideOptionsFrame();
+        View:HideDKPAdjustFrame();
+        View:HideDKPHistoryFrame();
+        View:ToggleTdkpAdminsFrame()
+    end)
+end
+
 local function CreateAddRaidToDKPTableButton()
-    MainFrame.addRaidToTableBtn = CreateMainFrameButton("Add Raid", Const.BOTTOM_LEFT_POINT, MainFrame.optionsButton, Const.TOP_LEFT_POINT)
+    MainFrame.addRaidToTableBtn = CreateMainFrameButton("Add Raid", Const.BOTTOM_LEFT_POINT, MainFrame.addGuildToTableBtn, Const.TOP_LEFT_POINT, 0, 0)
+
     View:AttachHoverOverTooltipAndOnclick(MainFrame.addRaidToTableBtn, "Add raid members to DKP table", "Given that theyre in the guild obviously", function()
         -- If you aint in raid
         if not IsInRaid() then
@@ -94,7 +160,7 @@ local function CreateAddRaidToDKPTableButton()
 end
 
 local function CreateAddGuildToDKPTableButton()
-    MainFrame.addGuildToTableBtn = CreateMainFrameButton("Add Guild", Const.BOTTOM_LEFT_POINT, MainFrame.addRaidToTableBtn, Const.TOP_LEFT_POINT)
+    MainFrame.addGuildToTableBtn = CreateMainFrameButton("Add Guild", Const.BOTTOM_RIGHT_POINT, MainFrame, Const.BOTTOM_RIGHT_POINT, -10, 10)
 
     View:AttachHoverOverTooltipAndOnclick(MainFrame.addGuildToTableBtn, "Add guild members to DKP table", "Adds guild members that aren't in the dkp table", function()
         -- If not in guild
@@ -128,77 +194,6 @@ local function CreateAddGuildToDKPTableButton()
     end);
 end
 
-local function CreateBroadcastDKPDataButton()
-    MainFrame.broadcastBtn = CreateMainFrameButton("Broadcast", Const.BOTTOM_RIGHT_POINT, MainFrame.addGuildToTableBtn, Const.TOP_RIGHT_POINT)
-
-    View:AttachHoverOverTooltipAndOnclick(MainFrame.broadcastBtn, "Broadcasts ThirtyDKP data", "Attempts to broadcast out your dkp data to other online members:\ndkp table, dkp history and addon options", function()
-        StaticPopupDialogs["BROADCAST_THIRTYDKPDATA"] = {
-            text = "Are you sure you want to broadcast your ThirtyDKP data?",
-            button1 = "Yes",
-            button2 = "No",
-            OnAccept = function()
-                Core:BroadcastThirtyDKPData();
-                View:ShowBroadcastingStatusFrame()
-            end,
-            timeout = 0,
-            whileDead = true,
-            hideOnEscape = true,
-            preferredIndex = 3,
-        }
-        StaticPopup_Show("BROADCAST_THIRTYDKPDATA")
-    end)
-end
-
-local function CreateRaidManagementButton()
-    MainFrame.raidBtn = CreateMainFrameButton("Raid", Const.BOTTOM_RIGHT_POINT, MainFrame.broadcastBtn, Const.TOP_RIGHT_POINT)
-
-    View:AttachHoverOverTooltipAndOnclick(MainFrame.raidBtn, "Raid Management", "Manage raids and handle manual DKP adjustments", function()
-        View:HideOptionsFrame();
-        View:HideTdkpAdminsFrame()
-        View:HideDKPHistoryFrame();
-        View:ToggleRaidManagementFrame();
-    end)
-end
-
-local function CreateDKPAdminsButton()
-    MainFrame.dkpAdminsBtn = CreateMainFrameButton("Admins", Const.BOTTOM_RIGHT_POINT, MainFrame.raidBtn, Const.TOP_RIGHT_POINT)
-
-    View:AttachHoverOverTooltipAndOnclick(MainFrame.dkpAdminsBtn, "Admins Management", "Manage DKP admins for your guild. Admins can change dkp options, adjust dkp, start dkp awarding raids, etc", function()
-        View:HideOptionsFrame();
-        View:HideRaidManagementFrame();
-        View:HideDKPHistoryFrame();
-        View:ToggleTdkpAdminsFrame()
-    end)
-end
-
-local function CreateDKPHistoryButton()
-    MainFrame.dkpHistoryBtn = CreateMainFrameButton("History", Const.BOTTOM_RIGHT_POINT, MainFrame.dkpAdminsBtn, Const.TOP_RIGHT_POINT)
-
-    View:AttachHoverOverTooltipAndOnclick(MainFrame.dkpHistoryBtn, "DKP History", "Manage DKP history for your guild.", function()
-        View:HideOptionsFrame();
-        View:HideRaidManagementFrame();
-        View:HideTdkpAdminsFrame()
-        View:ToggleDKPHistoryFrame();
-    end)
-end
-
-local function CreateDKPOptionsButton()
-    MainFrame.optionsButton = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
-    MainFrame.optionsButton:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame, Const.BOTTOM_RIGHT_POINT, -10, 10);
-    MainFrame.optionsButton:SetSize(80, Const.ButtonHeight);
-    MainFrame.optionsButton:SetText("Options");
-    MainFrame.optionsButton:SetNormalFontObject("GameFontNormal");
-    MainFrame.optionsButton:SetHighlightFontObject("GameFontHighlight");
-    MainFrame.optionsButton:RegisterForClicks("AnyUp");
-    MainFrame.optionsButton:SetScript("OnClick", function (self, button, down)
-        View:HideRaidManagementFrame();
-        View:HideTdkpAdminsFrame();
-        View:HideDKPHistoryFrame();
-        View:ToggleOptionsFrame();
-    end);
-end
-
-
 local function CreateMainFrame(isAddonAdmin)
     local mainFrameWidth;
     if isAddonAdmin then
@@ -223,7 +218,7 @@ local function CreateMainFrame(isAddonAdmin)
     MainFrame:SetScript("OnHide", function(self)
         if isAddonAdmin then
             View:HideOptionsFrame();
-            View:HideRaidManagementFrame();
+            View:HideDKPAdjustFrame();
         end
 	end);
 
@@ -242,19 +237,19 @@ local function CreateMainFrame(isAddonAdmin)
 	-- Buttons
 
     if isAddonAdmin then
-        CreateDKPOptionsButton()
-
-        CreateAddRaidToDKPTableButton()
-
         CreateAddGuildToDKPTableButton()
-
-        CreateBroadcastDKPDataButton()
-
-        CreateRaidManagementButton()
-
+        
+        CreateAddRaidToDKPTableButton()
+        
         CreateDKPAdminsButton()
-
+        
+        CreateBroadcastDKPDataButton()
+        
         CreateDKPHistoryButton()
+        
+        CreateDKPOptionsButton()
+        
+        CreateDKPAdjustButton()
         
     end
 end
@@ -281,7 +276,7 @@ function View:Initialize()
     View:CreateBidAnnounceFrame();
     if isAddonAdmin then
         View:CreateOptionsFrame(MainFrame);
-		View:CreateRaidManagementFrame(MainFrame);
+		View:CreateDKPAdjustFrame(MainFrame);
         View:CreateTdkpAdminsFrame(MainFrame);
         View:CreateDKPHistoryFrame(MainFrame);
     end

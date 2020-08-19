@@ -89,18 +89,7 @@ local function InitializeRaidDropdown(frame, level, menuList)
 end
 
 function View:CreateOptionsFrame(parentFrame)
-	OptionsFrame = CreateFrame("Frame", "ThirtyDKP_OptionsFrame", parentFrame, "TooltipBorderedFrameTemplate"); 
-	OptionsFrame:SetShown(false);
-	OptionsFrame:SetSize(370, 450);
-	OptionsFrame:SetFrameStrata("HIGH");
-	OptionsFrame:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
-    OptionsFrame:EnableMouse(true);
-
-    -- title
-    local title = OptionsFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
-    title:SetFontObject("GameFontNormal");
-    title:SetPoint(Const.TOP_LEFT_POINT, OptionsFrame, Const.TOP_LEFT_POINT, 15, -10);
-    title:SetText(OPTIONS_FRAME_TITLE);
+	OptionsFrame = View:CreateContainerFrame("ThirtyDKP_OptionsFrame", parentFrame, OPTIONS_FRAME_TITLE, 370, 450);
 
 	local options = DAL:GetOptions();
 	SelectedRaid = options.lastSelectedRaid
@@ -192,11 +181,6 @@ function View:CreateOptionsFrame(parentFrame)
     OptionsFrame.twoHandedWeaponCostInput = CreateAndAttachDkpCostFrame("Two-handed:", "twoHandedWeapon", itemCostSectionRight, OptionsFrame.oneHandedWeaponCostInput);
     OptionsFrame.rangedWeaponCostInput = CreateAndAttachDkpCostFrame("Ranged:", "rangedWeapon", itemCostSectionRight, OptionsFrame.twoHandedWeaponCostInput);
     OptionsFrame.offhandCostInput = CreateAndAttachDkpCostFrame("Offhand:", "offhand", itemCostSectionRight, OptionsFrame.rangedWeaponCostInput);
-
-
-    -- Buttons
-    OptionsFrame.closeBtn = CreateFrame("Button", nil, OptionsFrame, "UIPanelCloseButton")
-	OptionsFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, OptionsFrame, Const.TOP_RIGHT_POINT)
 
 end
 

@@ -26,6 +26,7 @@ end
 
 local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 	local b = CreateFrame("Button", nil, parent);
+	local totalEntryHeight = 32;
 
 	-- entry header
 	local colorizedDKPAdjust = "";
@@ -47,14 +48,19 @@ local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 	b.entryHeader:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT, 15, 0)
     
 	-- player string
-	local colorizedPlayerString, rows = Core:ColorizeAndBreakPlayers(dkpHistory[id].players);
+	local colorizedPlayerString, rows = "", 0
 
-	b.affectedPlayers = b:CreateFontString(nil, Const.OVERLAY_LAYER)
-	b.affectedPlayers:SetFontObject("ThirtyDKPTinyLeft")
-	b.affectedPlayers:SetText(colorizedPlayerString);
-	b.affectedPlayers:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT, 25, -15);
+	if not (maybeDecay == "Decay") then
+		colorizedPlayerString, rows = Core:ColorizeAndBreakPlayers(dkpHistory[id].players);
+	
+		b.affectedPlayers = b:CreateFontString(nil, Const.OVERLAY_LAYER)
+		b.affectedPlayers:SetFontObject("ThirtyDKPTinyLeft")
+		b.affectedPlayers:SetText(colorizedPlayerString);
+		b.affectedPlayers:SetPoint(Const.TOP_LEFT_POINT, b, Const.TOP_LEFT_POINT, 25, -15);
+	else
+		totalEntryHeight = 24;
+	end
 
-	local totalEntryHeight = 32;
 	for i = 1, rows do
 		totalEntryHeight = totalEntryHeight + 8
 	end

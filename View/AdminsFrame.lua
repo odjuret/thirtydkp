@@ -99,22 +99,9 @@ local function CreateDKPAdminsList()
 end
 
 function View:CreateTdkpAdminsFrame(parentFrame)
-	TdkpAdminsFrame = CreateFrame("Frame", "ThirtyDKP_AdminsFrame", parentFrame, "TooltipBorderedFrameTemplate");
-	TdkpAdminsFrame:SetShown(false);
-	TdkpAdminsFrame:SetSize(170, 190);
-	TdkpAdminsFrame:SetFrameStrata("HIGH");
-	TdkpAdminsFrame:SetPoint(Const.TOP_LEFT_POINT, parentFrame, Const.TOP_RIGHT_POINT, 0, 0); -- point, relative frame, relative point on relative frame
-    TdkpAdminsFrame:EnableMouse(true);
-
-    -- title
-    local title = TdkpAdminsFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
-    title:SetFontObject("GameFontNormal");
-    title:SetPoint(Const.TOP_LEFT_POINT, TdkpAdminsFrame, Const.TOP_LEFT_POINT, 15, -10);
-    title:SetText(TDKPADMINS_FRAME_TITLE);
+	TdkpAdminsFrame = View:CreateContainerFrame("ThirtyDKP_AdminsFrame", parentFrame, TDKPADMINS_FRAME_TITLE, 170, 190);
 
     -- Buttons
-    TdkpAdminsFrame.closeBtn = CreateFrame("Button", nil, TdkpAdminsFrame, "UIPanelCloseButton")
-    TdkpAdminsFrame.closeBtn:SetPoint(Const.TOP_RIGHT_POINT, TdkpAdminsFrame, Const.TOP_RIGHT_POINT)
     
     TdkpAdminsFrame.addAdminsBtn = CreateFrame("Button", nil, TdkpAdminsFrame, "GameMenuButtonTemplate");
     TdkpAdminsFrame.addAdminsBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, TdkpAdminsFrame, Const.BOTTOM_RIGHT_POINT, -10, 10);

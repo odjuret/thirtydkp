@@ -11,7 +11,10 @@ function Core:ImportFromMonolithDKP()
             button1 = "Yes",
             button2 = "No",
             OnAccept = function()
-                DAL:WipeDKPTableAndImportFromMonolith()
+                if not DAL:WipeDKPTableAndImportFromMonolith() then
+                    Core:Print("Could not find Monolith DKP data.")
+                end
+                
                 -- todo: history and maybe options ??
                 DAL:WipeAndSetNewHistory({})
                 StaticPopup_Hide ("FULL_MONOLITHDKP_IMPORT_WARNING")

@@ -180,10 +180,8 @@ end
 
 function DAL:WipeDKPTableAndImportFromMonolith()
 	if not MonDKP_DKPTable or (MonDKP_DKPTable == nil) then
-		print("shit aitn working!")
-		return;
+		return false
 	else
-
 		ThirtyDKP_Database_DKPTable = {}
 		for i, monolithDkpTableEntry in ipairs(MonDKP_DKPTable) do
 			local sanitizedClassName = monolithDkpTableEntry.class:lower():gsub("^%l", string.upper);
@@ -194,7 +192,7 @@ function DAL:WipeDKPTableAndImportFromMonolith()
 				dkp=monolithDkpTableEntry.dkp,
 			});
 		end
-
+		return true
 	end
 end
 

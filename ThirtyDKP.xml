@@ -71,5 +71,6 @@
 		</Member>
 	</FontFamily>
 	<Font name="ThirtyDKPTinyLeft" inherits="ThirtyDKPTiny" justifyH="LEFT" virtual="true"/>
+	<Font name="ThirtyDKPSmallLeft" inherits="ThirtyDKPSmall" justifyH="LEFT" virtual="true"/>
 
 </Ui>

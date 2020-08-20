@@ -4,15 +4,15 @@ local View = ThirtyDKP.View;
 local Core = ThirtyDKP.Core;
 local Const = ThirtyDKP.View.Constants;
 
-local TdkpAdminsFrame = nil;
+local dkpAdminsFrame = nil;
 
-local TDKPADMINS_FRAME_TITLE = "Admins"
+local DKPADMINS_FRAME_TITLE = "Admins"
 
 local selectedDKPAdmins = {};
 
 
 local function UpdateDKPAdminsListRowsTextures()
-	for i, row in ipairs(TdkpAdminsFrame.AdminsList.scrollChild.Rows) do 
+	for i, row in ipairs(dkpAdminsFrame.AdminsList.scrollChild.Rows) do 
 		local playerIsSelected = DAL:Table_Search(selectedDKPAdmins, row.DKPAdmin.originalValue)
 		if playerIsSelected ~= false then
             row:SetNormalTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
@@ -28,7 +28,7 @@ end
 local function CreateDKPAdminListRow(parent, id, dkpAdmins)
 
 	local b = CreateFrame("Button", nil, parent);
-	b:SetSize(TdkpAdminsFrame:GetWidth()-10, Const.DKPTableRowHeight);
+	b:SetSize(dkpAdminsFrame:GetWidth()-10, Const.DKPTableRowHeight);
 	b:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
 	b:SetNormalTexture("Interface\\COMMON\\talent-blue-glow")
 	b:GetNormalTexture():SetAlpha(0.5)
@@ -76,8 +76,8 @@ end
 
 local function CreateDKPAdminsList()
     local dkpAdmins = DAL:GetAddonAdmins();
-    TdkpAdminsFrame.AdminsList = CreateFrame("ScrollFrame", 'DKPAdminsScrollFrame', TdkpAdminsFrame, "UIPanelScrollFrameTemplate");
-    local adminsList = TdkpAdminsFrame.AdminsList;
+    dkpAdminsFrame.AdminsList = CreateFrame("ScrollFrame", 'DKPAdminsScrollFrame', dkpAdminsFrame, "UIPanelScrollFrameTemplate");
+    local adminsList = dkpAdminsFrame.AdminsList;
 	adminsList:SetFrameStrata("HIGH");
 	adminsList:SetFrameLevel(9);
 
@@ -98,19 +98,19 @@ local function CreateDKPAdminsList()
 	PopulateDKPAdminsList(adminsList, dkpAdmins);
 end
 
-function View:CreateTdkpAdminsFrame(parentFrame)
-	TdkpAdminsFrame = View:CreateContainerFrame("ThirtyDKP_AdminsFrame", parentFrame, TDKPADMINS_FRAME_TITLE, 170, 190);
+function View:CreateDKPAdminsFrame(parentFrame)
+	dkpAdminsFrame = View:CreateContainerFrame("ThirtyDKP_AdminsFrame", parentFrame, DKPADMINS_FRAME_TITLE, 170, 190);
 
     -- Buttons
     
-    TdkpAdminsFrame.addAdminsBtn = CreateFrame("Button", nil, TdkpAdminsFrame, "GameMenuButtonTemplate");
-    TdkpAdminsFrame.addAdminsBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, TdkpAdminsFrame, Const.BOTTOM_RIGHT_POINT, -10, 10);
-    TdkpAdminsFrame.addAdminsBtn:SetSize(110, Const.ButtonHeight);
-    TdkpAdminsFrame.addAdminsBtn:SetText("Promote Admins");
-    TdkpAdminsFrame.addAdminsBtn:SetNormalFontObject("GameFontNormal");
-    TdkpAdminsFrame.addAdminsBtn:SetHighlightFontObject("GameFontHighlight");
-    TdkpAdminsFrame.addAdminsBtn:RegisterForClicks("AnyUp");
-    TdkpAdminsFrame.addAdminsBtn:SetScript("OnClick", function (self, button, down)
+    dkpAdminsFrame.addAdminsBtn = CreateFrame("Button", nil, dkpAdminsFrame, "GameMenuButtonTemplate");
+    dkpAdminsFrame.addAdminsBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, dkpAdminsFrame, Const.BOTTOM_RIGHT_POINT, -10, 10);
+    dkpAdminsFrame.addAdminsBtn:SetSize(110, Const.ButtonHeight);
+    dkpAdminsFrame.addAdminsBtn:SetText("Promote Admins");
+    dkpAdminsFrame.addAdminsBtn:SetNormalFontObject("GameFontNormal");
+    dkpAdminsFrame.addAdminsBtn:SetHighlightFontObject("GameFontHighlight");
+    dkpAdminsFrame.addAdminsBtn:RegisterForClicks("AnyUp");
+    dkpAdminsFrame.addAdminsBtn:SetScript("OnClick", function (self, button, down)
         local selectedPlayers = View:GetSelectedDKPTableEntries();
         if #selectedPlayers < 1 then
             Core:Print("Please select players to promote from the DKP table to the left")
@@ -123,14 +123,14 @@ function View:CreateTdkpAdminsFrame(parentFrame)
         View:UpdateDKPAdminsFrame()
     end);
 
-    TdkpAdminsFrame.removeAdminsBtn = CreateFrame("Button", nil, TdkpAdminsFrame, "GameMenuButtonTemplate");
-    TdkpAdminsFrame.removeAdminsBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, TdkpAdminsFrame.addAdminsBtn, Const.TOP_RIGHT_POINT, 0, 0);
-    TdkpAdminsFrame.removeAdminsBtn:SetSize(110, Const.ButtonHeight);
-    TdkpAdminsFrame.removeAdminsBtn:SetText("Demote Admins");
-    TdkpAdminsFrame.removeAdminsBtn:SetNormalFontObject("GameFontNormal");
-    TdkpAdminsFrame.removeAdminsBtn:SetHighlightFontObject("GameFontHighlight");
-    TdkpAdminsFrame.removeAdminsBtn:RegisterForClicks("AnyUp");
-    TdkpAdminsFrame.removeAdminsBtn:SetScript("OnClick", function (self, button, down)
+    dkpAdminsFrame.removeAdminsBtn = CreateFrame("Button", nil, dkpAdminsFrame, "GameMenuButtonTemplate");
+    dkpAdminsFrame.removeAdminsBtn:SetPoint(Const.BOTTOM_RIGHT_POINT, dkpAdminsFrame.addAdminsBtn, Const.TOP_RIGHT_POINT, 0, 0);
+    dkpAdminsFrame.removeAdminsBtn:SetSize(110, Const.ButtonHeight);
+    dkpAdminsFrame.removeAdminsBtn:SetText("Demote Admins");
+    dkpAdminsFrame.removeAdminsBtn:SetNormalFontObject("GameFontNormal");
+    dkpAdminsFrame.removeAdminsBtn:SetHighlightFontObject("GameFontHighlight");
+    dkpAdminsFrame.removeAdminsBtn:RegisterForClicks("AnyUp");
+    dkpAdminsFrame.removeAdminsBtn:SetScript("OnClick", function (self, button, down)
         if #selectedDKPAdmins < 1 then
             Core:Print("Please select admins to demote from the admin list")
             return;
@@ -147,18 +147,18 @@ end
 function View:UpdateDKPAdminsFrame()
 	local mainFrame = View:GetMainFrame()
 
-	TdkpAdminsFrame:Hide()
-	TdkpAdminsFrame:SetParent(nil)
-	TdkpAdminsFrame = nil;
+	dkpAdminsFrame:Hide()
+	dkpAdminsFrame:SetParent(nil)
+	dkpAdminsFrame = nil;
 
-	View:CreateTdkpAdminsFrame(mainFrame)
-	TdkpAdminsFrame:Show()
+	View:CreateDKPAdminsFrame(mainFrame)
+	dkpAdminsFrame:Show()
 end
 
-function View:ToggleTdkpAdminsFrame()
-    TdkpAdminsFrame:SetShown(not TdkpAdminsFrame:IsShown());
+function View:ToggleDKPAdminsFrame()
+    dkpAdminsFrame:SetShown(not dkpAdminsFrame:IsShown());
 end
 
-function View:HideTdkpAdminsFrame()
-    TdkpAdminsFrame:SetShown(false);
+function View:HideDKPAdminsFrame()
+    dkpAdminsFrame:SetShown(false);
 end

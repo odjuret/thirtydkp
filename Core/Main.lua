@@ -174,7 +174,8 @@ function ThirtyDKP_OnInitialize(event, name)
         end
     end)
 
-    Core:Print("Loaded. Type /tdkp to view dkp table and options.")
+    Core:Print("Loaded. Type /tdkp to view dkp table, and options (if admin).")
+    Core:Print(" /tdkp bid  or  /tdkp bid [itemlink]  to open bidding window.")
 end
 
 ----------------------------------

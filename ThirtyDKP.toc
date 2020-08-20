@@ -1,8 +1,8 @@
-## Interface: 11304
+## Interface: 11305
 ## Title: Thirty |cffDC143CDKP|r
 ## Author: Gordito-Gehennas, Throes-Gehennas, Bredsida-Gehennas
 ## Notes: Simple, lightweight and efficient DKP loot system management.
-## Version: 0.1.0
+## Version: 1.0.1
 ## DefaultState: enabled
 ## SavedVariables: ThirtyDKP_Database_DKPTable, ThirtyDKP_Database_CurrentLoot, ThirtyDKP_Database_Options, ThirtyDKP_Database_DKPHistory, ThirtyDKP_Database_Raid
 

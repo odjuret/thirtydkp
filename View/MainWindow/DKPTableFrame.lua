@@ -123,10 +123,11 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 	b:RegisterForClicks("AnyUp");
 	b:SetScript("OnClick", function (self, button, down)
 		if button == "LeftButton" then
+			-- did we click on an already selected player
+			local playerSelected = DAL:Table_Search(selectedDKPTableEntries, originalPlayerNameValue);
 			if not IsShiftKeyDown() then
 				selectedDKPTableEntries = {}
 			end
-			local playerSelected = DAL:Table_Search(selectedDKPTableEntries, originalPlayerNameValue);
 			if playerSelected == false then
 				table.insert(selectedDKPTableEntries, originalPlayerNameValue);
 			else
@@ -200,7 +201,7 @@ function View:CreateDKPTable(parentFrame)
 	DKPTableFrame:SetFrameStrata("HIGH");
 	DKPTableFrame:SetFrameLevel(9);
 
-	DKPTableFrame:SetSize(310, parentFrame:GetHeight() - 40);
+	DKPTableFrame:SetSize(300, parentFrame:GetHeight() - 40);
 	DKPTableFrame:SetPoint( Const.TOP_LEFT_POINT, 5, -30 );
 	DKPTableFrame.scrollBar = _G["DKPTableScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 

@@ -97,7 +97,6 @@ end
 -- Main event controller. Delegates all incoming events
 --------------------------------------------------------
 function ThirtyDKP_OnEvent(self, event, arg1, ...)
-    -- TODO: handle all other events, boss kill, bid command, etc 
 
     if event == "ADDON_LOADED" then
 		ThirtyDKP_OnInitialize(event, arg1)
@@ -124,8 +123,8 @@ function ThirtyDKP_OnEvent(self, event, arg1, ...)
 end
 
 
-function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to run on load triggered registered events at bottom of file
-	if (name ~= "ThirtyDKP") then return end     -- if its not this addon, return.
+function ThirtyDKP_OnInitialize(event, name)
+	if (name ~= "ThirtyDKP") then return end
 
 	----------------------------------
     -- Register Slash Commands
@@ -150,8 +149,8 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
     end
 
     --[[
-    Debugging shit thats nice to have during development
-    --]]
+    -- Debugging shit thats nice to have during development
+
     SLASH_RELOADUI1 = "/rl" -- For quicker reloading
     SlashCmdList.RELOADUI = ReloadUI
 
@@ -160,6 +159,7 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
         LoadAddOn('Blizzard_DebugTools')
         FrameStackTooltip_Toggle()
     end
+    --]]
 
     DAL:InitializeOptions();
     DAL:InitializeDKPTable();
@@ -178,7 +178,7 @@ function ThirtyDKP_OnInitialize(event, name)		-- This is the FIRST function to r
 end
 
 ----------------------------------
--- Register Events and Initialise AddOn, this should be done in a Init.lua file
+-- Register Events
 ----------------------------------
 local events = CreateFrame("Frame", "TDKPEventsFrame");
 events:RegisterEvent("ADDON_LOADED");

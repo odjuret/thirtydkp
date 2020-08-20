@@ -36,3 +36,4 @@ Core\ManageBidding.lua
 Core\ManageDKPTableEntries.lua
 Core\DataSync.lua
 Core\Colorizer.lua
+Core\Import.lua

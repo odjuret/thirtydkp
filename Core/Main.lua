@@ -144,6 +144,12 @@ function ThirtyDKP_OnInitialize(event, name)
 
             if arg1 == 'bid' then
                 Core:ManualBidAnnounce(arg2)
+                return;
+            end
+
+            local maybeImport = strsub(argsAsString, 1,6); 
+            if maybeImport == 'import' then
+                Core:ImportFromMonolithDKP();
             end
         end
     end

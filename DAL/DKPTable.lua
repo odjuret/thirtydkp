@@ -177,3 +177,24 @@ end
 function DAL:GetDKPTableVersion()
 	return ThirtyDKP_Database_DKPTable.version
 end
+
+function DAL:WipeDKPTableAndImportFromMonolith()
+	if not MonDKP_DKPTable or (MonDKP_DKPTable == nil) then
+		print("shit aitn working!")
+		return;
+	else
+
+		ThirtyDKP_Database_DKPTable = {}
+		for i, monolithDkpTableEntry in ipairs(MonDKP_DKPTable) do
+			local sanitizedClassName = monolithDkpTableEntry.class:lower():gsub("^%l", string.upper);
+
+			tinsert(ThirtyDKP_Database_DKPTable, {
+				player=monolithDkpTableEntry.player,
+				class=sanitizedClassName,
+				dkp=monolithDkpTableEntry.dkp,
+			});
+		end
+
+	end
+end
+

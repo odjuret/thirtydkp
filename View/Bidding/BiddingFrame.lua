@@ -16,7 +16,7 @@ function View:CreateBiddingFrame(item)
 
 	BiddingFrame = CreateFrame('Frame', 'ThirtyDKP_BiddingFrame', UIParent, "TooltipBorderedFrameTemplate"); 
 	BiddingFrame:Hide()
-	BiddingFrame:SetSize(Const.LootTableWidth, 60);
+	BiddingFrame:SetSize(Const.LootTableWidth+50, 60);
     BiddingFrame:SetFrameStrata("DIALOG");
     BiddingFrame:SetClampedToScreen(true);
     BiddingFrame:SetFrameLevel(10);

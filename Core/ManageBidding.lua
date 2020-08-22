@@ -47,6 +47,7 @@ function Core:StartBidding(item, timer)
         Core:RegisterForRaidMessageEvents()
         local startBiddingMessage = tostring(timer).."-"..tostring(item)
         Core:CommunicateBidding(startBiddingMessage);
+        SendChatMessage("Bidding started for: "..itemLink.."", "RAID", nil, nil)
 
         local secondsLeft = timer
         local bidTimer = C_Timer.NewTicker(1, 
@@ -70,7 +71,6 @@ end
 function Core:IncomingStartBiddingHandler(message)
     local timer, itemLink = strsplit("-", message);
     View:CreateBiddingFrame(itemLink);
-    SendChatMessage("Bidding started for: "..itemLink.."", "RAID", nil, nil)
     C_Timer.After(timer, function()
         View:HideBiddingFrame()
     end) 

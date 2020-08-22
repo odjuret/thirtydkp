@@ -98,13 +98,11 @@ end
 -- todo compare options version if admin
 local function CompareDataVersions()
     local dataGuildname, _, dataVersionDate = strsplit("-", DAL:GetDKPTableVersion())
-    local _, _, historyVersionDate = strsplit("-", DAL:GetDKPHistoryVersion())
     local dataStatusText = ""
 
     if tonumber(dataVersionDate) > 0 then
         local currentGuildName = GetGuildInfo("player");
-        local _, _, latestKnownDKPTableDate = string.split("-", latestKnownDKPTableVersion)
-        local _, _, latestKnownHistoryDate = string.split("-", latestKnownHistoryVersion)
+        local _, knownLatestVersionOwner, latestKnownDKPTableDate = string.split("-", latestKnownDKPTableVersion)
 
         if not currentGuildName == dataGuildname then
             dataStatusText = "Actual guild: "..currentGuildName.." mismatches with ThirtyDKP data guild name: "..dataGuildname.."."
@@ -113,9 +111,14 @@ local function CompareDataVersions()
             dataStatusText = "Not enough updates recieved. Try again when more guildies are online."
 
         elseif (tonumber(latestKnownDKPTableDate) > tonumber(dataVersionDate)) then
-            local formattedDate = Core:FormatTimestamp(latestKnownDKPTableDate)
-            dataStatusText = "Newer DKP data found from "..formattedDate..". By "..knownLatestVersionOwner.."."
-
+            local playerName = UnitName("player");
+            if knownLatestVersionOwner == playerName then
+                isUpToDate = true
+                dataStatusText = "Data up-to-date."
+            else
+                local formattedDate = Core:FormatTimestamp(latestKnownDKPTableDate)
+                dataStatusText = "Newer DKP data found from "..formattedDate..". By "..knownLatestVersionOwner.."."
+            end
         else 
             -- Could not find any newer data versions
             if latestKnownDKPTableVersion ~= latestKnownHistoryVersion then

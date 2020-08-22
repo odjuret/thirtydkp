@@ -26,5 +26,7 @@ function Core:ImportFromMonolithDKP()
             preferredIndex = 3,
         }
         StaticPopup_Show ("FULL_MONOLITHDKP_IMPORT_WARNING") 
+    else
+        Core:Print("You are not admin.. you pleb.")
     end
 end

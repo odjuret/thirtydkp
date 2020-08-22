@@ -297,10 +297,10 @@ function Core:AdjustPlayersDKP(selectedPlayers, DkpAdjustAmount, DkpAdjustReason
 
     for i, selectedPlayer in ipairs(selectedPlayers) do
         if DAL:AdjustPlayerDKP(selectedPlayer, DkpAdjustAmount) then
-            if listOfAwardedPlayers == "" then
-                listOfAwardedPlayers = selectedPlayer;
+            if listOfAdjustedPlayers == "" then
+                listOfAdjustedPlayers = selectedPlayer;
             else
-                listOfAwardedPlayers = listOfAwardedPlayers..","..selectedPlayer;
+                listOfAdjustedPlayers = listOfAdjustedPlayers..","..selectedPlayer;
             end
         end
     end

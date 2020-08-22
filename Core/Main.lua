@@ -102,6 +102,9 @@ function ThirtyDKP_OnEvent(self, event, arg1, ...)
 		ThirtyDKP_OnInitialize(event, arg1)
         self:UnregisterEvent("ADDON_LOADED")
 
+    elseif event == "GET_ITEM_INFO_RECEIVED" then
+        Core:HandleGetItemInfoRecieved(arg1, ...)
+
     elseif event == "GUILD_ROSTER_UPDATE" or event == "PLAYER_GUILD_UPDATE" then 
         self:UnregisterEvent("GUILD_ROSTER_UPDATE");
         self:UnregisterEvent("PLAYER_GUILD_UPDATE"); 
@@ -203,4 +206,12 @@ end
 function Core:UnRegisterForRaidMessageEvents()
     events:UnregisterEvent("CHAT_MSG_RAID");
     events:UnregisterEvent("CHAT_MSG_RAID_LEADER");
+end
+
+function Core:RegisterForGetItemInfoEvents()
+    events:RegisterEvent("GET_ITEM_INFO_RECEIVED");
+end
+
+function Core:UnregisterForGetItemInfoEvents()
+    events:UnregisterEvent("GET_ITEM_INFO_RECEIVED");
 end

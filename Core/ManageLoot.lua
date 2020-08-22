@@ -6,9 +6,34 @@ local View = ThirtyDKP.View
 
 local lootAnnouncedForBoss = false;
 
+local lootAnnounceQueue = {};
+
 function Core:SetLootAnnouncedForBoss(isAnnounced)
   lootAnnouncedForBoss = isAnnounced;
 end
+
+function Core:HandleGetItemInfoRecieved(itemdID, success)
+  if #lootAnnounceQueue > 0 then
+    if success then
+      local _, itemLink, itemRarity = GetItemInfo(itemdID);
+
+      for i, queuedLink in ipairs(lootAnnounceQueue) do
+        if queuedLink == itemLink then
+          if itemRarity > 3 then
+
+            DAL:AddToLootTable(queuedLink);
+            SendChatMessage("ThirtyDKP: "..queuedLink.." is now available for bidding. ", "RAID", nil, nil);
+            table.remove(lootAnnounceQueue, queuedLink);
+          end
+        end
+      end
+      View:UpdateLootTableFrame();
+    end
+  else
+    Core:UnregisterForGetItemInfoEvents()
+  end
+end
+
 
 function Core:HandleLootWindow()
   if not Core:IsPlayerMasterLooter() then return end
@@ -18,11 +43,18 @@ function Core:HandleLootWindow()
     local itemLink = GetLootSlotLink(i)
     if itemLink ~= nil then
       local _, _, itemRarity = GetItemInfo(itemLink);
-      if itemRarity > 3 then
-        foundEpaxx = true
-        DAL:AddToLootTable(itemLink)
-        if not lootAnnouncedForBoss then
-          SendChatMessage("ThirtyDKP: "..itemLink.." is now available for bidding. ", "RAID", nil, nil)
+      if itemRarity == nil then
+        -- if item not in cache, put it in queue and wait for it to arrive.
+        Core:RegisterForGetItemInfoEvents();
+        table.insert(lootAnnounceQueue, itemLink);
+      else
+
+        if itemRarity > 3 then
+          foundEpaxx = true
+          DAL:AddToLootTable(itemLink)
+          if not lootAnnouncedForBoss then
+            SendChatMessage("ThirtyDKP: "..itemLink.." is now available for bidding. ", "RAID", nil, nil)
+          end
         end
       end
     end
@@ -47,6 +79,8 @@ function Core:ManualBidAnnounce(itemLink)
       local _, _, itemRarity = GetItemInfo(itemLink);
       if itemRarity > 3 then
         DAL:AddToLootTable(itemLink);
+      else
+        Core:Print("Bidding is only available for items of epic or legendary quality." );
       end
     end) then
       Core:Print("Opening bid announcer for "..itemLink.."" );

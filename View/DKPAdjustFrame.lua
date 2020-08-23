@@ -129,8 +129,18 @@ function View:CreateDKPAdjustFrame(parentFrame)
 			return;
 		end
 
+		local printableSelectedPlayers = "";
+
+		for i, selectedPlayers in ipairs(selectedPlayers) do
+			if printableSelectedPlayers == "" then
+                printableSelectedPlayers = Core:TryToAddClassColor(selectedPlayers);
+            else
+				printableSelectedPlayers = printableSelectedPlayers..","..Core:TryToAddClassColor(selectedPlayers);
+			end
+		end
+
 		StaticPopupDialogs["ADJUST_DKP"] = {
-			text = "Are you you want to award "..DkpAdjustAmount.." DKP?",
+			text = "Are you you want to award "..DkpAdjustAmount.." to the following players: "..printableSelectedPlayers.."?",
 			button1 = "Yes",
 			button2 = "No",
 			OnAccept = function()

@@ -5,7 +5,7 @@ local DAL = ThirtyDKP.DAL
 
 local function SortTable()
 	table.sort(ThirtyDKP_Database_CurrentLoot, function(a, b)
-        return a["timestamp"] < b["timestamp"]
+        return a["timestamp"] > b["timestamp"]
     end)
 end
 
@@ -54,7 +54,7 @@ function DAL:AddToLootTable(itemLink)
     if not alreadyInTable then
         local curTime = time();
         local newIndex = UnitName("player").."-"..curTime
-        tinsert(ThirtyDKP_Database_CurrentLoot, {
+        table.insert(ThirtyDKP_Database_CurrentLoot, {
             loot=itemLink,
             index=newIndex,
             timestamp=curTime,

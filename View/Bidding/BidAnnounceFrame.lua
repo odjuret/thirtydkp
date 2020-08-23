@@ -53,7 +53,11 @@ local function CreateIncomingBidsTableRow(parent, id, incomingBidsTable)
     
     b:SetScript("OnClick", function(self, button)
         if button == "LeftButton" then
-            selectedBidder = self
+            if selectedBidder == self then
+                selectedBidder = nil
+            else
+                selectedBidder = self
+            end
             UpdateIncomingBidsRowsTextures()
         end
     end)
@@ -82,7 +86,6 @@ local function CreateIncomingBidsFrame()
 
     IncomingBidsFrame:SetSize( Const.LootTableWidth-12, Const.DKPTableRowHeight*8);
 	IncomingBidsFrame:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame.CurrentItemForBidFrame, Const.TOP_LEFT_POINT, 0, -30 );
-	--IncomingBidsFrame:SetPoint( Const.BOTTOM_RIGHT_POINT, BidAnnounceFrame.CurrentItemForBidFrame, Const.BOTTOM_RIGHT_POINT, -22, 40 );
 	IncomingBidsFrame.scrollBar = _G["IncomingBidsFrameScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 
 	-- Child frame which holds all the content being scrolled through.
@@ -202,9 +205,16 @@ local function CreateLootTableRow(parent, id, lootTable)
     
     row:SetScript("OnClick", function(self, button)
         if button == "LeftButton" then
-            selectedItem = self
-            selectedItemDKPCost = Core:GetDKPCostByItemlink(selectedItem.item.loot, selectedRaid);
-            BidAnnounceFrame.CustomDKPCost.input:SetNumber(selectedItemDKPCost);
+            if selectedItem == self then
+                selectedItem = nil
+                selectedItemDKPCost = 0
+                BidAnnounceFrame.CustomDKPCost.input:SetNumber(0);
+            else
+                selectedItem = self
+                selectedItemDKPCost = Core:GetDKPCostByItemlink(selectedItem.item.loot, selectedRaid);
+                BidAnnounceFrame.CustomDKPCost.input:SetNumber(selectedItemDKPCost);
+            end
+            
             UpdateLootTableRowsTextures()
             View:UpdateItemForBidFrame()
         end

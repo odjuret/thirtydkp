@@ -151,7 +151,13 @@ function DAL:AddToDKPTable(playerName, playerClass)
     
 end
 
-function DAL:RemoveFromDKPTable()
+function DAL:RemoveFromDKPTable(playersToRemove)	
+	for i, playerName in ipairs(playersToRemove) do
+		if (playerName ~= "") and (playerName ~= nil) then
+			local playerExists = DAL:Table_Search(ThirtyDKP_Database_DKPTable, playerName, 'player')
+			table.remove(ThirtyDKP_Database_DKPTable, playerExists[1][1])
+		end
+	end
 end
 
 function DAL:AdjustPlayerDKP(playerName, adjustment)

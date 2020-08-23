@@ -6,11 +6,10 @@ local DAL = ThirtyDKP.DAL;
 local Const = ThirtyDKP.View.Constants;
 
 -- Main addon window
-local Initialized = false;
-local MainFrame = nil;
+local TdkpIsInitialized = false;
+local TdkpFrame = nil;
 
--- Titles related constants
-local MAIN_FRAME_TITLE = "Thirty DKP"
+local TDKP_MAIN_FRAME_TITLE = "Thirty DKP"
 
 
 function View:UpdateDataUpToDateFrame(incHoverOverText)
@@ -29,11 +28,11 @@ function View:UpdateDataUpToDateFrame(incHoverOverText)
         end
         colorizedText = Core:ColorizePositiveOrNegative(-1, " Outdated")
     end
-    MainFrame.upToDateFrame.text:SetText("Data:"..colorizedText);
+    TdkpFrame.upToDateFrame.text:SetText("Data:"..colorizedText);
 
-    View:AttachHoverOverTooltipAndOnclick(MainFrame.upToDateFrame, "Your local data is"..colorizedText, hoverOverText, function ()
+    View:AttachHoverOverTooltipAndOnclick(TdkpFrame.upToDateFrame, "Your local data is"..colorizedText, hoverOverText, function ()
         StaticPopupDialogs["TDKP_DATA_STATUS_FRAME_CLICK"] = {
-            text = "Do you want to re-sync data with guild?",
+            text = "Do you want to re-check if your data is up to date?",
             button1 = "Yes",
             button2 = "No",
             OnAccept = function()
@@ -48,8 +47,8 @@ function View:UpdateDataUpToDateFrame(incHoverOverText)
     end)
 end
 
-local function CreateMainFrameButton(text, relativePoint, parentFrame, relativePointOnParentFrame, x, y)
-    local b = CreateFrame("Button", nil, MainFrame, "GameMenuButtonTemplate");
+local function CreateTdkpMainFrameButton(text, relativePoint, parentFrame, relativePointOnParentFrame, x, y)
+    local b = CreateFrame("Button", nil, TdkpFrame, "GameMenuButtonTemplate");
     b:SetPoint(relativePoint, parentFrame, relativePointOnParentFrame, x, y);
     b:SetSize(80, Const.ButtonHeight);
     b:SetText(text);
@@ -59,12 +58,31 @@ local function CreateMainFrameButton(text, relativePoint, parentFrame, relativeP
 end
 
 local function CreateRightSideAdminPanel()
-    local adminPanel = CreateFrame("Frame", nil, MainFrame, nil);
+    local adminPanel = CreateFrame("Frame", nil, TdkpFrame, nil);
     adminPanel:SetSize(100, 370);
-    adminPanel:SetPoint(Const.BOTTOM_RIGHT_POINT, MainFrame, Const.BOTTOM_RIGHT_POINT, 0, 0);
+    adminPanel:SetPoint(Const.BOTTOM_RIGHT_POINT, TdkpFrame, Const.BOTTOM_RIGHT_POINT, 0, 0);
 
     -- building buttons from the bottom and up
-    adminPanel.addGuildToTableBtn = CreateMainFrameButton("Add Guild", Const.BOTTOM_RIGHT_POINT, adminPanel, Const.BOTTOM_RIGHT_POINT, -10, 10)
+    adminPanel.removePlayerBtn = CreateTdkpMainFrameButton("Remove", Const.BOTTOM_RIGHT_POINT, adminPanel, Const.BOTTOM_RIGHT_POINT, -10, 10)
+    View:AttachHoverOverTooltipAndOnclick(adminPanel.removePlayerBtn, "Remove players", "Removes selected players from the DKP table.", function()
+        local selectedPlayers = View:GetSelectedDKPTableEntries();
+        StaticPopupDialogs["ADD_GUILD_ENTRIES"] = {
+            text = "Are you sure you want to remove selected players from the DKP table?",
+            button1 = "Yes",
+            button2 = "No",
+            OnAccept = function()
+                DAL:RemoveFromDKPTable(selectedPlayers);
+                View:UpdateDKPTable();
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+        }
+        StaticPopup_Show("ADD_GUILD_ENTRIES")
+    end);
+
+    adminPanel.addGuildToTableBtn = CreateTdkpMainFrameButton("Add Guild", Const.BOTTOM_LEFT_POINT, adminPanel.removePlayerBtn, Const.TOP_LEFT_POINT, 0, 0)
     View:AttachHoverOverTooltipAndOnclick(adminPanel.addGuildToTableBtn, "Add guild members to DKP table", "Adds guild members that aren't in the dkp table", function()
         -- If not in guild
         if not IsInGuild() then
@@ -96,7 +114,7 @@ local function CreateRightSideAdminPanel()
         end
     end);
 
-    adminPanel.addRaidToTableBtn = CreateMainFrameButton("Add Raid", Const.BOTTOM_LEFT_POINT, adminPanel.addGuildToTableBtn, Const.TOP_LEFT_POINT, 0, 0)
+    adminPanel.addRaidToTableBtn = CreateTdkpMainFrameButton("Add Raid", Const.BOTTOM_LEFT_POINT, adminPanel.addGuildToTableBtn, Const.TOP_LEFT_POINT, 0, 0)
     View:AttachHoverOverTooltipAndOnclick(adminPanel.addRaidToTableBtn, "Add raid members to DKP table", "Given that theyre in the guild obviously", function()
         -- If you aint in raid
         if not IsInRaid() then
@@ -129,7 +147,7 @@ local function CreateRightSideAdminPanel()
         end
     end);
 
-    adminPanel.dkpAdminsBtn = CreateMainFrameButton("Admins", Const.BOTTOM_RIGHT_POINT, adminPanel.addRaidToTableBtn, Const.TOP_RIGHT_POINT, 0, 0)
+    adminPanel.dkpAdminsBtn = CreateTdkpMainFrameButton("Admins", Const.BOTTOM_RIGHT_POINT, adminPanel.addRaidToTableBtn, Const.TOP_RIGHT_POINT, 0, 0)
     View:AttachHoverOverTooltipAndOnclick(adminPanel.dkpAdminsBtn, "Admins Management", "Manage DKP admins for your guild. Admins can change dkp options, adjust dkp, start dkp awarding raids, etc", function()
         View:HideOptionsFrame();
         View:HideDKPAdjustFrame();
@@ -137,7 +155,7 @@ local function CreateRightSideAdminPanel()
         View:ToggleDKPAdminsFrame()
     end)
 
-    adminPanel.broadcastBtn = CreateMainFrameButton("Broadcast", Const.BOTTOM_RIGHT_POINT, adminPanel.dkpAdminsBtn, Const.TOP_RIGHT_POINT, 0, 0)
+    adminPanel.broadcastBtn = CreateTdkpMainFrameButton("Broadcast", Const.BOTTOM_RIGHT_POINT, adminPanel.dkpAdminsBtn, Const.TOP_RIGHT_POINT, 0, 0)
     View:AttachHoverOverTooltipAndOnclick(adminPanel.broadcastBtn, "Broadcasts ThirtyDKP data", "Attempts to broadcast out your dkp data to other online members:\ndkp table, dkp history and addon options", function()
         StaticPopupDialogs["BROADCAST_THIRTYDKPDATA"] = {
             text = "Are you sure you want to broadcast your ThirtyDKP data?",
@@ -159,10 +177,10 @@ local function CreateRightSideAdminPanel()
     adminPanel.adminHeader:SetFontObject("ThirtyDKPSmall");
     adminPanel.adminHeader:SetPoint(Const.BOTTOM_LEFT_POINT, adminPanel.broadcastBtn, Const.TOP_LEFT_POINT, 0, 5);
     adminPanel.adminHeader:SetSize(80, Const.ButtonHeight);
-    adminPanel.adminHeader:SetText("Misc.")
+    adminPanel.adminHeader:SetText("Admin.")
 
 
-    adminPanel.dkpHistoryBtn = CreateMainFrameButton("History", Const.BOTTOM_RIGHT_POINT, adminPanel.adminHeader, Const.TOP_RIGHT_POINT, 0, 10)
+    adminPanel.dkpHistoryBtn = CreateTdkpMainFrameButton("History", Const.BOTTOM_RIGHT_POINT, adminPanel.adminHeader, Const.TOP_RIGHT_POINT, 0, 10)
     View:AttachHoverOverTooltipAndOnclick(adminPanel.dkpHistoryBtn, "DKP History", "Manage DKP history for your guild.", function()
         View:HideOptionsFrame();
         View:HideDKPAdjustFrame();
@@ -170,7 +188,7 @@ local function CreateRightSideAdminPanel()
         View:ToggleDKPHistoryFrame();
     end)
 
-    adminPanel.optionsButton = CreateMainFrameButton("Options", Const.BOTTOM_RIGHT_POINT, adminPanel.dkpHistoryBtn, Const.TOP_RIGHT_POINT, 0, 0)
+    adminPanel.optionsButton = CreateTdkpMainFrameButton("Options", Const.BOTTOM_RIGHT_POINT, adminPanel.dkpHistoryBtn, Const.TOP_RIGHT_POINT, 0, 0)
     View:AttachHoverOverTooltipAndOnclick(adminPanel.optionsButton, "DKP Options", "Manage costs and gains", function()
         View:HideDKPAdjustFrame();
         View:HideDKPAdminsFrame();
@@ -178,7 +196,7 @@ local function CreateRightSideAdminPanel()
         View:ToggleOptionsFrame();
     end)
 
-    adminPanel.dkpAdjustBtn = CreateMainFrameButton("Adjust", Const.BOTTOM_RIGHT_POINT, adminPanel.optionsButton, Const.TOP_RIGHT_POINT, 0, 0)
+    adminPanel.dkpAdjustBtn = CreateTdkpMainFrameButton("Adjust", Const.BOTTOM_RIGHT_POINT, adminPanel.optionsButton, Const.TOP_RIGHT_POINT, 0, 0)
     View:AttachHoverOverTooltipAndOnclick(adminPanel.dkpAdjustBtn, "DKP Adjustments", "Give on-time and raid completion bonuses.\nManually adjust player DKP.\nApply DKP Decay for guild.", function()
         View:HideOptionsFrame();
         View:HideDKPAdminsFrame()
@@ -195,7 +213,7 @@ local function CreateRightSideAdminPanel()
 end
 
 
-local function CreateMainFrame(isAddonAdmin)
+local function CreateTdkpMainFrame(isAddonAdmin)
     local mainFrameWidth;
     if isAddonAdmin then
         mainFrameWidth = Const.DKPTableWidth + 130 -- make room for options buttons
@@ -204,19 +222,19 @@ local function CreateMainFrame(isAddonAdmin)
     end
     
 
-    MainFrame = View:CreateContainerFrame('ThirtyDKP_MainFrame', nil, MAIN_FRAME_TITLE, mainFrameWidth, Const.DKPTableRowHeight*14)
-	MainFrame:SetClampedToScreen(true);
+    TdkpFrame = View:CreateContainerFrame('ThirtyDKP_MainFrame', nil, TDKP_MAIN_FRAME_TITLE, mainFrameWidth, Const.DKPTableRowHeight*14)
+	TdkpFrame:SetClampedToScreen(true);
 	if isAddonAdmin then
-		MainFrame:SetSize(420, 400);
+		TdkpFrame:SetSize(420, 400);
 	else
-		MainFrame:SetSize(335, 400);
+		TdkpFrame:SetSize(335, 400);
 	end
-	MainFrame:SetMovable(true);
-	MainFrame:EnableMouse(true);
-	MainFrame:RegisterForDrag("LeftButton");
-	MainFrame:SetScript("OnDragStart", MainFrame.StartMoving);
-	MainFrame:SetScript("OnDragStop", MainFrame.StopMovingOrSizing);
-    MainFrame:SetScript("OnHide", function(self)
+	TdkpFrame:SetMovable(true);
+	TdkpFrame:EnableMouse(true);
+	TdkpFrame:RegisterForDrag("LeftButton");
+	TdkpFrame:SetScript("OnDragStart", TdkpFrame.StartMoving);
+	TdkpFrame:SetScript("OnDragStop", TdkpFrame.StopMovingOrSizing);
+    TdkpFrame:SetScript("OnHide", function(self)
         if isAddonAdmin then
             View:HideOptionsFrame();
             View:HideDKPAdjustFrame();
@@ -227,13 +245,13 @@ local function CreateMainFrame(isAddonAdmin)
 
 
     -- up-to-date frame
-    MainFrame.upToDateFrame = CreateFrame('Button', nil, MainFrame);
-    MainFrame.upToDateFrame:SetSize(100, 30);
-    MainFrame.upToDateFrame:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 110, 0);
-    MainFrame.upToDateFrame:RegisterForClicks("AnyUp");
-    MainFrame.upToDateFrame.text = MainFrame.upToDateFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
-	MainFrame.upToDateFrame.text:SetFontObject("ThirtyDKPTiny");
-    MainFrame.upToDateFrame.text:SetPoint(Const.LEFT_POINT, MainFrame.upToDateFrame, Const.LEFT_POINT, 0, 5);
+    TdkpFrame.upToDateFrame = CreateFrame('Button', nil, TdkpFrame);
+    TdkpFrame.upToDateFrame:SetSize(100, 30);
+    TdkpFrame.upToDateFrame:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 110, 0);
+    TdkpFrame.upToDateFrame:RegisterForClicks("AnyUp");
+    TdkpFrame.upToDateFrame.text = TdkpFrame.upToDateFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
+	TdkpFrame.upToDateFrame.text:SetFontObject("ThirtyDKPTiny");
+    TdkpFrame.upToDateFrame.text:SetPoint(Const.LEFT_POINT, TdkpFrame.upToDateFrame, Const.LEFT_POINT, 0, 5);
     
     View:UpdateDataUpToDateFrame()
 
@@ -243,31 +261,31 @@ local function CreateMainFrame(isAddonAdmin)
 end
 
 function View:GetMainFrame()
-	return MainFrame;
+	return TdkpFrame;
 end
 
 function View:OpenMainFrame()
-	MainFrame:SetShown(true);
+	TdkpFrame:SetShown(true);
 end
 
 function View:IsInitialized()
-	return Initialized;
+	return TdkpIsInitialized;
 end
 
 function View:Initialize()
-    if Initialized then return end
+    if TdkpIsInitialized then return end
     
     local isAddonAdmin = Core:IsAddonAdmin();
 
-	CreateMainFrame(isAddonAdmin);
-    View:CreateDKPTable(MainFrame);
+	CreateTdkpMainFrame(isAddonAdmin);
+    View:CreateDKPTable(TdkpFrame);
     View:CreateBidAnnounceFrame();
     if isAddonAdmin then
-        View:CreateOptionsFrame(MainFrame);
-		View:CreateDKPAdjustFrame(MainFrame);
-        View:CreateDKPAdminsFrame(MainFrame);
-        View:CreateDKPHistoryFrame(MainFrame);
+        View:CreateOptionsFrame(TdkpFrame);
+		View:CreateDKPAdjustFrame(TdkpFrame);
+        View:CreateDKPAdminsFrame(TdkpFrame);
+        View:CreateDKPHistoryFrame(TdkpFrame);
     end
 
-	Initialized = true;
+	TdkpIsInitialized = true;
 end

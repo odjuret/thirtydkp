@@ -14,8 +14,8 @@ end
 function Core:IncomingBidsHandler(message, sender)
     if biddingInProgress then
         if message == passOnItemBidMessage then
-            SendChatMessage("ThirtyDKP: "..sender.." passed. ", "RAID", nil, nil)
-            return
+            Core:Print("ThirtyDKP: "..sender.." passed. ")
+            return;
         end
 
         Core:Print("Incoming bid from "..sender.."") 
@@ -47,7 +47,7 @@ function Core:StartBidding(item, timer)
         Core:RegisterForRaidMessageEvents()
         local startBiddingMessage = tostring(timer).."-"..tostring(item)
         Core:CommunicateBidding(startBiddingMessage);
-        SendChatMessage("Bidding started for: "..itemLink.."", "RAID", nil, nil)
+        SendChatMessage("Bidding started for: "..item.."", "RAID", nil, nil)
 
         local secondsLeft = timer
         local bidTimer = C_Timer.NewTicker(1, 

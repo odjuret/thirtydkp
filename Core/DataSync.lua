@@ -75,7 +75,7 @@ local function TryUpdateKnownHistoryVersion(incomingHistoryVersion)
     end
     
     if (incomingDate > latestKnownDate) then
-        latestKnownDKPTableVersion = incomingHistoryVersion
+        latestKnownHistoryVersion = incomingHistoryVersion
     end
 end
 
@@ -97,7 +97,8 @@ end
 
 -- todo compare options version if admin
 local function CompareDataVersions()
-    local dataGuildname, _, dataVersionDate = strsplit("-", DAL:GetDKPTableVersion())
+    local localData = DAL:GetDKPTableVersion()
+    local dataGuildname, _, dataVersionDate = strsplit("-", localData)
     local dataStatusText = ""
 
     if tonumber(dataVersionDate) > 0 then
@@ -107,7 +108,7 @@ local function CompareDataVersions()
         if not currentGuildName == dataGuildname then
             dataStatusText = "Actual guild: "..currentGuildName.." mismatches with ThirtyDKP data guild name: "..dataGuildname.."."
         
-        elseif recievedUpdates < 4 then
+        elseif recievedUpdates < 3 then
             dataStatusText = "Not enough updates recieved. Try again when more guildies are online."
 
         elseif (tonumber(latestKnownDKPTableDate) > tonumber(dataVersionDate)) then

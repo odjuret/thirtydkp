@@ -7,8 +7,8 @@ local Const = ThirtyDKP.View.Constants;
 local DKPAdjustFrame = nil;
 
 local DKPADJUST_FRAME_TITLE = "DKP Adjustments";
-local RAID_BUTTON_START = "Start Raid";
-local RAID_BUTTON_END = "End Raid";
+local TDKP_RAID_BUTTON_START = "Start Raid";
+local TDKP_RAID_BUTTON_END = "End Raid";
 local ADJUST_DKP_LABEL = "Adjust DKP";
 local ADJUST_DKP_REASON_LABEL = "Reason";
 
@@ -35,9 +35,9 @@ function View:CreateDKPAdjustFrame(parentFrame)
 	raidEndBonusButtonText:SetText("Give raid completion bonus");
 
 	if raidInfo.raidOngoing then
-		startOrEndRaidBtn:SetText(RAID_BUTTON_END);
+		startOrEndRaidBtn:SetText(TDKP_RAID_BUTTON_END);
 	else
-		startOrEndRaidBtn:SetText(RAID_BUTTON_START);
+		startOrEndRaidBtn:SetText(TDKP_RAID_BUTTON_START);
 	end
 	startOrEndRaidBtn:SetNormalFontObject("GameFontNormal");
 	startOrEndRaidBtn:SetHighlightFontObject("GameFontHighlight");
@@ -55,16 +55,16 @@ function View:CreateDKPAdjustFrame(parentFrame)
 			StaticPopup_Show("STARTEND_RAID");
 			return;
 		end
-		if self:GetText() == RAID_BUTTON_START then
+		if self:GetText() == TDKP_RAID_BUTTON_START then
 			Core:StartRaid();
-			startOrEndRaidBtn:SetText(RAID_BUTTON_END);
+			startOrEndRaidBtn:SetText(TDKP_RAID_BUTTON_END);
 
 			if onTimeBonusButton:GetChecked() then
 				Core:ApplyOnTimeBonus();
 			end
 		else
 			Core:EndRaid();
-			startOrEndRaidBtn:SetText(RAID_BUTTON_START);
+			startOrEndRaidBtn:SetText(TDKP_RAID_BUTTON_START);
 
 			if raidEndBonusButton:GetChecked() then
 				Core:ApplyRaidEndBonus();

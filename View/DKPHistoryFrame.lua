@@ -8,7 +8,7 @@ local DKPHistoryFrame = nil;
 
 local DKPHISTORY_FRAME_TITLE = "DKP History"
 
-local DEFAULT_MAX_HISTORY_ROWS = 50;
+local TDKP_DEFAULT_MAX_HISTORY_ROWS = 50;
 local dkpHistoryScrollChildHeight = 0;
 
 
@@ -103,7 +103,7 @@ local function PopulateDKPHistoryList(scrollChild, dkpHistory)
 		local totalScrollChildIndex = 0;
 		local lastDate, lastTimeOfDay = strsplit(" ", Core:FormatTimestamp(dkpHistory[#dkpHistory].timestamp));
 		for i = 0, (#dkpHistory-1) do
-			if i > DEFAULT_MAX_HISTORY_ROWS then
+			if i > TDKP_DEFAULT_MAX_HISTORY_ROWS then
 				return;
 			end
 			
@@ -173,7 +173,7 @@ function View:UpdateDKPHistoryFrame()
 	DKPHistoryFrame:SetParent(nil)
 	DKPHistoryFrame = nil;
 
-	DEFAULT_MAX_HISTORY_ROWS = 50;
+	TDKP_DEFAULT_MAX_HISTORY_ROWS = 50;
  	dkpHistoryScrollChildHeight = 0;
 
 	View:CreateDKPHistoryFrame(mainFrame)

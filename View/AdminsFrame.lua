@@ -145,13 +145,13 @@ function View:CreateDKPAdminsFrame(parentFrame)
 end
 
 function View:UpdateDKPAdminsFrame()
-	local mainFrame = View:GetMainFrame()
+	local tdkpMainFrame = View:GetMainFrame()
 
 	dkpAdminsFrame:Hide()
 	dkpAdminsFrame:SetParent(nil)
 	dkpAdminsFrame = nil;
 
-	View:CreateDKPAdminsFrame(mainFrame)
+	View:CreateDKPAdminsFrame(tdkpMainFrame)
 	dkpAdminsFrame:Show()
 end
 

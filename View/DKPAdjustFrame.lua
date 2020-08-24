@@ -44,7 +44,7 @@ function View:CreateDKPAdjustFrame(parentFrame)
 	startOrEndRaidBtn:RegisterForClicks("AnyUp");
 	startOrEndRaidBtn:SetScript("OnClick", function (self, button, down)
 		if not Core:IsPlayerMasterLooter() then
-			StaticPopupDialogs["STARTEND_RAID"] = {
+			StaticPopupDialogs["TDKP_STARTEND_RAID"] = {
 				text = "You must be master looter to start or end raids",
 				button1 = "OK",
 				timeout = 0,
@@ -52,7 +52,7 @@ function View:CreateDKPAdjustFrame(parentFrame)
 				hideOnEscape = true,
 				preferredIndex = 3,
 			}
-			StaticPopup_Show("STARTEND_RAID");
+			StaticPopup_Show("TDKP_STARTEND_RAID");
 			return;
 		end
 		if self:GetText() == TDKP_RAID_BUTTON_START then
@@ -129,7 +129,7 @@ function View:CreateDKPAdjustFrame(parentFrame)
 			return;
 		end
 
-		StaticPopupDialogs["ADJUST_DKP"] = {
+		StaticPopupDialogs["TDKP_ADJUST_DKP"] = {
 			text = "Are you you want to award "..DkpAdjustAmount.." DKP?",
 			button1 = "Yes",
 			button2 = "No",
@@ -143,7 +143,7 @@ function View:CreateDKPAdjustFrame(parentFrame)
 			hideOnEscape = true,
 			preferredIndex = 3,
 		}
-		StaticPopup_Show("ADJUST_DKP");
+		StaticPopup_Show("TDKP_ADJUST_DKP");
 	end);
 
 	local applyDecayBtn = CreateFrame("Button", nil, DKPAdjustFrame, "GameMenuButtonTemplate");
@@ -154,7 +154,7 @@ function View:CreateDKPAdjustFrame(parentFrame)
 	applyDecayBtn:SetHighlightFontObject("GameFontHighlight");
 	applyDecayBtn:RegisterForClicks("AnyUp");
 	applyDecayBtn:SetScript("OnClick", function (self, button, down)
-		StaticPopupDialogs["APPLY_DECAY"] = {
+		StaticPopupDialogs["TDKP_APPLY_DECAY"] = {
 			text = "Are you sure you want to apply decay?",
 			button1 = "Yes",
 			button2 = "No",
@@ -166,7 +166,7 @@ function View:CreateDKPAdjustFrame(parentFrame)
 			hideOnEscape = true,
 			preferredIndex = 3,
 		}
-		StaticPopup_Show("APPLY_DECAY");
+		StaticPopup_Show("TDKP_APPLY_DECAY");
 
 	end);
 

@@ -66,27 +66,31 @@ local function CreateRightSideAdminPanel()
     adminPanel.removePlayerBtn = CreateTdkpMainFrameButton("Remove", Const.BOTTOM_RIGHT_POINT, adminPanel, Const.BOTTOM_RIGHT_POINT, -10, 10)
     View:AttachHoverOverTooltipAndOnclick(adminPanel.removePlayerBtn, "Remove players", "Removes selected players from the DKP table.", function()
         local selectedPlayers = View:GetSelectedDKPTableEntries();
-        StaticPopupDialogs["ADD_GUILD_ENTRIES"] = {
+        StaticPopupDialogs["REMOVE_DKPTABLE_ENTRIES"] = {
             text = "Are you sure you want to remove selected players from the DKP table?",
             button1 = "Yes",
             button2 = "No",
             OnAccept = function()
-                DAL:RemoveFromDKPTable(selectedPlayers);
-                View:UpdateDKPTable();
+                if #selectedPlayers > 0 then
+                    DAL:RemoveFromDKPTable(selectedPlayers);
+                    View:UpdateDKPTable();
+                else
+                    Core:Print("No players selected");
+                end
             end,
             timeout = 0,
             whileDead = true,
             hideOnEscape = true,
             preferredIndex = 3,
         }
-        StaticPopup_Show("ADD_GUILD_ENTRIES")
+        StaticPopup_Show("REMOVE_DKPTABLE_ENTRIES")
     end);
 
     adminPanel.addGuildToTableBtn = CreateTdkpMainFrameButton("Add Guild", Const.BOTTOM_LEFT_POINT, adminPanel.removePlayerBtn, Const.TOP_LEFT_POINT, 0, 0)
     View:AttachHoverOverTooltipAndOnclick(adminPanel.addGuildToTableBtn, "Add guild members to DKP table", "Adds guild members that aren't in the dkp table", function()
         -- If not in guild
         if not IsInGuild() then
-            StaticPopupDialogs["NOT_IN_GUILD"] = {
+            StaticPopupDialogs["TDKP_NOT_IN_GUILD"] = {
                 text = "You need to be in a guild to be able to add guild members to dkp table",
                 button1 = "OK",
                 timeout = 0,
@@ -94,10 +98,10 @@ local function CreateRightSideAdminPanel()
                 hideOnEscape = true,
                 preferredIndex = 3,
             }
-            StaticPopup_Show ("NOT_IN_GUILD")
+            StaticPopup_Show ("TDKP_NOT_IN_GUILD")
         else
             local selected = "Do you want to add guild members to dkp table?"
-            StaticPopupDialogs["ADD_GUILD_ENTRIES"] = {
+            StaticPopupDialogs["TDKP_ADD_GUILD_ENTRIES"] = {
                 text = selected,
                 button1 = "Yes",
                 button2 = "No",
@@ -110,7 +114,7 @@ local function CreateRightSideAdminPanel()
                 hideOnEscape = true,
                 preferredIndex = 3,
             }
-            StaticPopup_Show("ADD_GUILD_ENTRIES")
+            StaticPopup_Show("TDKP_ADD_GUILD_ENTRIES")
         end
     end);
 
@@ -118,7 +122,7 @@ local function CreateRightSideAdminPanel()
     View:AttachHoverOverTooltipAndOnclick(adminPanel.addRaidToTableBtn, "Add raid members to DKP table", "Given that theyre in the guild obviously", function()
         -- If you aint in raid
         if not IsInRaid() then
-            StaticPopupDialogs["NOT_IN_RAID"] = {
+            StaticPopupDialogs["TDKP_NOT_IN_RAID"] = {
                 text = "Well you gotta be in a raid to add raid members to DKP table...",
                 button1 = "Oh right...",
                 timeout = 0,
@@ -126,11 +130,11 @@ local function CreateRightSideAdminPanel()
                 hideOnEscape = true,
                 preferredIndex = 3,
             }
-            StaticPopup_Show ("NOT_IN_RAID")
+            StaticPopup_Show ("TDKP_NOT_IN_RAID")
         else
             -- confirmation dialog to remove user(s)
             local selected = "Sure you want to add the entire raid to the DKP table?";
-            StaticPopupDialogs["ADD_RAID_ENTRIES"] = {
+            StaticPopupDialogs["TDKP_ADD_RAID_ENTRIES"] = {
             text = selected,
             button1 = "Yes",
             button2 = "No",
@@ -143,7 +147,7 @@ local function CreateRightSideAdminPanel()
             hideOnEscape = true,
             preferredIndex = 3,
             }
-            StaticPopup_Show ("ADD_RAID_ENTRIES")
+            StaticPopup_Show ("TDKP_ADD_RAID_ENTRIES")
         end
     end);
 

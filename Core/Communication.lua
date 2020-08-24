@@ -28,7 +28,7 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
         local decoded = LibDeflate:DecompressDeflate(LibDeflate:DecodeForWoWAddonChannel(message))
         local success, deserialized = LibAceSerializer:Deserialize(decoded);
         if success then
-            StaticPopupDialogs["FULL_BROADCAST_WARNING"] = {
+            StaticPopupDialogs["TDKP_FULL_BROADCAST_WARNING"] = {
                 text = "Warning! Incoming DKP Table broadcast. Do you trust the sender "..sender.."?",
                 button1 = "Yes",
                 button2 = "No",
@@ -36,7 +36,7 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
                     DAL:WipeAndSetNewDKPTable(deserialized.dkpTable)
                     DAL:WipeAndSetNewOptions(deserialized.options)
                     DAL:WipeAndSetNewHistory(deserialized.history)
-                    StaticPopup_Hide ("FULL_BROADCAST_WARNING")
+                    StaticPopup_Hide ("TDKP_FULL_BROADCAST_WARNING")
                     View:UpdateAllViews();
                 end,
                 timeout = 0,
@@ -44,7 +44,7 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
                 hideOnEscape = true,
                 preferredIndex = 3,
             }
-            StaticPopup_Show ("FULL_BROADCAST_WARNING")
+            StaticPopup_Show ("TDKP_FULL_BROADCAST_WARNING")
         else
             Core:Print("DKP Table broadcasting message recieved but something went wrong... Contact Authors.")
         end

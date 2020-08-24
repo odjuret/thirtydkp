@@ -167,7 +167,7 @@ function View:CreateDKPHistoryFrame(parentFrame)
 end
 
 function View:UpdateDKPHistoryFrame()
-	local mainFrame = View:GetMainFrame()
+	local tdkpMainFrame = View:GetMainFrame()
 
 	DKPHistoryFrame:Hide()
 	DKPHistoryFrame:SetParent(nil)
@@ -176,7 +176,7 @@ function View:UpdateDKPHistoryFrame()
 	TDKP_DEFAULT_MAX_HISTORY_ROWS = 50;
  	dkpHistoryScrollChildHeight = 0;
 
-	View:CreateDKPHistoryFrame(mainFrame)
+	View:CreateDKPHistoryFrame(tdkpMainFrame)
 end
 
 function View:ToggleDKPHistoryFrame()

@@ -190,28 +190,28 @@ end
 ----------------------------------
 -- Register Events
 ----------------------------------
-local events = CreateFrame("Frame", "TDKPEventsFrame");
-events:RegisterEvent("ADDON_LOADED");
-events:RegisterEvent("LOOT_OPENED");
-events:RegisterEvent("BOSS_KILL");
-events:RegisterEvent("GUILD_ROSTER_UPDATE");
-events:RegisterEvent("PLAYER_GUILD_UPDATE");
-events:SetScript("OnEvent", ThirtyDKP_OnEvent);
+local tdkpEvents = CreateFrame("Frame", "TDKPEventsFrame");
+tdkpEvents:RegisterEvent("ADDON_LOADED");
+tdkpEvents:RegisterEvent("LOOT_OPENED");
+tdkpEvents:RegisterEvent("BOSS_KILL");
+tdkpEvents:RegisterEvent("GUILD_ROSTER_UPDATE");
+tdkpEvents:RegisterEvent("PLAYER_GUILD_UPDATE");
+tdkpEvents:SetScript("OnEvent", ThirtyDKP_OnEvent);
 
 function Core:RegisterForRaidMessageEvents()
-    events:RegisterEvent("CHAT_MSG_RAID");
-    events:RegisterEvent("CHAT_MSG_RAID_LEADER");
+    tdkpEvents:RegisterEvent("CHAT_MSG_RAID");
+    tdkpEvents:RegisterEvent("CHAT_MSG_RAID_LEADER");
 end
 
 function Core:UnRegisterForRaidMessageEvents()
-    events:UnregisterEvent("CHAT_MSG_RAID");
-    events:UnregisterEvent("CHAT_MSG_RAID_LEADER");
+    tdkpEvents:UnregisterEvent("CHAT_MSG_RAID");
+    tdkpEvents:UnregisterEvent("CHAT_MSG_RAID_LEADER");
 end
 
 function Core:RegisterForGetItemInfoEvents()
-    events:RegisterEvent("GET_ITEM_INFO_RECEIVED");
+    tdkpEvents:RegisterEvent("GET_ITEM_INFO_RECEIVED");
 end
 
 function Core:UnregisterForGetItemInfoEvents()
-    events:UnregisterEvent("GET_ITEM_INFO_RECEIVED");
+    tdkpEvents:UnregisterEvent("GET_ITEM_INFO_RECEIVED");
 end

@@ -13,17 +13,17 @@ local SelectedRaid = Const.RAID_NAXX;
 
 local function CreateDkpCostInputFrame(text, itemName, parent)
     local options = DAL:GetRaidOptions(SelectedRaid);
-    local frame = View:CreateNumericInputFrame(parent, text, options.itemCosts[itemName], function(input)
+    local inputFrame = View:CreateNumericInputFrame(parent, text, options.itemCosts[itemName], function(input)
 		DAL:GetRaidOptions(SelectedRaid).itemCosts[itemName] = input:GetNumber();
     end);
 
-    return frame;
+    return inputFrame;
 end
 
 local function CreateAndAttachDkpCostFrame(text, itemName, parent, attachTarget)
-    local frame = CreateDkpCostInputFrame(text, itemName, parent);
-    frame:SetPoint(Const.TOP_LEFT_POINT, attachTarget, Const.BOTTOM_LEFT_POINT, 0, 0);
-    return frame;
+    local inputFrame = CreateDkpCostInputFrame(text, itemName, parent);
+    inputFrame:SetPoint(Const.TOP_LEFT_POINT, attachTarget, Const.BOTTOM_LEFT_POINT, 0, 0);
+    return inputFrame;
 end
 
 function View:UpdateOptionsFrame()
@@ -53,39 +53,39 @@ local function RaidDropdownOnClick(self, arg1, arg2, checked)
 	View:UpdateOptionsFrame();
 end
 
-local function InitializeRaidDropdown(frame, level, menuList)
-	local info = UIDropDownMenu_CreateInfo();
-	info.func = RaidDropdownOnClick;
+local function InitializeRaidDropdown(_, _, _)
+	local raidDropdownInfo = UIDropDownMenu_CreateInfo();
+	raidDropdownInfo.func = RaidDropdownOnClick;
 
-	info.text = "Naxxramas";
-	info.arg1 = Const.RAID_NAXX;
-	info.arg2 = info.text;
-	info.checked = SelectedRaid == Const.RAID_NAXX;
-	UIDropDownMenu_AddButton(info);
+	raidDropdownInfo.text = "Naxxramas";
+	raidDropdownInfo.arg1 = Const.RAID_NAXX;
+	raidDropdownInfo.arg2 = raidDropdownInfo.text;
+	raidDropdownInfo.checked = SelectedRaid == Const.RAID_NAXX;
+	UIDropDownMenu_AddButton(raidDropdownInfo);
 
-	info.text = "Ahn'Qiraj";
-	info.arg1 = Const.RAID_AQ40;
-	info.arg2 = info.text;
-	info.checked = SelectedRaid == Const.RAID_AQ40;
-	UIDropDownMenu_AddButton(info);
+	raidDropdownInfo.text = "Ahn'Qiraj";
+	raidDropdownInfo.arg1 = Const.RAID_AQ40;
+	raidDropdownInfo.arg2 = raidDropdownInfo.text;
+	raidDropdownInfo.checked = SelectedRaid == Const.RAID_AQ40;
+	UIDropDownMenu_AddButton(raidDropdownInfo);
 
-	info.text = "Blackwing Lair";
-	info.arg1 = Const.RAID_BWL;
-	info.arg2 = info.text;
-	info.checked = SelectedRaid == Const.RAID_BWL;
-	UIDropDownMenu_AddButton(info);
+	raidDropdownInfo.text = "Blackwing Lair";
+	raidDropdownInfo.arg1 = Const.RAID_BWL;
+	raidDropdownInfo.arg2 = raidDropdownInfo.text;
+	raidDropdownInfo.checked = SelectedRaid == Const.RAID_BWL;
+	UIDropDownMenu_AddButton(raidDropdownInfo);
 
-	info.text = "Molten Core";
-	info.arg1 = Const.RAID_MC;
-	info.arg2 = info.text;
-	info.checked = SelectedRaid == Const.RAID_MC;
-	UIDropDownMenu_AddButton(info);
+	raidDropdownInfo.text = "Molten Core";
+	raidDropdownInfo.arg1 = Const.RAID_MC;
+	raidDropdownInfo.arg2 = raidDropdownInfo.text;
+	raidDropdownInfo.checked = SelectedRaid == Const.RAID_MC;
+	UIDropDownMenu_AddButton(raidDropdownInfo);
 
-	info.text = "Onyxia";
-	info.arg1 = Const.RAID_ONYXIA;
-	info.arg2 = info.text;
-	info.checked = selectedRaid == Const.RAID_ONYXIA;
-	UIDropDownMenu_AddButton(info);
+	raidDropdownInfo.text = "Onyxia";
+	raidDropdownInfo.arg1 = Const.RAID_ONYXIA;
+	raidDropdownInfo.arg2 = raidDropdownInfo.text;
+	raidDropdownInfo.checked = selectedRaid == Const.RAID_ONYXIA;
+	UIDropDownMenu_AddButton(raidDropdownInfo);
 end
 
 function View:CreateOptionsFrame(parentFrame)

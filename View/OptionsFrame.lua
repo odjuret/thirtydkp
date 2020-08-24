@@ -49,43 +49,43 @@ end
 local function RaidDropdownOnClick(self, arg1, arg2, checked)
 	SelectedRaid = arg1;
 	DAL:SetLastSelectedRaid(arg1)
-	UIDropDownMenu_SetText(TdkpOptionsFrame.raidDropdown, Const.RAID_DISPLAY_NAME[arg1]);
+	L_UIDropDownMenu_SetText(TdkpOptionsFrame.raidDropdown, Const.RAID_DISPLAY_NAME[arg1]);
 	View:UpdateOptionsFrame();
 end
 
 local function InitializeRaidDropdown(_, _, _)
-	local raidDropdownInfo = UIDropDownMenu_CreateInfo();
+	local raidDropdownInfo = L_UIDropDownMenu_CreateInfo();
 	raidDropdownInfo.func = RaidDropdownOnClick;
 
 	raidDropdownInfo.text = "Naxxramas";
 	raidDropdownInfo.arg1 = Const.RAID_NAXX;
 	raidDropdownInfo.arg2 = raidDropdownInfo.text;
 	raidDropdownInfo.checked = SelectedRaid == Const.RAID_NAXX;
-	UIDropDownMenu_AddButton(raidDropdownInfo);
+	L_UIDropDownMenu_AddButton(raidDropdownInfo);
 
 	raidDropdownInfo.text = "Ahn'Qiraj";
 	raidDropdownInfo.arg1 = Const.RAID_AQ40;
 	raidDropdownInfo.arg2 = raidDropdownInfo.text;
 	raidDropdownInfo.checked = SelectedRaid == Const.RAID_AQ40;
-	UIDropDownMenu_AddButton(raidDropdownInfo);
+	L_UIDropDownMenu_AddButton(raidDropdownInfo);
 
 	raidDropdownInfo.text = "Blackwing Lair";
 	raidDropdownInfo.arg1 = Const.RAID_BWL;
 	raidDropdownInfo.arg2 = raidDropdownInfo.text;
 	raidDropdownInfo.checked = SelectedRaid == Const.RAID_BWL;
-	UIDropDownMenu_AddButton(raidDropdownInfo);
+	L_UIDropDownMenu_AddButton(raidDropdownInfo);
 
 	raidDropdownInfo.text = "Molten Core";
 	raidDropdownInfo.arg1 = Const.RAID_MC;
 	raidDropdownInfo.arg2 = raidDropdownInfo.text;
 	raidDropdownInfo.checked = SelectedRaid == Const.RAID_MC;
-	UIDropDownMenu_AddButton(raidDropdownInfo);
+	L_UIDropDownMenu_AddButton(raidDropdownInfo);
 
 	raidDropdownInfo.text = "Onyxia";
 	raidDropdownInfo.arg1 = Const.RAID_ONYXIA;
 	raidDropdownInfo.arg2 = raidDropdownInfo.text;
 	raidDropdownInfo.checked = selectedRaid == Const.RAID_ONYXIA;
-	UIDropDownMenu_AddButton(raidDropdownInfo);
+	L_UIDropDownMenu_AddButton(raidDropdownInfo);
 end
 
 function View:CreateOptionsFrame(parentFrame)
@@ -131,11 +131,11 @@ function View:CreateOptionsFrame(parentFrame)
 	raidOptionsHeader:SetPoint(Const.TOP_LEFT_POINT, globalSectionLeft, Const.BOTTOM_LEFT_POINT, -10, 0);
 	raidOptionsHeader:SetText("Raid Specific Options for: ");
 
-	TdkpOptionsFrame.raidDropdown = CreateFrame("Frame", "ThirtyDKP_RaidOptionsDropdown", TdkpOptionsFrame, "UIDropDownMenuTemplate");
+	TdkpOptionsFrame.raidDropdown = CreateFrame("Frame", "ThirtyDKP_RaidOptionsDropdown", TdkpOptionsFrame, "L_UIDropDownMenuTemplate");
 	TdkpOptionsFrame.raidDropdown:SetPoint(Const.LEFT_POINT, raidOptionsHeader, Const.RIGHT_POINT, 0, -4);
-	UIDropDownMenu_SetWidth(TdkpOptionsFrame.raidDropdown, 110);
-	UIDropDownMenu_Initialize(TdkpOptionsFrame.raidDropdown, InitializeRaidDropdown);
-	UIDropDownMenu_SetText(TdkpOptionsFrame.raidDropdown, Const.RAID_DISPLAY_NAME[SelectedRaid]);
+	L_UIDropDownMenu_SetWidth(TdkpOptionsFrame.raidDropdown, 110);
+	L_UIDropDownMenu_Initialize(TdkpOptionsFrame.raidDropdown, InitializeRaidDropdown);
+	L_UIDropDownMenu_SetText(TdkpOptionsFrame.raidDropdown, Const.RAID_DISPLAY_NAME[SelectedRaid]);
 
 
 	local dkpGainSection = CreateFrame("Frame", nil, TdkpOptionsFrame, nil);

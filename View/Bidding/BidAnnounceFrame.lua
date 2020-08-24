@@ -267,43 +267,43 @@ end
 local function DkpCostDropdownOnClick(self, arg1, arg2, checked)
     selectedRaid = arg1;
     DAL:SetLastSelectedRaid(arg1);
-	UIDropDownMenu_SetText(BidAnnounceFrame.DkpCostDropdown, Const.RAID_DISPLAY_NAME[arg1]);
+	L_UIDropDownMenu_SetText(BidAnnounceFrame.DkpCostDropdown, Const.RAID_DISPLAY_NAME[arg1]);
 	View:UpdateOptionsFrame();
 end
 
 local function InitializeDkpCostDropdown(frame, level, menuList)
-	local info = UIDropDownMenu_CreateInfo();
+	local info = L_UIDropDownMenu_CreateInfo();
 	info.func = DkpCostDropdownOnClick;
 
 	info.text = "Naxxramas";
 	info.arg1 = Const.RAID_NAXX;
 	info.arg2 = info.text;
 	info.checked = selectedRaid == Const.RAID_NAXX;
-	UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info.text = "Ahn'Qiraj";
 	info.arg1 = Const.RAID_AQ40;
 	info.arg2 = info.text;
 	info.checked = selectedRaid == Const.RAID_AQ40;
-	UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info.text = "Blackwing Lair";
 	info.arg1 = Const.RAID_BWL;
 	info.arg2 = info.text;
 	info.checked = selectedRaid == Const.RAID_BWL;
-	UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info.text = "Molten Core";
 	info.arg1 = Const.RAID_MC;
 	info.arg2 = info.text;
 	info.checked = selectedRaid == Const.RAID_MC;
-	UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 
 	info.text = "Onyxia";
 	info.arg1 = Const.RAID_ONYXIA;
 	info.arg2 = info.text;
 	info.checked = selectedRaid == Const.RAID_ONYXIA;
-	UIDropDownMenu_AddButton(info);
+	L_UIDropDownMenu_AddButton(info);
 end
 
 -----------------------------
@@ -342,10 +342,10 @@ function View:CreateBidAnnounceFrame()
 	dkpCostOptionsLabel:SetText("Use prices for:");
     dkpCostOptionsLabel:SetPoint(Const.TOP_LEFT_POINT, inputSection, Const.TOP_LEFT_POINT, 0, 0);
 
-	f.DkpCostDropdown = CreateFrame("Frame", "ThirtyDKP_RaidDKPCostDropdown", inputSection, "UIDropDownMenuTemplate");
-	UIDropDownMenu_SetWidth(f.DkpCostDropdown, 110);
-	UIDropDownMenu_Initialize(f.DkpCostDropdown, InitializeDkpCostDropdown);
-	UIDropDownMenu_SetText(f.DkpCostDropdown, Const.RAID_DISPLAY_NAME[selectedRaid]);
+	f.DkpCostDropdown = CreateFrame("Frame", "ThirtyDKP_RaidDKPCostDropdown", inputSection, "L_UIDropDownMenuTemplate");
+	L_UIDropDownMenu_SetWidth(f.DkpCostDropdown, 110);
+	L_UIDropDownMenu_Initialize(f.DkpCostDropdown, InitializeDkpCostDropdown);
+	L_UIDropDownMenu_SetText(f.DkpCostDropdown, Const.RAID_DISPLAY_NAME[selectedRaid]);
 	f.DkpCostDropdown:SetPoint(Const.TOP_LEFT_POINT, dkpCostOptionsLabel, Const.TOP_RIGHT_POINT, 0, 5);
 
     f.CustomDKPCost = View:CreateNumericInputFrame(inputSection, "DKP Cost:", selectedItemDKPCost, function(input)

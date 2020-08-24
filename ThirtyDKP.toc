@@ -6,6 +6,8 @@
 ## DefaultState: enabled
 ## SavedVariables: ThirtyDKP_Database_DKPTable, ThirtyDKP_Database_CurrentLoot, ThirtyDKP_Database_Options, ThirtyDKP_Database_DKPHistory, ThirtyDKP_Database_Raid
 
+Libs\Libs.xml
+
 Init.lua
 ThirtyDKP.xml
 

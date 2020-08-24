@@ -2,7 +2,7 @@ local addonName, ThirtyDKP = ...
 local View = ThirtyDKP.View;
 local Const = ThirtyDKP.View.Constants;
 
-local tdkpMenuFrame = CreateFrame("Frame", "ThirtyDKPRightClickMenuFrame", UIParent, "UIDropDownMenuTemplate")
+local tdkpMenuFrame = CreateFrame("Frame", "ThirtyDKPRightClickMenuFrame", UIParent, "L_UIDropDownMenuTemplate")
 
 function View:CreateNumericInputFrame(parent, label, value, valueChangedCallback)
     local wrapper = CreateFrame("Frame", nil, parent, nil);
@@ -109,7 +109,7 @@ function View:CreateRightClickMenu(self, title, actionHeader, actionFunction)
         { text = title, isTitle = true},
         { text = actionHeader, func = actionFunction },
     }
-    EasyMenu(menu, tdkpMenuFrame, "cursor", 0 , 0, "MENU", 2);
+    L_EasyMenu(menu, tdkpMenuFrame, "cursor", 0 , 0, "MENU", 2);
 end
 
 function View:AttachHoverOverTooltip(frame, titleText, textContent)

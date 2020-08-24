@@ -140,7 +140,7 @@ function View:CreateDKPAdjustFrame(parentFrame)
 		end
 
 		StaticPopupDialogs["TDKP_ADJUST_DKP"] = {
-			text = "Are you you want to award "..DkpAdjustAmount.." to the following players: "..printableSelectedPlayers.."?",
+			text = "Are you sure you want to adjust "..DkpAdjustAmount.." DKP to the following players: "..printableSelectedPlayers.."?",
 			button1 = "Yes",
 			button2 = "No",
 			OnAccept = function()

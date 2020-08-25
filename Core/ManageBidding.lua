@@ -14,11 +14,12 @@ end
 function Core:IncomingBidsHandler(message, sender)
     if biddingInProgress then
         if message == passOnItemBidMessage then
-            Core:Print("ThirtyDKP: "..sender.." passed. ")
+            Core:Print(sender.." passed. ");
+            SendChatMessage("ThirtyDKP: Pass accepted!", "WHISPER", nil, sender);
             return;
         end
 
-        Core:Print("Incoming bid from "..sender.."") 
+        Core:Print("Incoming bid from "..sender.."");
         local player = DAL:GetFromDKPTable(sender)
 
         if player == false then
@@ -36,8 +37,9 @@ function Core:IncomingBidsHandler(message, sender)
             end
         end
         
-        View:AddBidder(player)
-        View:UpdateAllViews()
+        View:AddBidder(player);
+        SendChatMessage("ThirtyDKP: Bid accepted!", "WHISPER", nil, sender);
+        View:UpdateAllViews();
     end
 end
 
@@ -69,7 +71,10 @@ function Core:StartBidding(item, timer)
 end
 
 function Core:IncomingStartBiddingHandler(message)
-    local timer, itemLink = strsplit("-", message);
+    local delimiterIndex = string.find(message, '%-');
+    local timer = strsub(message, 1, delimiterIndex-1);
+    local itemLink = strsub(message, delimiterIndex+1);
+
     View:CreateBiddingFrame(itemLink);
     C_Timer.After(timer, function()
         View:HideBiddingFrame()

@@ -84,7 +84,7 @@ local function CreateIncomingBidsFrame()
     -- "Container" frame that clips out its child frame "excess" content.
     IncomingBidsFrame = CreateFrame("ScrollFrame", 'IncomingBidsFrameScrollFrame', BidAnnounceFrame.CurrentItemForBidFrame, "UIPanelScrollFrameTemplate");
 
-    IncomingBidsFrame:SetSize( Const.LootTableWidth-12, Const.DKPTableRowHeight*8);
+    IncomingBidsFrame:SetSize( Const.LootTableWidth-12, Const.DKPTableRowHeight*9);
 	IncomingBidsFrame:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame.CurrentItemForBidFrame, Const.TOP_LEFT_POINT, 0, -30 );
 	IncomingBidsFrame.scrollBar = _G["IncomingBidsFrameScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 

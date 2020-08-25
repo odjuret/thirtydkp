@@ -1,6 +1,7 @@
 local addonName, ThirtyDKP = ...
 local View = ThirtyDKP.View;
 local Core = ThirtyDKP.Core;
+local DAL = ThirtyDKP.DAL;
 local Const = ThirtyDKP.View.Constants;
 
 local BiddingFrame = nil;
@@ -12,7 +13,8 @@ function View:CreateBiddingFrame(item)
         BiddingFrame = nil;
     end
 
-    local itemName,_,_,_,_,_,_,_,_,itemIcon = GetItemInfo(item)
+    local _,_,_,_,_,_,_,_,_,itemIcon = GetItemInfo(item)
+    local biddingFramePosition = DAL:GetBiddingFramePosition()
 
 	BiddingFrame = CreateFrame('Frame', 'ThirtyDKP_BiddingFrame', UIParent, "TooltipBorderedFrameTemplate"); 
 	BiddingFrame:Hide()
@@ -20,44 +22,44 @@ function View:CreateBiddingFrame(item)
     BiddingFrame:SetFrameStrata("DIALOG");
     BiddingFrame:SetClampedToScreen(true);
     BiddingFrame:SetFrameLevel(10);
-	BiddingFrame:SetPoint(Const.CENTER_POINT, UIParent, Const.CENTER_POINT, 200, 100); -- point, relative frame, relative point on relative frame
+	BiddingFrame:SetPoint(biddingFramePosition.point, UIParent, biddingFramePosition.relativePoint, biddingFramePosition.x, biddingFramePosition.y); -- point, relative frame, relative point on relative frame
     BiddingFrame:EnableMouse(true);
     BiddingFrame:SetMovable(true);
 	BiddingFrame:RegisterForDrag("LeftButton");
 	BiddingFrame:SetScript("OnDragStart", BiddingFrame.StartMoving);
-    BiddingFrame:SetScript("OnDragStop", BiddingFrame.StopMovingOrSizing);
+    BiddingFrame:SetScript("OnDragStop", function()
+        BiddingFrame:StopMovingOrSizing();
+        local point, _, relativePoint, xOfs, yOfs = BiddingFrame:GetPoint();
+        DAL:SetBiddingFramePosition(point, relativePoint, xOfs, yOfs)
+    end
+    );
 
-    -- todo: standardize item frame and move into FrameFactory.lua 
-    BiddingFrame.ItemFrame = CreateFrame('Frame', 'ThirtyDKP_BiddingFrame', BiddingFrame);
-    local itemFrame = BiddingFrame.ItemFrame
-    itemFrame:SetPoint(Const.TOP_LEFT_POINT, 5, -5)
-    itemFrame:SetSize(Const.LootTableWidth-10, 28)
+    BiddingFrame.itemIconTexture = BiddingFrame:CreateTexture(nil, Const.OVERLAY_LAYER, nil);
+    BiddingFrame.itemIconTexture:SetPoint(Const.TOP_LEFT_POINT, 5 ,-5)
+    BiddingFrame.itemIconTexture:SetColorTexture(0, 0, 0, 1)
+    BiddingFrame.itemIconTexture:SetSize(28, 28);
+    BiddingFrame.itemIconTexture:SetTexture(itemIcon)
 
-    itemFrame:SetScript("OnEnter", function(self)
+    BiddingFrame.ItemIconButton = CreateFrame("Button", "ThirtyDKPBiddingFrameIconButton", BiddingFrame)
+    BiddingFrame.ItemIconButton:SetPoint(Const.TOP_LEFT_POINT, BiddingFrame.itemIconTexture, Const.TOP_LEFT_POINT, 0, 0);
+    BiddingFrame.ItemIconButton:SetSize(28, 28);
+
+    ActionButton_ShowOverlayGlow(BiddingFrame.ItemIconButton)
+
+	BiddingFrame.itemName = BiddingFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
+	BiddingFrame.itemName:SetFontObject("GameFontHighlight");
+    BiddingFrame.itemName:SetPoint(Const.LEFT_POINT, BiddingFrame.itemIconTexture, Const.RIGHT_POINT, 10, 0);
+    BiddingFrame.itemName:SetText(item);
+
+    BiddingFrame:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT", 15, 0);
         GameTooltip:SetHyperlink(item);
     end)
 
-    itemFrame:SetScript("OnLeave", function()
+    BiddingFrame:SetScript("OnLeave", function()
         GameTooltip:Hide()
     end)
-
-    itemFrame.itemIconTexture = itemFrame:CreateTexture(nil, Const.OVERLAY_LAYER, nil);
-    itemFrame.itemIconTexture:SetPoint(Const.TOP_LEFT_POINT)
-    itemFrame.itemIconTexture:SetColorTexture(0, 0, 0, 1)
-    itemFrame.itemIconTexture:SetSize(28, 28);
-    itemFrame.itemIconTexture:SetTexture(itemIcon)
-
-    itemFrame.ItemIconButton = CreateFrame("Button", "ThirtyDKPBiddingFrameIconButton", itemFrame)
-    itemFrame.ItemIconButton:SetPoint(Const.TOP_LEFT_POINT, itemFrame.itemIconTexture, Const.TOP_LEFT_POINT, 0, 0);
-    itemFrame.ItemIconButton:SetSize(28, 28);
-
-    ActionButton_ShowOverlayGlow(itemFrame.ItemIconButton)
-
-	itemFrame.itemName = itemFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
-	itemFrame.itemName:SetFontObject("GameFontHighlight");
-    itemFrame.itemName:SetPoint(Const.LEFT_POINT, itemFrame.itemIconTexture, Const.RIGHT_POINT, 10, 0);
-    itemFrame.itemName:SetText(item);
+    
 
     -- Buttons
 

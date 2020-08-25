@@ -7,7 +7,7 @@ local Const = ThirtyDKP.View.Constants;
 
 -- Main addon window
 local TdkpIsInitialized = false;
-local TdkpFrame = nil;
+local TdkpMainFrame = nil;
 
 local TDKP_MAIN_FRAME_TITLE = "Thirty DKP"
 
@@ -28,9 +28,9 @@ function View:UpdateDataUpToDateFrame(incHoverOverText)
         end
         colorizedText = Core:ColorizePositiveOrNegative(-1, " Outdated")
     end
-    TdkpFrame.upToDateFrame.text:SetText("Data:"..colorizedText);
+    TdkpMainFrame.upToDateFrame.text:SetText("Data:"..colorizedText);
 
-    View:AttachHoverOverTooltipAndOnclick(TdkpFrame.upToDateFrame, "Your local data is"..colorizedText, hoverOverText, function ()
+    View:AttachHoverOverTooltipAndOnclick(TdkpMainFrame.upToDateFrame, "Your local data is"..colorizedText, hoverOverText, function ()
         StaticPopupDialogs["TDKP_DATA_STATUS_FRAME_CLICK"] = {
             text = "Do you want to re-check if your data is up to date?",
             button1 = "Yes",
@@ -48,7 +48,7 @@ function View:UpdateDataUpToDateFrame(incHoverOverText)
 end
 
 local function CreateTdkpMainFrameButton(text, relativePoint, parentFrame, relativePointOnParentFrame, x, y)
-    local b = CreateFrame("Button", nil, TdkpFrame, "GameMenuButtonTemplate");
+    local b = CreateFrame("Button", nil, TdkpMainFrame, "GameMenuButtonTemplate");
     b:SetPoint(relativePoint, parentFrame, relativePointOnParentFrame, x, y);
     b:SetSize(80, Const.ButtonHeight);
     b:SetText(text);
@@ -58,9 +58,9 @@ local function CreateTdkpMainFrameButton(text, relativePoint, parentFrame, relat
 end
 
 local function CreateRightSideAdminPanel()
-    local adminPanel = CreateFrame("Frame", nil, TdkpFrame, nil);
+    local adminPanel = CreateFrame("Frame", nil, TdkpMainFrame, nil);
     adminPanel:SetSize(100, 370);
-    adminPanel:SetPoint(Const.BOTTOM_RIGHT_POINT, TdkpFrame, Const.BOTTOM_RIGHT_POINT, 0, 0);
+    adminPanel:SetPoint(Const.BOTTOM_RIGHT_POINT, TdkpMainFrame, Const.BOTTOM_RIGHT_POINT, 0, 0);
 
     -- building buttons from the bottom and up
     adminPanel.removePlayerBtn = CreateTdkpMainFrameButton("Remove", Const.BOTTOM_RIGHT_POINT, adminPanel, Const.BOTTOM_RIGHT_POINT, -10, 10)
@@ -226,19 +226,20 @@ local function CreateTdkpMainFrame(isAddonAdmin)
     end
     
 
-    TdkpFrame = View:CreateContainerFrame('ThirtyDKP_MainFrame', nil, TDKP_MAIN_FRAME_TITLE, mainFrameWidth, Const.DKPTableRowHeight*14)
-	TdkpFrame:SetClampedToScreen(true);
+    TdkpMainFrame = View:CreateContainerFrame('ThirtyDKP_MainFrame', nil, TDKP_MAIN_FRAME_TITLE, mainFrameWidth, Const.DKPTableRowHeight*14);
+    local f = TdkpMainFrame
+	f:SetClampedToScreen(true);
 	if isAddonAdmin then
-		TdkpFrame:SetSize(420, 400);
+		f:SetSize(420, 400);
 	else
-		TdkpFrame:SetSize(335, 400);
+		f:SetSize(335, 400);
 	end
-	TdkpFrame:SetMovable(true);
-	TdkpFrame:EnableMouse(true);
-	TdkpFrame:RegisterForDrag("LeftButton");
-	TdkpFrame:SetScript("OnDragStart", TdkpFrame.StartMoving);
-	TdkpFrame:SetScript("OnDragStop", TdkpFrame.StopMovingOrSizing);
-    TdkpFrame:SetScript("OnHide", function(self)
+	f:SetMovable(true);
+	f:EnableMouse(true);
+	f:RegisterForDrag("LeftButton");
+	f:SetScript("OnDragStart", f.StartMoving);
+	f:SetScript("OnDragStop", f.StopMovingOrSizing);
+    f:SetScript("OnHide", function(self)
         if isAddonAdmin then
             View:HideOptionsFrame();
             View:HideDKPAdjustFrame();
@@ -249,13 +250,13 @@ local function CreateTdkpMainFrame(isAddonAdmin)
 
 
     -- up-to-date frame
-    TdkpFrame.upToDateFrame = CreateFrame('Button', nil, TdkpFrame);
-    TdkpFrame.upToDateFrame:SetSize(100, 30);
-    TdkpFrame.upToDateFrame:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 110, 0);
-    TdkpFrame.upToDateFrame:RegisterForClicks("AnyUp");
-    TdkpFrame.upToDateFrame.text = TdkpFrame.upToDateFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
-	TdkpFrame.upToDateFrame.text:SetFontObject("ThirtyDKPTiny");
-    TdkpFrame.upToDateFrame.text:SetPoint(Const.LEFT_POINT, TdkpFrame.upToDateFrame, Const.LEFT_POINT, 0, 5);
+    f.upToDateFrame = CreateFrame('Button', nil, f);
+    f.upToDateFrame:SetSize(100, 30);
+    f.upToDateFrame:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 110, 0);
+    f.upToDateFrame:RegisterForClicks("AnyUp");
+    f.upToDateFrame.text = f.upToDateFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
+	f.upToDateFrame.text:SetFontObject("ThirtyDKPTiny");
+    f.upToDateFrame.text:SetPoint(Const.LEFT_POINT, f.upToDateFrame, Const.LEFT_POINT, 0, 5);
     
     View:UpdateDataUpToDateFrame()
 
@@ -265,11 +266,11 @@ local function CreateTdkpMainFrame(isAddonAdmin)
 end
 
 function View:GetMainFrame()
-	return TdkpFrame;
+	return TdkpMainFrame;
 end
 
 function View:OpenMainFrame()
-	TdkpFrame:SetShown(true);
+	TdkpMainFrame:SetShown(true);
 end
 
 function View:IsInitialized()
@@ -282,13 +283,13 @@ function View:Initialize()
     local isAddonAdmin = Core:IsAddonAdmin();
 
 	CreateTdkpMainFrame(isAddonAdmin);
-    View:CreateDKPTable(TdkpFrame);
+    View:CreateDKPTable(TdkpMainFrame);
     View:CreateBidAnnounceFrame();
     if isAddonAdmin then
-        View:CreateOptionsFrame(TdkpFrame);
-		View:CreateDKPAdjustFrame(TdkpFrame);
-        View:CreateDKPAdminsFrame(TdkpFrame);
-        View:CreateDKPHistoryFrame(TdkpFrame);
+        View:CreateOptionsFrame(TdkpMainFrame);
+		View:CreateDKPAdjustFrame(TdkpMainFrame);
+        View:CreateDKPAdminsFrame(TdkpMainFrame);
+        View:CreateDKPHistoryFrame(TdkpMainFrame);
     end
 
 	TdkpIsInitialized = true;

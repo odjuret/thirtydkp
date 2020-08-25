@@ -36,7 +36,7 @@ end
 
 
 function Core:HandleLootWindow()
-  if not Core:IsPlayerMasterLooter() then return end
+  if not Core:IsPlayerMasterLooter() or not Core:IsRaidStarted() then return end
   local foundEpaxx = false
 
   for i = 1, GetNumLootItems() do

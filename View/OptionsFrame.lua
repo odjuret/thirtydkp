@@ -141,7 +141,7 @@ function View:CreateOptionsFrame(parentFrame)
 	local dkpGainSection = CreateFrame("Frame", nil, TdkpOptionsFrame, nil);
 	dkpGainSection:SetSize(115, 30);
 	dkpGainSection:SetPoint(Const.TOP_LEFT_POINT, raidOptionsHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
-	TdkpOptionsFrame.dkpGainPerKill = View:CreateNumericInputFrame(dkpGainSection, "DKP Per Kill:", raidOptions.dkpGainPerKill, function(input)
+	TdkpOptionsFrame.dkpGainPerKill = View:CreateNumericInputFrame(dkpGainSection, "Boss kill DKP:", raidOptions.dkpGainPerKill, function(input)
 		DAL:GetRaidOptions(SelectedRaid).dkpGainPerKill = input:GetNumber();
     end);
     TdkpOptionsFrame.dkpGainPerKill:SetAllPoints();
@@ -181,6 +181,7 @@ function View:CreateOptionsFrame(parentFrame)
     TdkpOptionsFrame.twoHandedWeaponCostInput = CreateAndAttachDkpCostFrame("Two-handed:", "twoHandedWeapon", itemCostSectionRight, TdkpOptionsFrame.oneHandedWeaponCostInput);
     TdkpOptionsFrame.rangedWeaponCostInput = CreateAndAttachDkpCostFrame("Ranged:", "rangedWeapon", itemCostSectionRight, TdkpOptionsFrame.twoHandedWeaponCostInput);
     TdkpOptionsFrame.offhandCostInput = CreateAndAttachDkpCostFrame("Offhand:", "offhand", itemCostSectionRight, TdkpOptionsFrame.rangedWeaponCostInput);
+    TdkpOptionsFrame.defaultCostInput = CreateAndAttachDkpCostFrame("Other:", "default", itemCostSectionRight, TdkpOptionsFrame.offhandCostInput);
 
 end
 

@@ -44,6 +44,7 @@ function View:UpdateOptionsFrame()
 	TdkpOptionsFrame.oneHandedWeaponCostInput.input:SetNumber(options.itemCosts.oneHandedWeapon);
 	TdkpOptionsFrame.twoHandedWeaponCostInput.input:SetNumber(options.itemCosts.twoHandedWeapon);
 	TdkpOptionsFrame.rangedWeaponCostInput.input:SetNumber(options.itemCosts.rangedWeapon);
+	TdkpOptionsFrame.defaultCostInput.input:SetNumber(options.itemCosts.default);
 end
 
 local function RaidDropdownOnClick(self, arg1, arg2, checked)

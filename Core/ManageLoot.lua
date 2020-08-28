@@ -45,8 +45,8 @@ function Core:HandleLootWindow()
       local _, _, itemRarity = GetItemInfo(itemLink);
       if itemRarity == nil then
         -- if item not in cache, put it in queue and wait for it to arrive.
-        Core:RegisterForGetItemInfoEvents();
         table.insert(lootAnnounceQueue, itemLink);
+        Core:RegisterForGetItemInfoEvents();
       else
 
         if itemRarity > 3 then

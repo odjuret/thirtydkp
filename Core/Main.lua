@@ -142,8 +142,14 @@ function ThirtyDKP_OnInitialize(event, name)
         if #argsAsString == 0 then
             View:OpenMainFrame();
         else
-            local arg1 = strsub(argsAsString, 1,3); -- todo: this smells
-            local arg2 = strsub(argsAsString, 5); 
+            local delimiterIndex = string.find(argsAsString, ' ');
+            local arg1, arg2 = "", "";
+            if delimiterIndex ~= nil then
+                arg1 = strsub(argsAsString, 1, delimiterIndex-1);
+                arg2 = strsub(argsAsString, delimiterIndex+1);
+            else
+                arg1 = argsAsString
+            end
 
             if arg1 == 'bid' then
                 Core:ManualBidAnnounce(arg2)
@@ -153,7 +159,10 @@ function ThirtyDKP_OnInitialize(event, name)
             local maybeImport = strsub(argsAsString, 1,6); 
             if maybeImport == 'import' then
                 Core:ImportFromMonolithDKP();
+                return;
             end
+
+            Core:Print("Unknown command.")
         end
     end
 
@@ -184,8 +193,8 @@ function ThirtyDKP_OnInitialize(event, name)
         end
     end)
 
-    Core:Print("Loaded. Type /tdkp to view dkp table, and options (if admin).")
-    Core:Print(" /tdkp bid  or  /tdkp bid [itemlink]  to open bidding window.")
+    Core:Print("Loaded.")
+    Core:Print("Use /thirtydkp or /tdkp for main window.")
 end
 
 ----------------------------------

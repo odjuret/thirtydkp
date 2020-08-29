@@ -75,6 +75,7 @@ function Core:IncomingStartBiddingHandler(message)
     local timer = strsub(message, 1, delimiterIndex-1);
     local itemLink = strsub(message, delimiterIndex+1);
 
+    PlaySound(8959)
     View:CreateBiddingFrame(itemLink);
     C_Timer.After(timer, function()
         View:HideBiddingFrame()

@@ -108,8 +108,8 @@ function View:CreateOptionsFrame(parentFrame)
     globalSectionLeft:SetPoint(Const.TOP_LEFT_POINT, globalOptionsHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
 
     local globalSectionRight = CreateFrame("Frame", nil, TdkpOptionsFrame, nil);
-    globalSectionRight:SetSize(135, 70);
-    globalSectionRight:SetPoint(Const.TOP_LEFT_POINT, globalSectionLeft, Const.TOP_RIGHT_POINT, 20, 0);
+    globalSectionRight:SetSize(100, 70);
+    globalSectionRight:SetPoint(Const.TOP_LEFT_POINT, globalSectionLeft, Const.TOP_RIGHT_POINT, 30, 0);
 
     TdkpOptionsFrame.onTimeBonus = View:CreateNumericInputFrame(globalSectionLeft, "On Time Bonus:", options.onTimeBonus, function(input)
         options.onTimeBonus = input:GetNumber();
@@ -121,10 +121,14 @@ function View:CreateOptionsFrame(parentFrame)
     end);
 	TdkpOptionsFrame.raidCompletionBonus:SetPoint(Const.TOP_LEFT_POINT, TdkpOptionsFrame.onTimeBonus, Const.BOTTOM_LEFT_POINT, 0, 0);
 
-	TdkpOptionsFrame.decay = View:CreateNumericInputFrame(globalSectionRight, "Decay Percent:", options.decay, function(input)
+	TdkpOptionsFrame.decay = View:CreateNumericInputFrame(globalSectionRight, "Decay:", options.decay, function(input)
         options.decay = input:GetNumber();
     end);
 	TdkpOptionsFrame.decay:SetPoint(Const.TOP_LEFT_POINT);
+	local decayPercentageCharacter = globalSectionRight:CreateFontString(nil, OVERLAY_LAYER);
+	decayPercentageCharacter:SetFontObject("GameFontNormal");
+	decayPercentageCharacter:SetPoint(Const.TOP_LEFT_POINT, globalSectionRight, Const.TOP_RIGHT_POINT, 4, -5);
+	decayPercentageCharacter:SetText("%");
 
 
 	local raidOptionsHeader = TdkpOptionsFrame:CreateFontString(nil, OVERLAY_LAYER);

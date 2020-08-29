@@ -31,16 +31,18 @@ local function UpdateDKPTableRowsTextures()
 end
 
 local function CreateDKPTableHeadersRow(parent)
-
 	local headersFrame = CreateFrame("Frame", nil, parent);
 	headersFrame:SetSize(Const.DKPTableWidth, Const.DKPTableRowHeight);
+	headersFrame.bg = headersFrame:CreateTexture(nil, Const.BACKGROUND_LAYER)
+	headersFrame.bg:SetAllPoints(true)
+	headersFrame.bg:SetColorTexture(0, 0, 0, 1)
 
 	headersFrame.playerHeaderBtn = CreateFrame("Button", nil, headersFrame);
     headersFrame.playerHeaderBtn:SetPoint(Const.LEFT_POINT)
     headersFrame.playerHeaderBtn:SetSize(headersFrame:GetWidth()/3, Const.DKPTableRowHeight);
-    headersFrame.playerHeaderBtn:SetText("Name");
     headersFrame.playerHeaderBtn:SetNormalFontObject("GameFontNormal");
-	headersFrame.playerHeaderBtn:SetHighlightFontObject("GameFontHighlight");
+	headersFrame.playerHeaderBtn:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
+    headersFrame.playerHeaderBtn:SetText("Name");
     headersFrame.playerHeaderBtn:GetFontString():SetPoint(Const.LEFT_POINT, Const.Margin, 0)
 	headersFrame.playerHeaderBtn:RegisterForClicks("AnyUp");
 	headersFrame.playerHeaderBtn:SetScript("OnClick", function ()
@@ -51,9 +53,9 @@ local function CreateDKPTableHeadersRow(parent)
 	headersFrame.classHeaderBtn = CreateFrame("Button", nil, headersFrame);
     headersFrame.classHeaderBtn:SetPoint(Const.CENTER_POINT, Const.Margin, 0)
     headersFrame.classHeaderBtn:SetSize(headersFrame:GetWidth()/3, Const.DKPTableRowHeight);
-    headersFrame.classHeaderBtn:SetText("Class");
     headersFrame.classHeaderBtn:SetNormalFontObject("GameFontNormal");
-	headersFrame.classHeaderBtn:SetHighlightFontObject("GameFontHighlight");
+	headersFrame.classHeaderBtn:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
+    headersFrame.classHeaderBtn:SetText("Class");
 	headersFrame.classHeaderBtn:RegisterForClicks("AnyUp");
 	headersFrame.classHeaderBtn:SetScript("OnClick", function ()
 		DAL:ToggleDKPTableSorting("class")
@@ -63,9 +65,9 @@ local function CreateDKPTableHeadersRow(parent)
 	headersFrame.dkpHeaderBtn = CreateFrame("Button", nil, headersFrame);
     headersFrame.dkpHeaderBtn:SetPoint(Const.RIGHT_POINT)
     headersFrame.dkpHeaderBtn:SetSize(headersFrame:GetWidth()/3, Const.DKPTableRowHeight);
-    headersFrame.dkpHeaderBtn:SetText("DKP");
     headersFrame.dkpHeaderBtn:SetNormalFontObject("GameFontNormal");
-	headersFrame.dkpHeaderBtn:SetHighlightFontObject("GameFontHighlight");
+	headersFrame.dkpHeaderBtn:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
+    headersFrame.dkpHeaderBtn:SetText("DKP");
 	headersFrame.dkpHeaderBtn:GetFontString():SetPoint(Const.RIGHT_POINT, -Const.Margin, 0)
 	headersFrame.dkpHeaderBtn:RegisterForClicks("AnyUp");
 	headersFrame.dkpHeaderBtn:SetScript("OnClick", function ()
@@ -142,29 +144,30 @@ local function CreateDKPTableRow(parent, id, dkpTable)
 	if #playerHistory > 0 then	
 		b:SetScript("OnEnter", function(self)
 			GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-			local lastDate = strsplit(" ", Core:FormatTimestamp(playerHistory[#playerHistory].timestamp));
+			local lastDate = strsplit(" ", Core:FormatTimestamp(playerHistory[1].timestamp));
 			GameTooltip:SetText("Recent history for "..colorizedName, 0.25, 0.75, 0.90, 1, true);
 			GameTooltip:AddLine(lastDate, 1.0, 1.0, 1.0, true);
 
-			for i = 0, (#playerHistory-1) do
-				local entryDate = strsplit(" ", Core:FormatTimestamp(playerHistory[(#playerHistory-i)].timestamp));
+			for i, historyEntry in ipairs(playerHistory) do
+				local entryDate = strsplit(" ", Core:FormatTimestamp(historyEntry.timestamp));
 				if (lastDate ~= entryDate) then
 					GameTooltip:AddLine(entryDate, 1.0, 1.0, 1.0, true);
 					lastDate = entryDate;
 				end
 
-				local maybeDecay, maybeDecayAmount = string.split(":", playerHistory[(#playerHistory-i)].reason)
+				local maybeDecay, maybeDecayAmount = string.split(":", historyEntry.reason)
 				local colorizedReasonText = ""
 				local colorizedDKPText = ""
 				if maybeDecay == "Decay" then
 					colorizedReasonText = Core:ColorizeNegative(maybeDecay)
 					colorizedDKPText = Core:ColorizeNegative(maybeDecayAmount.." DKP")
 				else
-					colorizedReasonText = Core:ColorizePositiveOrNegative(playerHistory[(#playerHistory-i)].dkp, playerHistory[(#playerHistory-i)].reason)
-					colorizedDKPText = Core:ColorizePositiveOrNegative(playerHistory[(#playerHistory-i)].dkp, tostring(playerHistory[(#playerHistory-i)].dkp).." DKP")
+					colorizedReasonText = Core:ColorizePositiveOrNegative(historyEntry.dkp, historyEntry.reason)
+					colorizedDKPText = Core:ColorizePositiveOrNegative(historyEntry.dkp, tostring(historyEntry.dkp).." DKP")
 				end
 				GameTooltip:AddDoubleLine("  "..colorizedReasonText, colorizedDKPText, 1.0, 0, 0);
 			end
+
 			GameTooltip:Show();
 		end);
 
@@ -179,14 +182,12 @@ end
 
 local function PopulateDKPTable(parentFrame, numberOfRows)
 	local dkpTableCopy = DAL:GetDKPTable()
-	parentFrame.scrollChild.Headers = CreateDKPTableHeadersRow(parentFrame.scrollChild)
-	parentFrame.scrollChild.Headers:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild, Const.TOP_LEFT_POINT, 0, -2)
 	parentFrame.scrollChild.Rows = {}
 
 	for i = 1, numberOfRows do
 		parentFrame.scrollChild.Rows[i] = CreateDKPTableRow(parentFrame.scrollChild, i, dkpTableCopy)
 		if i==1 then
-			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild.Headers, Const.BOTTOM_LEFT_POINT)
+			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild, TOP_LEFT_POINT, 0, -2)
 		else
 			parentFrame.scrollChild.Rows[i]:SetPoint(Const.TOP_LEFT_POINT, parentFrame.scrollChild.Rows[i-1], Const.BOTTOM_LEFT_POINT)
 		end
@@ -196,18 +197,22 @@ end
 
 function View:CreateDKPTable(parentFrame)
 	local numberOfRowsInDKPTable = DAL:GetNumberOfRowsInDKPTable()
+
+	
 	-- "Container" frame that clips out its child frame "excess" content.
 	DKPTableFrame = CreateFrame("ScrollFrame", 'DKPTableScrollFrame', parentFrame, "UIPanelScrollFrameTemplate");
 	DKPTableFrame:SetFrameStrata("HIGH");
 	DKPTableFrame:SetFrameLevel(9);
-
-	DKPTableFrame:SetSize(300, parentFrame:GetHeight() - 40);
-	DKPTableFrame:SetPoint( Const.TOP_LEFT_POINT, 5, -30 );
+	DKPTableFrame:SetSize(300, parentFrame:GetHeight() - 55);
+	DKPTableFrame:SetPoint( Const.TOP_LEFT_POINT, 5, -45 );
 	DKPTableFrame.scrollBar = _G["DKPTableScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
+
+	local DKPTableHeaders = CreateDKPTableHeadersRow(DKPTableFrame); -- todo not updating
+	DKPTableHeaders:SetPoint( Const.BOTTOM_LEFT_POINT, DKPTableFrame, Const.TOP_LEFT_POINT , 0, 0 );
 
 	-- Child frame which holds all the content being scrolled through.
     DKPTableFrame.scrollChild = CreateFrame( "Frame", "$parent_ScrollChild", DKPTableFrame );
-	DKPTableFrame.scrollChild:SetHeight( Const.DKPTableRowHeight*(numberOfRowsInDKPTable+1)+3 );
+	DKPTableFrame.scrollChild:SetHeight( Const.DKPTableRowHeight*(numberOfRowsInDKPTable)+3 );
     DKPTableFrame.scrollChild:SetWidth( Const.DKPTableWidth );
 	DKPTableFrame.scrollChild:SetAllPoints( DKPTableFrame );
 	DKPTableFrame.scrollChild.bg = DKPTableFrame.scrollChild:CreateTexture(nil, Const.BACKGROUND_LAYER)

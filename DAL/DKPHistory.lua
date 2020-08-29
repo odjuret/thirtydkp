@@ -22,10 +22,10 @@ end
 
 function DAL:GetDKPHistoryFor(playerName, maxNumberOfRecords)
     local playerHistory = {}
-    for i, historyEntry in ipairs(ThirtyDKP_Database_DKPHistory) do
-        if string.find(historyEntry.players, playerName) then
+    for i = 0, #ThirtyDKP_Database_DKPHistory-1 do
+        if string.find(ThirtyDKP_Database_DKPHistory[(#ThirtyDKP_Database_DKPHistory-i)].players, playerName) then
             if #playerHistory < maxNumberOfRecords then
-                table.insert(playerHistory, historyEntry)
+                table.insert(playerHistory, ThirtyDKP_Database_DKPHistory[(#ThirtyDKP_Database_DKPHistory-i)])
             else
                 break;
             end

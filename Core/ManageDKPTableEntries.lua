@@ -17,7 +17,7 @@ function Core:AddRaidToDKPTable()
     end
 end
 
-function Core:AddGuildToDKPTable()
+function Core:AddGuildToDKPTable(arg_selectedRank)
     local guildSize = GetNumGuildMembers();
     local nameFromGuild, rank, rankIndex, tempClass;
     local playersAdded = "";
@@ -27,8 +27,7 @@ function Core:AddGuildToDKPTable()
         nameFromGuild, rank, rankIndex, _, tempClass = GetGuildRosterInfo(i)
         nameFromGuild = strsub(nameFromGuild, 1, string.find(nameFromGuild, "-")-1) -- required to remove server name from player (can remove in classic if this is not an issue)
         
-        -- TODO: user be able to choose rank
-        if rankIndex <= 4 then
+        if rank == arg_selectedRank then
             if DAL:AddToDKPTable(nameFromGuild, tempClass) then
                 if playersAdded == "" then
                     playersAdded = Core:AddClassColor(nameFromGuild, tempClass)
@@ -41,6 +40,6 @@ function Core:AddGuildToDKPTable()
     if playersAdded == "" then
         Core:Print("No more players added to table.")
     else
-        Core:Print("added "..playersAdded.." successfully to table.")
+        Core:Print("The following players were added to the table: "..playersAdded)
     end
 end

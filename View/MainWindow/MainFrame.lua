@@ -88,34 +88,11 @@ local function CreateRightSideAdminPanel()
 
     adminPanel.addGuildToTableBtn = CreateTdkpMainFrameButton("Add Guild", Const.BOTTOM_LEFT_POINT, adminPanel.removePlayerBtn, Const.TOP_LEFT_POINT, 0, 0)
     View:AttachHoverOverTooltipAndOnclick(adminPanel.addGuildToTableBtn, "Add guild members to DKP table", "Adds guild members that aren't in the dkp table", function()
-        -- If not in guild
-        if not IsInGuild() then
-            StaticPopupDialogs["TDKP_NOT_IN_GUILD"] = {
-                text = "You need to be in a guild to be able to add guild members to dkp table",
-                button1 = "OK",
-                timeout = 0,
-                whileDead = true,
-                hideOnEscape = true,
-                preferredIndex = 3,
-            }
-            StaticPopup_Show ("TDKP_NOT_IN_GUILD")
-        else
-            local selected = "Do you want to add guild members to dkp table?"
-            StaticPopupDialogs["TDKP_ADD_GUILD_ENTRIES"] = {
-                text = selected,
-                button1 = "Yes",
-                button2 = "No",
-                OnAccept = function()
-                    Core:AddGuildToDKPTable()
-                    View:UpdateDKPTable()
-                end,
-                timeout = 0,
-                whileDead = true,
-                hideOnEscape = true,
-                preferredIndex = 3,
-            }
-            StaticPopup_Show("TDKP_ADD_GUILD_ENTRIES")
-        end
+        View:HideOptionsFrame();
+        View:HideDKPAdjustFrame();
+        View:HideDKPAdminsFrame();
+        View:HideDKPHistoryFrame();
+        View:ToggleAddGuildFrame();
     end);
 
     adminPanel.addRaidToTableBtn = CreateTdkpMainFrameButton("Add Raid", Const.BOTTOM_LEFT_POINT, adminPanel.addGuildToTableBtn, Const.TOP_LEFT_POINT, 0, 0)
@@ -156,7 +133,8 @@ local function CreateRightSideAdminPanel()
         View:HideOptionsFrame();
         View:HideDKPAdjustFrame();
         View:HideDKPHistoryFrame();
-        View:ToggleDKPAdminsFrame()
+        View:HideAddGuildFrame();
+        View:ToggleDKPAdminsFrame();
     end)
 
     adminPanel.broadcastBtn = CreateTdkpMainFrameButton("Broadcast", Const.BOTTOM_RIGHT_POINT, adminPanel.dkpAdminsBtn, Const.TOP_RIGHT_POINT, 0, 0)
@@ -188,7 +166,8 @@ local function CreateRightSideAdminPanel()
     View:AttachHoverOverTooltipAndOnclick(adminPanel.dkpHistoryBtn, "DKP History", "Manage DKP history for your guild.", function()
         View:HideOptionsFrame();
         View:HideDKPAdjustFrame();
-        View:HideDKPAdminsFrame()
+        View:HideDKPAdminsFrame();
+        View:HideAddGuildFrame();
         View:ToggleDKPHistoryFrame();
     end)
 
@@ -197,6 +176,7 @@ local function CreateRightSideAdminPanel()
         View:HideDKPAdjustFrame();
         View:HideDKPAdminsFrame();
         View:HideDKPHistoryFrame();
+        View:HideAddGuildFrame();
         View:ToggleOptionsFrame();
     end)
 
@@ -205,15 +185,8 @@ local function CreateRightSideAdminPanel()
         View:HideOptionsFrame();
         View:HideDKPAdminsFrame()
         View:HideDKPHistoryFrame();
+        View:HideAddGuildFrame();
         View:ToggleDKPAdjustFrame();
-    end)
-
-    adminPanel.addGuildToTableBtn2 = CreateTdkpMainFrameButton("Add Guild", Const.BOTTOM_RIGHT_POINT, adminPanel.dkpAdjustBtn, Const.TOP_RIGHT_POINT, 0, 0)
-    View:AttachHoverOverTooltipAndOnclick(adminPanel.addGuildToTableBtn2, "Add guild", "Adds guild members to the DKP table", function()
-        View:HideOptionsFrame();
-        View:HideDKPAdminsFrame();
-        View:HideDKPHistoryFrame();
-        View:ToggleAddGuildFrame();
     end)
 
     adminPanel.dkpHeader = adminPanel:CreateFontString(nil, Const.OVERLAY_LAYER);
@@ -298,6 +271,7 @@ function View:Initialize()
 		View:CreateDKPAdjustFrame(TdkpMainFrame);
         View:CreateDKPAdminsFrame(TdkpMainFrame);
         View:CreateDKPHistoryFrame(TdkpMainFrame);
+        View:CreateAddGuildFrame(TdkpMainFrame);
     end
 
 	TdkpIsInitialized = true;

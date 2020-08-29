@@ -22,6 +22,7 @@ View\BroadcastingStatusFrame.lua
 View\AdminsFrame.lua
 View\DKPHistoryFrame.lua
 View\FrameFactory.lua
+View\AddGuildFrame.lua
 
 DAL\DKPTable.lua
 DAL\CurrentLoot.lua

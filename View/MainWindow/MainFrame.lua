@@ -208,6 +208,14 @@ local function CreateRightSideAdminPanel()
         View:ToggleDKPAdjustFrame();
     end)
 
+    adminPanel.addGuildToTableBtn2 = CreateTdkpMainFrameButton("Add Guild", Const.BOTTOM_RIGHT_POINT, adminPanel.dkpAdjustBtn, Const.TOP_RIGHT_POINT, 0, 0)
+    View:AttachHoverOverTooltipAndOnclick(adminPanel.addGuildToTableBtn2, "Add guild", "Adds guild members to the DKP table", function()
+        View:HideOptionsFrame();
+        View:HideDKPAdminsFrame();
+        View:HideDKPHistoryFrame();
+        View:ToggleAddGuildFrame();
+    end)
+
     adminPanel.dkpHeader = adminPanel:CreateFontString(nil, Const.OVERLAY_LAYER);
     adminPanel.dkpHeader:SetFontObject("ThirtyDKPSmall");
     adminPanel.dkpHeader:SetPoint(Const.BOTTOM_LEFT_POINT, adminPanel.dkpAdjustBtn, Const.TOP_LEFT_POINT, 0, 5);

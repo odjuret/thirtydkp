@@ -177,6 +177,22 @@ function DAL:GetDKPTableSorting()
 	return ThirtyDKP_Database_Options.dkpTableSorting;
 end
 
+function DAL:GetGuildRankInfo()
+	local guildSize = GetNumGuildMembers();
+    local nameFromGuild, rank, rankIndex, tempClass;
+
+	local ranks = {};
+	
+	for i=1, guildSize do
+		nameFromGuild, rank, rankIndex, _, tempClass = GetGuildRosterInfo(i)
+		nameFromGuild = strsub(nameFromGuild, 1, string.find(nameFromGuild, "-")-1)
+
+		ranks[rankIndex] = rank;
+	end
+		
+	return ranks;
+end
+
 function DAL:ToggleDKPTableSorting(column)
 	if ThirtyDKP_Database_Options.dkpTableSorting.column == column then
 		if ThirtyDKP_Database_Options.dkpTableSorting.mode == SORT_ASCENDING then

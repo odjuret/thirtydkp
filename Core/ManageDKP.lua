@@ -158,6 +158,11 @@ function Core:HandleBossKill(eventId, ...)
     if thirtyDKPRaidName == "" or thirtyDKPRaidName == nil then return end
 
     local bossKillDKPAward = DAL:GetRaidOptions(thirtyDKPRaidName).dkpGainPerKill; -- nil value
+
+    if bossKillDKPAward == 0 then
+        return
+    end
+
     local playerName, playerClass;
     local listOfAwardedPlayers = "";
     -- for every person in the raid

@@ -105,7 +105,7 @@ local function HandleRevertDKPEventMessage(prefix, message, distribution, sender
 
             -- if data versions mismatch, local data is outdated
             if Core:CheckHistoryDataVersion(deserialized.previousHistoryVersion) then
-                DAL:DeleteHistoryEntry(historyEntry);
+                DAL:DeleteHistoryEntry(deserialized.historyEntry);
                 DAL:UpdateDKPHistoryVersion(deserialized.newHistoryVersion)
             end
             View:UpdateAllViews();

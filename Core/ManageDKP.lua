@@ -141,6 +141,7 @@ end
 
 function Core:HandleBossKill(eventId, ...)
     if not Core:IsPlayerMasterLooter() or not Core:IsRaidStarted() then return end
+    Core:SetLootAnnouncedForBoss(false);
     
     local bossName = ...;
     local shouldAwardDKP = false;
@@ -152,8 +153,11 @@ function Core:HandleBossKill(eventId, ...)
     end
     if not shouldAwardDKP then return end
 
-	local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo()
-    local bossKillDKPAward = DAL:GetRaidOptions(GetRaidNameFromId(instanceMapId)).dkpGainPerKill;
+    local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo()
+    local thirtyDKPRaidName = GetRaidNameFromId(instanceMapId);
+    if thirtyDKPRaidName == "" or thirtyDKPRaidName == nil then return end
+
+    local bossKillDKPAward = DAL:GetRaidOptions(thirtyDKPRaidName).dkpGainPerKill; -- nil value
     local playerName, playerClass;
     local listOfAwardedPlayers = "";
     -- for every person in the raid

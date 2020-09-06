@@ -2,9 +2,9 @@
 ## Title: Thirty |cffDC143CDKP|r
 ## Author: Gordito-Gehennas, Throes-Gehennas, Bredsida-Gehennas
 ## Notes: Simple, lightweight and efficient DKP loot system management.
-## Version: 1.0.7
+## Version: 1.1.0
 ## DefaultState: enabled
-## SavedVariables: ThirtyDKP_Database_DKPTable, ThirtyDKP_Database_CurrentLoot, ThirtyDKP_Database_Options, ThirtyDKP_Database_DKPHistory, ThirtyDKP_Database_Raid, ThirtyDKP_Database_PersonalSettings
+## SavedVariables: ThirtyDKP_Database_DKPTable, ThirtyDKP_Database_CurrentLoot, ThirtyDKP_Database_Options, ThirtyDKP_Database_DKPHistory, ThirtyDKP_Database_Raid, ThirtyDKP_Database_PersonalSettings, ThirtyDKP_Database_Standbys
 
 Libs\Libs.xml
 
@@ -23,6 +23,7 @@ View\AdminsFrame.lua
 View\DKPHistoryFrame.lua
 View\FrameFactory.lua
 View\AddGuildFrame.lua
+View\StandbysFrame.lua
 
 DAL\DKPTable.lua
 DAL\CurrentLoot.lua
@@ -30,6 +31,7 @@ DAL\Options.lua
 DAL\DKPHistory.lua
 DAL\Raid.lua
 DAL\PersonalSettings.lua
+DAL\Standbys.lua
 
 Core\Communication.lua
 Core\Main.lua

@@ -128,6 +128,24 @@ local function DKPEvent(affectedPlayers, amount, reason, historyEntry)
     View:UpdateAllViews()
 end
 
+local function GiveStandbyDKP(dkpAmount, reason) 
+    local standbys = DAL:GetStandbys();
+    local listOfAwardedPlayers = "";
+
+    for _, playerName in ipairs(standbys) do
+        if DAL:AdjustPlayerDKP(playerName, tonumber(dkpAmount)) then
+            if listOfAwardedPlayers == "" then
+                listOfAwardedPlayers = playerName;
+            else
+                listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
+            end
+        else
+            Core:Print("Could not award "..playerName.." standby DKP. Contact authors.")
+        end
+    end
+    
+    DKPEvent(listOfAwardedPlayers, dkpAmount, "Standby: "..reason)
+end
 
 function Core:AwardItem(dkpTableEntry, itemLink, itemDKPCost)
     if DAL:AdjustPlayerDKP(dkpTableEntry.player, tonumber("-"..itemDKPCost)) then
@@ -191,6 +209,7 @@ function Core:HandleBossKill(eventId, ...)
     end
 
     DKPEvent(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
+    GiveStandbyDKP(bossKillDKPAward, "Boss Kill: "..bossName)
 end
 
 function Core:ApplyOnTimeBonus()
@@ -220,6 +239,7 @@ function Core:ApplyOnTimeBonus()
 	end
 
     DKPEvent(listOfAwardedPlayers, onTimeBonus, "On Time Bonus")
+    GiveStandbyDKP(onTimeBonus, "On Time Bonus")
 end
 
 function Core:ApplyRaidEndBonus()
@@ -251,6 +271,7 @@ function Core:ApplyRaidEndBonus()
 	end
 
     DKPEvent(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
+    GiveStandbyDKP(raidCompletionBonus, "Raid Completion Bonus")
 end
 
 function Core:ApplyDecay()

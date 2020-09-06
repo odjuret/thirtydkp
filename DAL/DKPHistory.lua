@@ -6,6 +6,12 @@ local Core = ThirtyDKP.Core;
 function DAL:InitializeDKPHistory()
     -- saved variables starts as nil. we want a empty tables
     if not ThirtyDKP_Database_DKPHistory then ThirtyDKP_Database_DKPHistory = {} end;
+    if #ThirtyDKP_Database_DKPHistory > 2500 then
+        local difference = #ThirtyDKP_Database_DKPHistory - 2500;
+        for i = 1, difference do 
+            table.remove(ThirtyDKP_Database_DKPHistory, i);
+        end;
+    end;
 end
 
 function DAL:InitializeHistoryVersion()

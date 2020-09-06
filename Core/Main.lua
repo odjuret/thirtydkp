@@ -185,6 +185,7 @@ function ThirtyDKP_OnInitialize(event, name)
     DAL:InitializeCurrentLootTable();
     DAL:InitializeDKPHistory();
     DAL:InitializePersonalSettings();
+    DAL:InitializeStandbys();
     Core:InitializeComms();
 
     C_Timer.After(1, function()

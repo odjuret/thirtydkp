@@ -8,7 +8,8 @@ local DKPHistoryFrame = nil;
 
 local DKPHISTORY_FRAME_TITLE = "DKP History"
 
-local TDKP_DEFAULT_MAX_HISTORY_ROWS = 50;
+local TDKP_DEFAULT_MAX_HISTORY_ROWS = 100;
+local selectedMaxNumberOfEntries = TDKP_DEFAULT_MAX_HISTORY_ROWS;
 local dkpHistoryScrollChildHeight = 0;
 
 
@@ -81,8 +82,9 @@ local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 						button2 = "No",
 						OnAccept = function()
 							Core:RevertHistory(dkpHistory[id]);
+							DKPHistoryFrame:SetShown(true);
 						end,
-						timeout = 0,
+						timeout = 6,
 						whileDead = true,
 						hideOnEscape = true,
 						preferredIndex = 3,
@@ -103,7 +105,7 @@ local function PopulateDKPHistoryList(scrollChild, dkpHistory)
 		local totalScrollChildIndex = 0;
 		local lastDate, lastTimeOfDay = strsplit(" ", Core:FormatTimestamp(dkpHistory[#dkpHistory].timestamp));
 		for i = 0, (#dkpHistory-1) do
-			if i > TDKP_DEFAULT_MAX_HISTORY_ROWS then
+			if i > selectedMaxNumberOfEntries then
 				return;
 			end
 			
@@ -132,13 +134,63 @@ local function PopulateDKPHistoryList(scrollChild, dkpHistory)
 	end
 end
 
+local function NumberOfEntriesDropdownOnClick(self, arg1, arg2, checked)
+    selectedMaxNumberOfEntries = arg1;
+    
+	L_UIDropDownMenu_SetText(DKPHistoryFrame.numberOfEntriesDropdown, arg2);
+	View:UpdateDKPHistoryFrame();
+	DKPHistoryFrame:SetShown(true);
+end
+
+local function InitializeNumberOfEntriesDropdown(frame, level, menuList)
+	local info = L_UIDropDownMenu_CreateInfo();
+	info.func = NumberOfEntriesDropdownOnClick;
+
+	info.text = "100 Entries";
+	info.arg1 = 100;
+	info.arg2 = info.text;
+	info.checked = selectedMaxNumberOfEntries == info.arg1;
+	L_UIDropDownMenu_AddButton(info);
+
+	info.text = "500 Entries";
+	info.arg1 = 500;
+	info.arg2 = info.text;
+	info.checked = selectedMaxNumberOfEntries == info.arg1;
+	L_UIDropDownMenu_AddButton(info);
+
+	info.text = "1000 Entries";
+	info.arg1 = 1000;
+	info.arg2 = info.text;
+	info.checked = selectedMaxNumberOfEntries == info.arg1;
+	L_UIDropDownMenu_AddButton(info);
+
+	info.text = "2500 Entries";
+	info.arg1 = 2500;
+	info.arg2 = info.text;
+	info.checked = selectedMaxNumberOfEntries == info.arg1;
+	L_UIDropDownMenu_AddButton(info);
+
+end
+
+local function CreateNumberOfEntriesDropdown()
+	local f = CreateFrame("Frame", "ThirtyDKP_NumberOfHistoryEntriesDropdown", DKPHistoryFrame, "L_UIDropDownMenuTemplate");
+	L_UIDropDownMenu_SetWidth(f, 100);
+	L_UIDropDownMenu_Initialize(f, InitializeNumberOfEntriesDropdown);
+	L_UIDropDownMenu_SetText(f, tostring(selectedMaxNumberOfEntries).." Entries");
+
+	return f
+end;
+
 function View:CreateDKPHistoryFrame(parentFrame)
 	DKPHistoryFrame = View:CreateContainerFrame("ThirtyDKP_HistoryFrame", parentFrame, DKPHISTORY_FRAME_TITLE, 432, 385)
 
 	DKPHistoryFrame.helpText = DKPHistoryFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
 	DKPHistoryFrame.helpText:SetFontObject("ThirtyDKPTiny");
-    DKPHistoryFrame.helpText:SetPoint(Const.TOP_LEFT_POINT, DKPHistoryFrame, Const.TOP_LEFT_POINT, 180, -20);
-    DKPHistoryFrame.helpText:SetText(Core:ColorizeGrey("Right click to delete entry."))
+    DKPHistoryFrame.helpText:SetPoint(Const.TOP_LEFT_POINT, DKPHistoryFrame, Const.TOP_LEFT_POINT, 240, -20);
+	DKPHistoryFrame.helpText:SetText(Core:ColorizeGrey("Right click to delete entry."));
+	
+	DKPHistoryFrame.numberOfEntriesDropdown = CreateNumberOfEntriesDropdown();
+	DKPHistoryFrame.numberOfEntriesDropdown:SetPoint(Const.TOP_LEFT_POINT, DKPHistoryFrame, Const.TOP_LEFT_POINT, 100, -4);
 
     local dkpHistory = DAL:GetDKPHistory()
 
@@ -173,7 +225,6 @@ function View:UpdateDKPHistoryFrame()
 	DKPHistoryFrame:SetParent(nil)
 	DKPHistoryFrame = nil;
 
-	TDKP_DEFAULT_MAX_HISTORY_ROWS = 50;
  	dkpHistoryScrollChildHeight = 0;
 
 	View:CreateDKPHistoryFrame(tdkpMainFrame)

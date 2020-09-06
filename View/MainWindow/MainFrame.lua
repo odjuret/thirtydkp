@@ -92,6 +92,7 @@ local function CreateRightSideAdminPanel()
         View:HideDKPAdjustFrame();
         View:HideDKPAdminsFrame();
         View:HideDKPHistoryFrame();
+        View:HideStandbysFrame();
         View:ToggleAddGuildFrame();
     end);
 
@@ -134,6 +135,7 @@ local function CreateRightSideAdminPanel()
         View:HideDKPAdjustFrame();
         View:HideDKPHistoryFrame();
         View:HideAddGuildFrame();
+        View:HideStandbysFrame();
         View:ToggleDKPAdminsFrame();
     end)
 
@@ -168,6 +170,7 @@ local function CreateRightSideAdminPanel()
         View:HideDKPAdjustFrame();
         View:HideDKPAdminsFrame();
         View:HideAddGuildFrame();
+        View:HideStandbysFrame();
         View:ToggleDKPHistoryFrame();
     end)
 
@@ -177,15 +180,27 @@ local function CreateRightSideAdminPanel()
         View:HideDKPAdminsFrame();
         View:HideDKPHistoryFrame();
         View:HideAddGuildFrame();
+        View:HideStandbysFrame();
         View:ToggleOptionsFrame();
     end)
 
-    adminPanel.dkpAdjustBtn = CreateTdkpMainFrameButton("Adjust", Const.BOTTOM_RIGHT_POINT, adminPanel.optionsButton, Const.TOP_RIGHT_POINT, 0, 0)
+    adminPanel.standbysButton = CreateTdkpMainFrameButton("Standbys", Const.BOTTOM_RIGHT_POINT, adminPanel.optionsButton, Const.TOP_RIGHT_POINT, 0, 0)
+    View:AttachHoverOverTooltipAndOnclick(adminPanel.standbysButton, "Manage raid standbys", "Members added to the standby list will also recieve auto awarded DKP.", function()
+        View:HideDKPAdjustFrame();
+        View:HideOptionsFrame();
+        View:HideDKPAdminsFrame();
+        View:HideDKPHistoryFrame();
+        View:HideAddGuildFrame();
+        View:ToggleStandbysFrame();
+    end)
+
+    adminPanel.dkpAdjustBtn = CreateTdkpMainFrameButton("Adjust", Const.BOTTOM_RIGHT_POINT, adminPanel.standbysButton, Const.TOP_RIGHT_POINT, 0, 0)
     View:AttachHoverOverTooltipAndOnclick(adminPanel.dkpAdjustBtn, "DKP Adjustments", "Give on-time and raid completion bonuses.\nManually adjust player DKP.\nApply DKP Decay for guild.", function()
         View:HideOptionsFrame();
         View:HideDKPAdminsFrame()
         View:HideDKPHistoryFrame();
         View:HideAddGuildFrame();
+        View:HideStandbysFrame();
         View:ToggleDKPAdjustFrame();
     end)
 
@@ -272,6 +287,7 @@ function View:Initialize()
         View:CreateDKPAdminsFrame(TdkpMainFrame);
         View:CreateDKPHistoryFrame(TdkpMainFrame);
         View:CreateAddGuildFrame(TdkpMainFrame);
+        View:CreateStandbysFrame(TdkpMainFrame);
     end
 
 	TdkpIsInitialized = true;

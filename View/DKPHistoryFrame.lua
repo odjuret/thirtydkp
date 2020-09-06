@@ -186,7 +186,7 @@ function View:CreateDKPHistoryFrame(parentFrame)
 
 	DKPHistoryFrame.helpText = DKPHistoryFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
 	DKPHistoryFrame.helpText:SetFontObject("ThirtyDKPTiny");
-    DKPHistoryFrame.helpText:SetPoint(Const.TOP_LEFT_POINT, DKPHistoryFrame, Const.TOP_LEFT_POINT, 240, -20);
+    DKPHistoryFrame.helpText:SetPoint(Const.TOP_RIGHT_POINT, DKPHistoryFrame, Const.TOP_RIGHT_POINT, -50, -20);
 	DKPHistoryFrame.helpText:SetText(Core:ColorizeGrey("Right click to delete entry."));
 	
 	DKPHistoryFrame.numberOfEntriesDropdown = CreateNumberOfEntriesDropdown();

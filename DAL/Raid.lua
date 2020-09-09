@@ -8,6 +8,11 @@ function DAL:InitializeRaid()
 			raidOngoing = false
 		}
 	end
+	if GetNumGroupMembers() < 2 then
+		ThirtyDKP_Database_Raid = {
+			raidOngoing = false
+		}
+	end
 end
 
 

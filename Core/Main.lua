@@ -110,7 +110,7 @@ function ThirtyDKP_OnEvent(self, event, arg1, ...)
         self:UnregisterEvent("PLAYER_GUILD_UPDATE"); 
         Core:CheckDataVersion();   
 
-    elseif event == "LOOT_OPENED" then
+    elseif event == "LOOT_READY" then
         Core:HandleLootWindow()
 
     elseif event == "BOSS_KILL" then
@@ -203,7 +203,7 @@ end
 ----------------------------------
 local tdkpEvents = CreateFrame("Frame", "TDKPEventsFrame");
 tdkpEvents:RegisterEvent("ADDON_LOADED");
-tdkpEvents:RegisterEvent("LOOT_OPENED");
+tdkpEvents:RegisterEvent("LOOT_READY");
 tdkpEvents:RegisterEvent("BOSS_KILL");
 tdkpEvents:RegisterEvent("GUILD_ROSTER_UPDATE");
 tdkpEvents:RegisterEvent("PLAYER_GUILD_UPDATE");

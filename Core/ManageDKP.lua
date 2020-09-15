@@ -159,7 +159,6 @@ end
 
 function Core:HandleBossKill(eventId, ...)
     if not Core:IsPlayerMasterLooter() or not Core:IsRaidStarted() then return end
-    Core:SetLootAnnouncedForBoss(false);
     
     local bossName = ...;
     local shouldAwardDKP = false;

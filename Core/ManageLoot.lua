@@ -4,12 +4,24 @@ local Core = ThirtyDKP.Core
 local DAL = ThirtyDKP.DAL
 local View = ThirtyDKP.View
 
-local lootAnnouncedForBoss = false;
+local lootSources = {};
 
 local lootAnnounceQueue = {};
 
-function Core:SetLootAnnouncedForBoss(isAnnounced)
-  lootAnnouncedForBoss = isAnnounced;
+local function LootHasBeenAnnounced()
+  local hasBeenAnnounced = false
+  local numberOfLootItems = GetNumLootItems()
+  for i = 1, numberOfLootItems do
+    if GetLootSlotType(i) == 1 then
+      for j = 1, numberOfLootItems do
+        if GetLootSourceInfo(i) == lootSources[j] then 
+          hasBeenAnnounced = true
+        break
+        end
+      end
+    end
+  end
+  return hasBeenAnnounced
 end
 
 function Core:HandleGetItemInfoRecieved(itemdID, success)
@@ -36,10 +48,11 @@ end
 
 
 function Core:HandleLootWindow()
-  if not Core:IsPlayerMasterLooter() or not Core:IsRaidStarted() then return end
+  if not Core:IsPlayerMasterLooter() or not Core:IsRaidStarted() or LootHasBeenAnnounced() then return end
   local foundEpaxx = false
+  local numberOfLootItems = GetNumLootItems();
 
-  for i = 1, GetNumLootItems() do
+  for i = 1, numberOfLootItems do
     local itemLink = GetLootSlotLink(i)
     if itemLink ~= nil then
       local _, _, itemRarity = GetItemInfo(itemLink);
@@ -52,17 +65,18 @@ function Core:HandleLootWindow()
         if itemRarity > 3 then
           foundEpaxx = true
           DAL:AddToLootTable(itemLink)
-          if not lootAnnouncedForBoss then
-            SendChatMessage("ThirtyDKP: "..itemLink.." is now available for bidding. ", "RAID", nil, nil)
-          end
+          SendChatMessage("ThirtyDKP: "..itemLink.." is now available for bidding. ", "RAID", nil, nil)
         end
       end
     end
   end
 
   if foundEpaxx then
-    lootAnnouncedForBoss = true;
-    View:ToggleBidAnnounceFrame();
+    for i = 1, numberOfLootItems do
+      lootSources[i] = GetLootSourceInfo(i)
+    end
+    View:UpdateLootTableFrame();
+    View:OpenBidAnnounceFrame();
   end
 end
 

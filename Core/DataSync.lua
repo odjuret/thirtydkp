@@ -118,7 +118,7 @@ local function CompareDataVersions()
                 dataStatusText = "Data up-to-date."
             else
                 local formattedDate = Core:FormatTimestamp(latestKnownDKPTableDate)
-                dataStatusText = "Newer DKP data found from "..formattedDate..". By "..knownLatestVersionOwner.."."
+                dataStatusText = "Hella fresh DKP data found from "..formattedDate..". By "..knownLatestVersionOwner.."."
             end
         else 
             -- Could not find any newer data versions
@@ -142,7 +142,7 @@ function Core:CheckDataVersion()
     C_Timer.After(1, function() 
         local currentGuildName = GetGuildInfo("player");
         if currentGuildName == nil then
-            Core:Print("No guild to sync data with.")
+            Core:Print("Found no guild to sync data with, server could be laggy.")
         else
             Core:Print("Attempting to sync DKP data with online guildies.")
             -- Request data versions from online members

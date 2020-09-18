@@ -5,9 +5,22 @@ local DAL = ThirtyDKP.DAL
 function DAL:InitializeStandbys()
 	if not ThirtyDKP_Database_Standbys then
 		ThirtyDKP_Database_Standbys = {}
+    end
+    
+    if not ThirtyDKP_Database_Standbys.includeStandbys then
+		ThirtyDKP_Database_Standbys = {
+            includeStandbys = true,
+        }
 	end
 end
 
+function DAL:GetIncludeStandbys()
+	return ThirtyDKP_Database_Standbys.includeStandbys;
+end
+
+function DAL:SetIncludeStandbys(incIncludeStandbys)
+	ThirtyDKP_Database_Standbys.includeStandbys = incIncludeStandbys;
+end
 
 function DAL:GetStandbys()
 	return ThirtyDKP_Database_Standbys;

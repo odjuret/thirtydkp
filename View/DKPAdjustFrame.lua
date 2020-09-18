@@ -34,6 +34,15 @@ function View:CreateDKPAdjustFrame(parentFrame)
 	raidEndBonusButton:SetChecked(true);
 	raidEndBonusButtonText:SetText("Give raid completion bonus");
 
+	local includeStandbysButton = CreateFrame("CheckButton", "includeStandbysButton", DKPAdjustFrame, "ChatConfigCheckButtonTemplate");
+	includeStandbysButton:SetPoint(Const.TOP_LEFT_POINT, raidEndBonusButton, Const.BOTTOM_LEFT_POINT, 0, 0);
+	includeStandbysButton:SetChecked(DAL:GetIncludeStandbys());
+	includeStandbysButtonText:SetText("Include standbys");
+	includeStandbysButton:RegisterForClicks("AnyUp");
+	includeStandbysButton:SetScript("OnClick", function(self, arg1) 
+		DAL:SetIncludeStandbys(self:GetChecked());
+	end);
+
 	if raidInfo.raidOngoing then
 		startOrEndRaidBtn:SetText(TDKP_RAID_BUTTON_END);
 	else
@@ -73,7 +82,7 @@ function View:CreateDKPAdjustFrame(parentFrame)
 
 	local adjustDkpSection = CreateFrame("Frame", nil, DKPAdjustFrame, nil);
 	adjustDkpSection:SetSize(DKPAdjustFrame:GetWidth() - 50, 70);
-	adjustDkpSection:SetPoint(Const.TOP_LEFT_POINT, startOrEndRaidBtn, Const.BOTTOM_LEFT_POINT, 0, -10);
+	adjustDkpSection:SetPoint(Const.TOP_LEFT_POINT, startOrEndRaidBtn, Const.BOTTOM_LEFT_POINT, 0, -20);
 
     local adjustDkpLabel = adjustDkpSection:CreateFontString(nil, Const.OVERLAY_LAYER);
     adjustDkpLabel:SetFontObject("GameFontWhite");

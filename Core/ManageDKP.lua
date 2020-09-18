@@ -128,23 +128,25 @@ local function DKPEvent(affectedPlayers, amount, reason, historyEntry)
     View:UpdateAllViews()
 end
 
-local function GiveStandbyDKP(dkpAmount, reason) 
-    local standbys = DAL:GetStandbys();
-    local listOfAwardedPlayers = "";
+local function GiveStandbyDKP(listOfAwardedPlayers, dkpAmount, reason)
+    if DAL:GetIncludeStandbys() then
+        local standbys = DAL:GetStandbys();
 
-    for _, playerName in ipairs(standbys) do
-        if DAL:AdjustPlayerDKP(playerName, tonumber(dkpAmount)) then
-            if listOfAwardedPlayers == "" then
-                listOfAwardedPlayers = playerName;
+        for _, playerName in ipairs(standbys) do
+            if DAL:AdjustPlayerDKP(playerName, tonumber(dkpAmount)) then
+                if listOfAwardedPlayers == "" then
+                    listOfAwardedPlayers = playerName;
+                else
+                    listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
+                end
             else
-                listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
+                Core:Print("Could not award "..playerName.." standby DKP. Contact authors.")
             end
-        else
-            Core:Print("Could not award "..playerName.." standby DKP. Contact authors.")
         end
+        return listOfAwardedPlayers;
+    else
+        return listOfAwardedPlayers;
     end
-    
-    DKPEvent(listOfAwardedPlayers, dkpAmount, "Standby: "..reason)
 end
 
 function Core:AwardItem(dkpTableEntry, itemLink, itemDKPCost)
@@ -159,42 +161,34 @@ end
 
 function Core:HandleBossKill(eventId, ...)
     if not Core:IsPlayerMasterLooter() or not Core:IsRaidStarted() then return end
-    
     local bossName = ...;
-    local shouldAwardDKP = false;
-    for _, bossEventId in ipairs(bossEventIds) do
-        if bossEventId == eventId then
-            shouldAwardDKP = true
-            break;
-        end
-    end
-    if not shouldAwardDKP then return end
-
-    local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo()
-    local thirtyDKPRaidName = GetRaidNameFromId(instanceMapId);
-    if thirtyDKPRaidName == "" or thirtyDKPRaidName == nil then return end
-
-    local bossKillDKPAward = DAL:GetRaidOptions(thirtyDKPRaidName).dkpGainPerKill; -- nil value
-
-    if bossKillDKPAward == 0 then
-        return
-    end
-
-    local playerName, playerClass;
-    local listOfAwardedPlayers = "";
-    -- for every person in the raid
-    for i=1, GetNumGroupMembers() do
-        playerName, _, _, _, playerClass  = GetRaidRosterInfo(i)
+    C_Timer.After(2, function()
         
-        if DAL:AdjustPlayerDKP(playerName, tonumber(bossKillDKPAward)) then
-            if listOfAwardedPlayers == "" then
-                listOfAwardedPlayers = playerName;
-            else
-                listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
+        local shouldAwardDKP = false;
+        for _, bossEventId in ipairs(bossEventIds) do
+            if bossEventId == eventId then
+                shouldAwardDKP = true
+                break;
             end
-        else
-            -- could not adjust player dkp, add player to dkp table first
-            DAL:AddToDKPTable(playerName, playerClass)
+        end
+        if not shouldAwardDKP then return end
+
+        local _, _, _, _, _, _, _, instanceMapId, _ = GetInstanceInfo()
+        local thirtyDKPRaidName = GetRaidNameFromId(instanceMapId);
+        if thirtyDKPRaidName == "" or thirtyDKPRaidName == nil then return end
+
+        local bossKillDKPAward = DAL:GetRaidOptions(thirtyDKPRaidName).dkpGainPerKill; -- nil value
+
+        if bossKillDKPAward == 0 then
+            return
+        end
+
+        local playerName, playerClass;
+        local listOfAwardedPlayers = "";
+        -- for every person in the raid
+        for i=1, GetNumGroupMembers() do
+            playerName, _, _, _, playerClass  = GetRaidRosterInfo(i)
+            
             if DAL:AdjustPlayerDKP(playerName, tonumber(bossKillDKPAward)) then
                 if listOfAwardedPlayers == "" then
                     listOfAwardedPlayers = playerName;
@@ -202,13 +196,24 @@ function Core:HandleBossKill(eventId, ...)
                     listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
                 end
             else
-                Core:Print("Could not award "..playerName.." boss kill DKP. Contact authors.")
+                -- could not adjust player dkp, add player to dkp table first
+                DAL:AddToDKPTable(playerName, playerClass)
+                if DAL:AdjustPlayerDKP(playerName, tonumber(bossKillDKPAward)) then
+                    if listOfAwardedPlayers == "" then
+                        listOfAwardedPlayers = playerName;
+                    else
+                        listOfAwardedPlayers = listOfAwardedPlayers..","..playerName;
+                    end
+                else
+                    Core:Print("Could not award "..playerName.." boss kill DKP. Contact authors.")
+                end
             end
         end
-    end
 
-    DKPEvent(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
-    GiveStandbyDKP(bossKillDKPAward, "Boss Kill: "..bossName)
+        listOfAwardedPlayers = GiveStandbyDKP(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
+        DKPEvent(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
+    
+    end)
 end
 
 function Core:ApplyOnTimeBonus()
@@ -237,8 +242,8 @@ function Core:ApplyOnTimeBonus()
 		end
 	end
 
+    listOfAwardedPlayers = GiveStandbyDKP(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
     DKPEvent(listOfAwardedPlayers, onTimeBonus, "On Time Bonus")
-    GiveStandbyDKP(onTimeBonus, "On Time Bonus")
 end
 
 function Core:ApplyRaidEndBonus()
@@ -269,8 +274,8 @@ function Core:ApplyRaidEndBonus()
 		end
 	end
 
+    listOfAwardedPlayers = GiveStandbyDKP(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
     DKPEvent(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
-    GiveStandbyDKP(raidCompletionBonus, "Raid Completion Bonus")
 end
 
 function Core:ApplyDecay()

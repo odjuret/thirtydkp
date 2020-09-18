@@ -55,7 +55,9 @@ function Core:HandleLootWindow()
   for i = 1, numberOfLootItems do
     local itemLink = GetLootSlotLink(i)
     if itemLink ~= nil then
-      local _, _, itemRarity = GetItemInfo(itemLink);
+      local _, _, itemRarity, _, _, itemType = GetItemInfo(itemLink);
+      if itemType == "Trade Goods" then return end
+
       if itemRarity == nil then
         -- if item not in cache, put it in queue and wait for it to arrive.
         table.insert(lootAnnounceQueue, itemLink);
@@ -75,7 +77,6 @@ function Core:HandleLootWindow()
     for i = 1, numberOfLootItems do
       lootSources[i] = GetLootSourceInfo(i)
     end
-    View:UpdateLootTableFrame();
     View:OpenBidAnnounceFrame();
   end
 end

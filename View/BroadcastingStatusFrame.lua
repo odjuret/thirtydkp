@@ -8,17 +8,11 @@ local bytesSent = 0
 local bytesTotal = 0
 
 local function CreateBroadcastingStatusFrame()
-	local f = CreateFrame("Frame", "ThirtyDKP_BroadcastingStatusFrame", UIParent, "ShadowOverlaySmallTemplate");
+	local f = CreateFrame("Frame", "ThirtyDKP_BroadcastingStatusFrame", UIParent, "TooltipBorderedFrameTemplate");
 
 	f:SetPoint("TOP", UIParent, "TOP", 0, -10);
-	f:SetSize(300, 85);
+	f:SetSize(210, 65);
 	f:SetClampedToScreen(true)
-	f:SetBackdrop({
-        bgFile = "Interface/Tooltips/UI-Tooltip-Background", 
-        tile = true, 
-    });
-	f:SetBackdropColor(0,0,0,0.9);
-	f:SetBackdropBorderColor(1,1,1,1)
 	f:SetFrameStrata("DIALOG")
 	f:SetFrameLevel(15)
 	f:SetMovable(true);
@@ -29,10 +23,10 @@ local function CreateBroadcastingStatusFrame()
 	f:Hide()
 
 	f.bcastHeader = f:CreateFontString(nil, "OVERLAY")
-	f.bcastHeader:SetFontObject("GameFontNormal");
+	f.bcastHeader:SetFontObject("ThirtyDKPHeader");
 	f.bcastHeader:SetPoint("TOPLEFT", f, "TOPLEFT", 15, -15);
     f.bcastHeader:SetScale(0.8)
-    f.bcastHeader:SetText("Broadcasting")
+    f.bcastHeader:SetText("ThirtyDKP Data Broadcasting")
 
 	f.status = CreateFrame("StatusBar", nil, f)
 	f.status:SetSize(200, 15)

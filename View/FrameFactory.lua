@@ -6,17 +6,17 @@ local tdkpMenuFrame = CreateFrame("Frame", "ThirtyDKPRightClickMenuFrame", UIPar
 
 function View:CreateNumericInputFrame(parent, label, value, valueChangedCallback)
     local wrapper = CreateFrame("Frame", nil, parent, nil);
-    wrapper:SetSize(parent:GetWidth(), 30);
+    wrapper:SetSize(parent:GetWidth(), 25);
 
     wrapper.label = wrapper:CreateFontString(nil, Const.OVERLAY_LAYER);
-    wrapper.label:SetFontObject("GameFontNormal");
+    wrapper.label:SetFontObject("ThirtyDKPSmall");
     wrapper.label:ClearAllPoints();
     wrapper.label:SetText(label);
-    wrapper.label:SetPoint(Const.TOP_LEFT_POINT, wrapper, Const.TOP_LEFT_POINT, 0, -5)
+    wrapper.label:SetPoint(Const.TOP_LEFT_POINT, wrapper, Const.TOP_LEFT_POINT, 0, -2)
 
     wrapper.input = CreateFrame("EditBox", nil, wrapper, nil);
-    wrapper.input:SetFontObject("GameFontNormal");
-    wrapper.input:SetSize(30, 20);
+    wrapper.input:SetFontObject("ThirtyDKPSmall");
+    wrapper.input:SetSize(30, 15);
     wrapper.input:SetAutoFocus(false);
     wrapper.input:SetNumeric(true);
     wrapper.input:SetNumber(value);

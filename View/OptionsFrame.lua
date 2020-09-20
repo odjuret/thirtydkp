@@ -29,10 +29,17 @@ end
 function View:UpdateOptionsFrame()
 	SelectedRaid = DAL:GetLastSelectedRaid();
 	local options = DAL:GetRaidOptions(SelectedRaid);
+	local decayOption, onTimeOption, CompletionBonusOption = DAL:GetGlobalDKPOptions();
+
+	TdkpOptionsFrame.onTimeBonus.input:SetNumber(onTimeOption);
+	TdkpOptionsFrame.raidCompletionBonus.input:SetNumber(CompletionBonusOption);
+	TdkpOptionsFrame.decay.input:SetNumber(decayOption);
+	
 	TdkpOptionsFrame.dkpGainPerKill.input:SetNumber(options.dkpGainPerKill);
 	TdkpOptionsFrame.headCostInput.input:SetNumber(options.itemCosts.head);
 	TdkpOptionsFrame.neckCostInput.input:SetNumber(options.itemCosts.neck);
 	TdkpOptionsFrame.shouldersCostInput.input:SetNumber(options.itemCosts.shoulders);
+	TdkpOptionsFrame.backCostInput.input:SetNumber(options.itemCosts.back);
 	TdkpOptionsFrame.chestCostInput.input:SetNumber(options.itemCosts.chest);
 	TdkpOptionsFrame.bracersCostInput.input:SetNumber(options.itemCosts.bracers);
 	TdkpOptionsFrame.glovesCostInput.input:SetNumber(options.itemCosts.gloves);
@@ -90,25 +97,25 @@ local function InitializeRaidDropdown(_, _, _)
 end
 
 function View:CreateOptionsFrame(parentFrame)
-	TdkpOptionsFrame = View:CreateContainerFrame("ThirtyDKP_OptionsFrame", parentFrame, TDKP_OPTIONS_FRAME_TITLE, 370, 450);
+	TdkpOptionsFrame = View:CreateContainerFrame("ThirtyDKP_OptionsFrame", parentFrame, TDKP_OPTIONS_FRAME_TITLE, 320, 440);
 
 	local options = DAL:GetOptions();
 	SelectedRaid = options.lastSelectedRaid
     local raidOptions = DAL:GetRaidOptions(SelectedRaid);
 
 	local globalOptionsHeader = TdkpOptionsFrame:CreateFontString(nil, OVERLAY_LAYER);
-	globalOptionsHeader:SetFontObject("GameFontWhite");
+	globalOptionsHeader:SetFontObject("GameFontNormal");
 	globalOptionsHeader:SetPoint(Const.TOP_LEFT_POINT, TdkpOptionsFrame, Const.TOP_LEFT_POINT, 10, -35);
 	globalOptionsHeader:SetText("Global Options");
 
 
     -- global settings, two sections
     local globalSectionLeft = CreateFrame("Frame", nil, TdkpOptionsFrame, nil);
-    globalSectionLeft:SetSize(180, 70);
+    globalSectionLeft:SetSize(145, 70);
     globalSectionLeft:SetPoint(Const.TOP_LEFT_POINT, globalOptionsHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
 
     local globalSectionRight = CreateFrame("Frame", nil, TdkpOptionsFrame, nil);
-    globalSectionRight:SetSize(100, 70);
+    globalSectionRight:SetSize(70, 70);
     globalSectionRight:SetPoint(Const.TOP_LEFT_POINT, globalSectionLeft, Const.TOP_RIGHT_POINT, 30, 0);
 
     TdkpOptionsFrame.onTimeBonus = View:CreateNumericInputFrame(globalSectionLeft, "On Time Bonus:", options.onTimeBonus, function(input)
@@ -126,13 +133,13 @@ function View:CreateOptionsFrame(parentFrame)
     end);
 	TdkpOptionsFrame.decay:SetPoint(Const.TOP_LEFT_POINT);
 	local decayPercentageCharacter = globalSectionRight:CreateFontString(nil, OVERLAY_LAYER);
-	decayPercentageCharacter:SetFontObject("GameFontNormal");
-	decayPercentageCharacter:SetPoint(Const.TOP_LEFT_POINT, globalSectionRight, Const.TOP_RIGHT_POINT, 4, -5);
+	decayPercentageCharacter:SetFontObject("ThirtyDKPSmall");
+	decayPercentageCharacter:SetPoint(Const.TOP_LEFT_POINT, globalSectionRight, Const.TOP_RIGHT_POINT, 4, -2);
 	decayPercentageCharacter:SetText("%");
 
 
 	local raidOptionsHeader = TdkpOptionsFrame:CreateFontString(nil, OVERLAY_LAYER);
-	raidOptionsHeader:SetFontObject("GameFontWhite");
+	raidOptionsHeader:SetFontObject("GameFontNormal");
 	raidOptionsHeader:SetPoint(Const.TOP_LEFT_POINT, globalSectionLeft, Const.BOTTOM_LEFT_POINT, -10, 0);
 	raidOptionsHeader:SetText("Raid Specific Options for: ");
 
@@ -144,7 +151,7 @@ function View:CreateOptionsFrame(parentFrame)
 
 
 	local dkpGainSection = CreateFrame("Frame", nil, TdkpOptionsFrame, nil);
-	dkpGainSection:SetSize(115, 30);
+	dkpGainSection:SetSize(95, 30);
 	dkpGainSection:SetPoint(Const.TOP_LEFT_POINT, raidOptionsHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
 	TdkpOptionsFrame.dkpGainPerKill = View:CreateNumericInputFrame(dkpGainSection, "Boss kill DKP:", raidOptions.dkpGainPerKill, function(input)
 		DAL:GetRaidOptions(SelectedRaid).dkpGainPerKill = input:GetNumber();
@@ -158,12 +165,12 @@ function View:CreateOptionsFrame(parentFrame)
 
     -- Item cost setting, two sections
     local itemCostSectionLeft = CreateFrame("Frame", nil, TdkpOptionsFrame, nil);
-    itemCostSectionLeft:SetSize(105, 150);
+    itemCostSectionLeft:SetSize(85, 150);
     itemCostSectionLeft:SetPoint(Const.TOP_LEFT_POINT, itemCostHeader, Const.BOTTOM_LEFT_POINT, 10, -10);
 
     local itemCostSectionRight = CreateFrame("Frame", nil, TdkpOptionsFrame, nil);
-    itemCostSectionRight:SetSize(115, 150);
-    itemCostSectionRight:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionLeft, Const.TOP_RIGHT_POINT, 20, 0);
+    itemCostSectionRight:SetSize(95, 150);
+    itemCostSectionRight:SetPoint(Const.TOP_LEFT_POINT, itemCostSectionLeft, Const.TOP_RIGHT_POINT, 30, 0);
 
     -- Left section
     TdkpOptionsFrame.headCostInput = CreateDkpCostInputFrame("Head:", "head", itemCostSectionLeft);
@@ -171,7 +178,8 @@ function View:CreateOptionsFrame(parentFrame)
 
     TdkpOptionsFrame.neckCostInput = CreateAndAttachDkpCostFrame("Neck:", "neck", itemCostSectionLeft, TdkpOptionsFrame.headCostInput);
     TdkpOptionsFrame.shouldersCostInput = CreateAndAttachDkpCostFrame("Shoulders:", "shoulders", itemCostSectionLeft, TdkpOptionsFrame.neckCostInput);
-    TdkpOptionsFrame.chestCostInput = CreateAndAttachDkpCostFrame("Chest:", "chest", itemCostSectionLeft, TdkpOptionsFrame.shouldersCostInput);
+    TdkpOptionsFrame.backCostInput = CreateAndAttachDkpCostFrame("Back:", "back", itemCostSectionLeft, TdkpOptionsFrame.shouldersCostInput);
+    TdkpOptionsFrame.chestCostInput = CreateAndAttachDkpCostFrame("Chest:", "chest", itemCostSectionLeft, TdkpOptionsFrame.backCostInput);
     TdkpOptionsFrame.bracersCostInput = CreateAndAttachDkpCostFrame("Bracers:", "bracers", itemCostSectionLeft, TdkpOptionsFrame.chestCostInput);
     TdkpOptionsFrame.glovesCostInput = CreateAndAttachDkpCostFrame("Gloves:", "gloves", itemCostSectionLeft, TdkpOptionsFrame.bracersCostInput);
     TdkpOptionsFrame.beltCostInput = CreateAndAttachDkpCostFrame("Belt:", "belt", itemCostSectionLeft, TdkpOptionsFrame.glovesCostInput);

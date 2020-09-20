@@ -247,12 +247,14 @@ local function CreateTdkpMainFrame(isAddonAdmin)
 
     -- up-to-date frame
     f.upToDateFrame = CreateFrame('Button', nil, f);
-    f.upToDateFrame:SetSize(100, 30);
-    f.upToDateFrame:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 110, 0);
+    f.upToDateFrame:SetSize(70, 15);
+    f.upToDateFrame:SetPoint(Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 110, -5);
     f.upToDateFrame:RegisterForClicks("AnyUp");
+    f.upToDateFrame:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight")
+    f.upToDateFrame:GetHighlightTexture():SetAlpha(0.5)
     f.upToDateFrame.text = f.upToDateFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
 	f.upToDateFrame.text:SetFontObject("ThirtyDKPTiny");
-    f.upToDateFrame.text:SetPoint(Const.LEFT_POINT, f.upToDateFrame, Const.LEFT_POINT, 0, 5);
+    f.upToDateFrame.text:SetPoint(Const.LEFT_POINT, f.upToDateFrame, Const.LEFT_POINT, 5, 0);
     
     View:UpdateDataUpToDateFrame()
 

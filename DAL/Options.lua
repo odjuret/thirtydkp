@@ -161,6 +161,10 @@ function DAL:GetOptions()
 	return ThirtyDKP_Database_Options;
 end
 
+function DAL:GetGlobalDKPOptions()
+	return ThirtyDKP_Database_Options.decay, ThirtyDKP_Database_Options.onTimeBonus, ThirtyDKP_Database_Options.raidCompletionBonus;
+end
+
 function DAL:GetRaidOptions(raidName)
 	return ThirtyDKP_Database_Options[raidName];
 end

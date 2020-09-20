@@ -27,16 +27,16 @@ end
 function Core:HandleGetItemInfoRecieved(itemdID, success)
   if #lootAnnounceQueue > 0 then
     if success then
-      local _, itemLink, itemRarity = GetItemInfo(itemdID);
+      local _, itemLink, itemRarity, _, _, itemType = GetItemInfo(itemdID);
 
       for i, queuedLink in ipairs(lootAnnounceQueue) do
         if queuedLink == itemLink then
-          if itemRarity > 3 then
+          if itemRarity > 3 and (itemType ~= "Trade Goods") then
 
             DAL:AddToLootTable(queuedLink);
             SendChatMessage("ThirtyDKP: "..queuedLink.." is now available for bidding. ", "RAID", nil, nil);
-            table.remove(lootAnnounceQueue, queuedLink);
           end
+          table.remove(lootAnnounceQueue, queuedLink);
         end
       end
       View:UpdateLootTableFrame();
@@ -56,20 +56,18 @@ function Core:HandleLootWindow()
     local itemLink = GetLootSlotLink(i)
     if itemLink ~= nil then
       local _, _, itemRarity, _, _, itemType = GetItemInfo(itemLink);
-      if itemType == "Trade Goods" then return end
-
-      if itemRarity == nil then
-        -- if item not in cache, put it in queue and wait for it to arrive.
-        table.insert(lootAnnounceQueue, itemLink);
-        Core:RegisterForGetItemInfoEvents();
-      else
-
-        if itemRarity > 3 then
-          foundEpaxx = true
-          DAL:AddToLootTable(itemLink)
-          SendChatMessage("ThirtyDKP: "..itemLink.." is now available for bidding. ", "RAID", nil, nil)
+        if itemRarity == nil then
+          -- if item not in cache, put it in queue and wait for it to arrive.
+          table.insert(lootAnnounceQueue, itemLink);
+          Core:RegisterForGetItemInfoEvents();
+        else
+  
+          if itemRarity > 3 and (itemType ~= "Trade Goods") then
+            foundEpaxx = true
+            DAL:AddToLootTable(itemLink)
+            SendChatMessage("ThirtyDKP: "..itemLink.." is now available for bidding. ", "RAID", nil, nil)
+          end
         end
-      end
     end
   end
 

@@ -103,6 +103,9 @@ local function CreateIncomingBidsFrame()
 
     IncomingBidsFrame:SetScrollChild( IncomingBidsFrame.scrollChild );
 
+    table.sort(incomingBids, function(a, b)
+        return a["dkp"] > b["dkp"];
+    end)
     PopulateIncomingBidsTable(IncomingBidsFrame, numberOfIncomingBids)
 end
 
@@ -112,7 +115,7 @@ local function CreateCurrentItemForBidFrame()
     local f = BidAnnounceFrame.CurrentItemForBidFrame;
     local itemName, itemIcon = "", nil
 
-    f:SetSize( Const.LootTableWidth+10, 180);
+    f:SetSize( Const.LootTableWidth+10, 165);
 	f:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame, Const.TOP_LEFT_POINT, 5, -15 );
 
     f.itemIcon = f:CreateTexture(nil, Const.OVERLAY_LAYER, nil);
@@ -246,7 +249,7 @@ local function CreateLootTableFrame()
     local lootTable = BidAnnounceFrame.LootTable
 
 	lootTable:SetSize( Const.LootTableWidth, numberOfRowsInLootTable*7);
-	lootTable:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame, Const.TOP_LEFT_POINT, 5, -290 );
+	lootTable:SetPoint( Const.TOP_LEFT_POINT, BidAnnounceFrame, Const.TOP_LEFT_POINT, 5, -270 );
 	lootTable:SetPoint( Const.BOTTOM_RIGHT_POINT, BidAnnounceFrame, Const.BOTTOM_RIGHT_POINT, -27, 5 );
 	lootTable.scrollBar = _G["BidAnnounceFrameScrollFrameScrollBar"]; --fuckin xml -> lua glue magic
 
@@ -313,7 +316,7 @@ function View:CreateBidAnnounceFrame()
     BidAnnounceFrame = CreateFrame('Frame', 'ThirtyDKP_BidAnnounceFrame', UIParent, "TooltipBorderedFrameTemplate"); 
     local f = BidAnnounceFrame;
 	f:SetShown(false);
-	f:SetSize(Const.LootTableWidth+20, 400);
+	f:SetSize(Const.LootTableWidth+20, 380);
     f:SetFrameStrata("HIGH");
     f:SetFrameLevel(10);
 
@@ -332,36 +335,40 @@ function View:CreateBidAnnounceFrame()
     local options = DAL:GetOptions();
     selectedRaid = options.lastSelectedRaid
 
-    -- Inputs
-    local inputSection = CreateFrame("Frame", nil, f, nil);
-    inputSection:SetSize(Const.LootTableWidth/2, 50);
-    inputSection:SetPoint(Const.TOP_LEFT_POINT, f, Const.TOP_LEFT_POINT, 10, -195);
+    -- middle sections
+    local leftMiddleSection = CreateFrame("Frame", nil, f, nil);
+    leftMiddleSection:SetSize(100, 80);
+    leftMiddleSection:SetPoint(Const.TOP_LEFT_POINT, f, Const.TOP_LEFT_POINT, 10, -183);
 
-	local dkpCostOptionsLabel = inputSection:CreateFontString(nil, Const.OVERLAY_LAYER);
-	dkpCostOptionsLabel:SetFontObject("GameFontWhite");
+    local rightMiddleSection = CreateFrame("Frame", nil, f, nil);
+    rightMiddleSection:SetSize(150, 80);
+    rightMiddleSection:SetPoint(Const.TOP_LEFT_POINT, leftMiddleSection, Const.TOP_RIGHT_POINT, 0, 0);
+
+	local dkpCostOptionsLabel = leftMiddleSection:CreateFontString(nil, Const.OVERLAY_LAYER);
+	dkpCostOptionsLabel:SetFontObject("GameFontNormal");
 	dkpCostOptionsLabel:SetText("Use prices for:");
-    dkpCostOptionsLabel:SetPoint(Const.TOP_LEFT_POINT, inputSection, Const.TOP_LEFT_POINT, 0, 0);
+    dkpCostOptionsLabel:SetPoint(Const.TOP_LEFT_POINT, leftMiddleSection, Const.TOP_LEFT_POINT, 0, -7);
 
-	f.DkpCostDropdown = CreateFrame("Frame", "ThirtyDKP_RaidDKPCostDropdown", inputSection, "L_UIDropDownMenuTemplate");
+	f.DkpCostDropdown = CreateFrame("Frame", "ThirtyDKP_RaidDKPCostDropdown", rightMiddleSection, "L_UIDropDownMenuTemplate");
 	L_UIDropDownMenu_SetWidth(f.DkpCostDropdown, 110);
 	L_UIDropDownMenu_Initialize(f.DkpCostDropdown, InitializeDkpCostDropdown);
 	L_UIDropDownMenu_SetText(f.DkpCostDropdown, Const.RAID_DISPLAY_NAME[selectedRaid]);
-	f.DkpCostDropdown:SetPoint(Const.TOP_LEFT_POINT, dkpCostOptionsLabel, Const.TOP_RIGHT_POINT, 0, 5);
+	f.DkpCostDropdown:SetPoint(Const.TOP_LEFT_POINT, rightMiddleSection, Const.TOP_LEFT_POINT, -20, 0);
 
-    f.CustomDKPCost = View:CreateNumericInputFrame(inputSection, "DKP Cost:", selectedItemDKPCost, function(input)
+    f.CustomDKPCost = View:CreateNumericInputFrame(leftMiddleSection, "DKP Cost:", selectedItemDKPCost, function(input)
         selectedItemDKPCost = input:GetNumber();
     end);
-    f.CustomDKPCost:SetPoint(Const.TOP_LEFT_POINT, dkpCostOptionsLabel, Const.BOTTOM_LEFT_POINT, 0, -20);
+    f.CustomDKPCost:SetPoint(Const.TOP_LEFT_POINT, dkpCostOptionsLabel, Const.BOTTOM_LEFT_POINT, 5, -17);
 
-    f.BidTimeInput = View:CreateNumericInputFrame(inputSection, "Bid Time:", options.bidTime, function(input)
+    f.BidTimeInput = View:CreateNumericInputFrame(leftMiddleSection, "Bid Timer:", options.bidTime, function(input)
         options.bidTime = input:GetNumber();
     end);
-    f.BidTimeInput:SetPoint(Const.TOP_LEFT_POINT, f.CustomDKPCost, Const.BOTTOM_LEFT_POINT, 0, 0);
+    f.BidTimeInput:SetPoint(Const.TOP_LEFT_POINT, f.CustomDKPCost, Const.BOTTOM_LEFT_POINT, 0, -2);
 
 
     -- Buttons
     f.AwardItemBtn = CreateFrame("Button", nil, f, "GameMenuButtonTemplate");
-    f.AwardItemBtn:SetPoint(Const.TOP_LEFT_POINT, f.CustomDKPCost, Const.TOP_RIGHT_POINT, Const.Margin, 0);
+    f.AwardItemBtn:SetPoint(Const.TOP_LEFT_POINT, f.DkpCostDropdown, Const.BOTTOM_LEFT_POINT, 35, 0);
     f.AwardItemBtn:SetSize(100, 22);
     f.AwardItemBtn:SetText("Award Item");
     f.AwardItemBtn:SetNormalFontObject("GameFontNormal");
@@ -380,7 +387,7 @@ function View:CreateBidAnnounceFrame()
     end)
 
     f.StartAndStopBiddingBtn = CreateFrame("Button", nil, f, "GameMenuButtonTemplate");
-    f.StartAndStopBiddingBtn:SetPoint(Const.TOP_LEFT_POINT, f.BidTimeInput, Const.TOP_RIGHT_POINT, Const.Margin, 0);
+    f.StartAndStopBiddingBtn:SetPoint(Const.TOP_LEFT_POINT, f.AwardItemBtn, Const.BOTTOM_LEFT_POINT, 0, -5);
     f.StartAndStopBiddingBtn:SetSize(100, 22);
     f.StartAndStopBiddingBtn:SetText("Start Bidding");
     f.StartAndStopBiddingBtn:SetNormalFontObject("GameFontNormal");

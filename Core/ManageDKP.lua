@@ -151,11 +151,11 @@ end
 
 function Core:AwardItem(dkpTableEntry, itemLink, itemDKPCost)
     if DAL:AdjustPlayerDKP(dkpTableEntry.player, tonumber("-"..itemDKPCost)) then
-        Core:RaidAnnounce(dkpTableEntry.player.." won "..itemLink.." ");
-
+        
+        SendChatMessage(dkpTableEntry.player.." won "..itemLink.." ", "RAID", nil, nil)
         DKPEvent(dkpTableEntry.player, tonumber("-"..itemDKPCost), "Loot: "..itemLink)
     else
-        Core:RaidAnnounce("Could not award "..dkpTableEntry.player.." with "..itemLink.." ");
+        Core:Print("Could not award "..dkpTableEntry.player.." with "..itemLink.." ");
     end 
 end
 

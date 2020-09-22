@@ -2,7 +2,7 @@
 ## Title: Thirty |cffDC143CDKP|r
 ## Author: Gordito-Gehennas, Throes-Gehennas, Bredsida-Gehennas
 ## Notes: Simple, lightweight and efficient DKP loot system management.
-## Version: 1.1.1
+## Version: 1.1.2
 ## DefaultState: enabled
 ## SavedVariables: ThirtyDKP_Database_DKPTable, ThirtyDKP_Database_CurrentLoot, ThirtyDKP_Database_Options, ThirtyDKP_Database_DKPHistory, ThirtyDKP_Database_Raid, ThirtyDKP_Database_PersonalSettings, ThirtyDKP_Database_Standbys
 

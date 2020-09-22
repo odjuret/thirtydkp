@@ -26,6 +26,10 @@ function DAL:GetDKPHistory()
     return ThirtyDKP_Database_DKPHistory
 end
 
+function DAL:GetNumberOfDKPHistoryRecords()
+    return #ThirtyDKP_Database_DKPHistory
+end
+
 function DAL:GetDKPHistoryFor(playerName, maxNumberOfRecords)
     local playerHistory = {}
     for i = 0, #ThirtyDKP_Database_DKPHistory-1 do

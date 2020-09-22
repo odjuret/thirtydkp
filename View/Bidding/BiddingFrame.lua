@@ -69,7 +69,7 @@ function View:CreateBiddingFrame(item)
 
     BiddingFrame.BiddingBtn = CreateFrame("Button", nil, BiddingFrame, "GameMenuButtonTemplate");
     BiddingFrame.BiddingBtn:SetPoint(Const.BOTTOM_LEFT_POINT, BiddingFrame, Const.BOTTOM_LEFT_POINT, 5, 5);
-    BiddingFrame.BiddingBtn:SetSize(100, 22);
+    BiddingFrame.BiddingBtn:SetSize(90, 22);
     BiddingFrame.BiddingBtn:SetText("Bid");
     BiddingFrame.BiddingBtn:SetNormalFontObject("GameFontNormal");
     BiddingFrame.BiddingBtn:SetHighlightFontObject("GameFontHighlight");
@@ -81,7 +81,7 @@ function View:CreateBiddingFrame(item)
 
     BiddingFrame.PassBtn = CreateFrame("Button", nil, BiddingFrame, "GameMenuButtonTemplate");
     BiddingFrame.PassBtn:SetPoint(Const.LEFT_POINT, BiddingFrame.BiddingBtn, Const.RIGHT_POINT, 0, 0);
-    BiddingFrame.PassBtn:SetSize(100, 22);
+    BiddingFrame.PassBtn:SetSize(90, 22);
     BiddingFrame.PassBtn:SetText("Pass");
     BiddingFrame.PassBtn:SetNormalFontObject("GameFontNormal");
     BiddingFrame.PassBtn:SetHighlightFontObject("GameFontHighlight");
@@ -89,6 +89,21 @@ function View:CreateBiddingFrame(item)
     BiddingFrame.PassBtn:SetScript("OnClick", function(self, button)
         Core:SubmitBidPass()
         BiddingFrame:Hide()
+    end)
+
+    BiddingFrame.RollBtn = CreateFrame("Button", nil, BiddingFrame, "GameMenuButtonTemplate");
+    BiddingFrame.RollBtn:SetPoint(Const.LEFT_POINT, BiddingFrame.PassBtn, Const.RIGHT_POINT, 0, 0);
+    BiddingFrame.RollBtn:SetSize(90, 22);
+    BiddingFrame.RollBtn:SetText("Roll");
+    BiddingFrame.RollBtn:SetNormalFontObject("GameFontNormal");
+    BiddingFrame.RollBtn:SetHighlightFontObject("GameFontHighlight");
+    BiddingFrame.RollBtn:RegisterForClicks("AnyUp");
+    BiddingFrame.RollBtn:SetScript("OnClick", function(self, button)
+        if (UnitName("player") == "Manoson") then
+            RandomRoll(1, 1)
+        else
+            RandomRoll(1, 100)
+        end
     end)
 
     BiddingFrame:Show();

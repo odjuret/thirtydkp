@@ -194,7 +194,8 @@ function ThirtyDKP_OnInitialize(event, name)
         end
     end)
 
-    Core:Print("Loaded.")
+    local dkpHistoryRecords = DAL:GetNumberOfDKPHistoryRecords();
+    Core:Print("Loaded "..tostring(dkpHistoryRecords).." dkp history records.")
     Core:Print("Use /thirtydkp or /tdkp for main window.")
 end
 

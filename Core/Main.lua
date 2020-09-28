@@ -108,7 +108,7 @@ function ThirtyDKP_OnEvent(self, event, arg1, ...)
     elseif event == "GUILD_ROSTER_UPDATE" or event == "PLAYER_GUILD_UPDATE" then 
         self:UnregisterEvent("GUILD_ROSTER_UPDATE");
         self:UnregisterEvent("PLAYER_GUILD_UPDATE"); 
-        Core:CheckDataVersion();   
+        Core:CheckDataVersion(1);   
 
     elseif event == "LOOT_READY" then
         Core:HandleLootWindow()

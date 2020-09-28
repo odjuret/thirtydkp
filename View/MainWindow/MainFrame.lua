@@ -36,7 +36,7 @@ function View:UpdateDataUpToDateFrame(incHoverOverText)
             button1 = "Yes",
             button2 = "No",
             OnAccept = function()
-                Core:CheckDataVersion();
+                Core:CheckDataVersion(0);
             end,
             timeout = 0,
             whileDead = true,
@@ -161,7 +161,7 @@ local function CreateRightSideAdminPanel()
     adminPanel.adminHeader:SetFontObject("ThirtyDKPSmall");
     adminPanel.adminHeader:SetPoint(Const.BOTTOM_LEFT_POINT, adminPanel.broadcastBtn, Const.TOP_LEFT_POINT, 0, 5);
     adminPanel.adminHeader:SetSize(80, Const.ButtonHeight);
-    adminPanel.adminHeader:SetText("Admin.")
+    adminPanel.adminHeader:SetText("Admin")
 
 
     adminPanel.dkpHistoryBtn = CreateTdkpMainFrameButton("History", Const.BOTTOM_RIGHT_POINT, adminPanel.adminHeader, Const.TOP_RIGHT_POINT, 0, 10)
@@ -208,7 +208,7 @@ local function CreateRightSideAdminPanel()
     adminPanel.dkpHeader:SetFontObject("ThirtyDKPSmall");
     adminPanel.dkpHeader:SetPoint(Const.BOTTOM_LEFT_POINT, adminPanel.dkpAdjustBtn, Const.TOP_LEFT_POINT, 0, 5);
     adminPanel.dkpHeader:SetSize(80, Const.ButtonHeight);
-    adminPanel.dkpHeader:SetText("DKP.")
+    adminPanel.dkpHeader:SetText("DKP")
 
 end
 
@@ -268,6 +268,7 @@ function View:GetMainFrame()
 end
 
 function View:OpenMainFrame()
+    View:UpdateDKPTable(true)
 	TdkpMainFrame:SetShown(true);
 end
 

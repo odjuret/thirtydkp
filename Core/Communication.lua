@@ -38,6 +38,7 @@ local function HandleDKPTableBroadcastMessage(prefix, message, distribution, sen
                     DAL:WipeAndSetNewHistory(deserialized.history)
                     StaticPopup_Hide ("TDKP_FULL_BROADCAST_WARNING")
                     View:UpdateAllViews();
+                    Core:CheckDataVersion(0);
                 end,
                 timeout = 0,
                 whileDead = true,

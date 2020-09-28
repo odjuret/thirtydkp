@@ -242,7 +242,7 @@ function Core:ApplyOnTimeBonus()
 		end
 	end
 
-    listOfAwardedPlayers = GiveStandbyDKP(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
+    listOfAwardedPlayers = GiveStandbyDKP(listOfAwardedPlayers, onTimeBonus, "On Time Bonus")
     DKPEvent(listOfAwardedPlayers, onTimeBonus, "On Time Bonus")
 end
 
@@ -274,7 +274,7 @@ function Core:ApplyRaidEndBonus()
 		end
 	end
 
-    listOfAwardedPlayers = GiveStandbyDKP(listOfAwardedPlayers, bossKillDKPAward, "Boss Kill: "..bossName)
+    listOfAwardedPlayers = GiveStandbyDKP(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
     DKPEvent(listOfAwardedPlayers, raidCompletionBonus, "Raid Completion Bonus")
 end
 

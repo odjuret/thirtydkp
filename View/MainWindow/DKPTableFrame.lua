@@ -224,13 +224,15 @@ function View:CreateDKPTable(parentFrame)
 	PopulateDKPTable(DKPTableFrame, numberOfRowsInDKPTable);
 end
 
-function View:UpdateDKPTable()
+function View:UpdateDKPTable(forceUpdate)
 	local mainFrame = View:GetMainFrame()
 
-	DKPTableFrame:Hide()
-	DKPTableFrame:SetParent(nil)
-	DKPTableFrame = nil;
-
-	View:CreateDKPTable(mainFrame)
-	DKPTableFrame:Show()
+	if (forceUpdate == true) or mainFrame:IsShown() then
+		DKPTableFrame:Hide()
+		DKPTableFrame:SetParent(nil)
+		DKPTableFrame = nil;
+	
+		View:CreateDKPTable(mainFrame)
+		DKPTableFrame:Show()
+	end
 end

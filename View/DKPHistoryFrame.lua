@@ -27,7 +27,7 @@ end
 
 local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 	local b = CreateFrame("Button", nil, parent);
-	local totalEntryHeight = 32;
+	local totalEntryHeight = 30;
 
 	-- entry header
 	local colorizedDKPAdjust = "";
@@ -63,7 +63,7 @@ local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 	end
 
 	for i = 1, rows do
-		totalEntryHeight = totalEntryHeight + 8
+		totalEntryHeight = totalEntryHeight + 12
 	end
 	
 	b:SetSize(parent:GetWidth(), totalEntryHeight);
@@ -218,19 +218,24 @@ function View:CreateDKPHistoryFrame(parentFrame)
 	
 end
 
-function View:UpdateDKPHistoryFrame()
-	local tdkpMainFrame = View:GetMainFrame()
-
-	DKPHistoryFrame:Hide()
-	DKPHistoryFrame:SetParent(nil)
-	DKPHistoryFrame = nil;
-
- 	dkpHistoryScrollChildHeight = 0;
-
-	View:CreateDKPHistoryFrame(tdkpMainFrame)
+function View:UpdateDKPHistoryFrame(forceUpdate)
+	if (forceUpdate == true) or DKPHistoryFrame:IsShown() then
+	
+		local tdkpMainFrame = View:GetMainFrame()
+		DKPHistoryFrame:Hide()
+		DKPHistoryFrame:SetParent(nil)
+		DKPHistoryFrame = nil;
+	
+		dkpHistoryScrollChildHeight = 0;
+	
+		View:CreateDKPHistoryFrame(tdkpMainFrame)
+	end
 end
 
 function View:ToggleDKPHistoryFrame()
+	if not DKPHistoryFrame:IsShown() then
+		View:UpdateDKPHistoryFrame(true)
+	end
     DKPHistoryFrame:SetShown(not DKPHistoryFrame:IsShown());
 end
 

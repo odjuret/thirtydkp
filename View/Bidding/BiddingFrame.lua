@@ -99,11 +99,7 @@ function View:CreateBiddingFrame(item)
     BiddingFrame.RollBtn:SetHighlightFontObject("GameFontHighlight");
     BiddingFrame.RollBtn:RegisterForClicks("AnyUp");
     BiddingFrame.RollBtn:SetScript("OnClick", function(self, button)
-        if (UnitName("player") == "Manoson") then
-            RandomRoll(1, 1)
-        else
-            RandomRoll(1, 100)
-        end
+        RandomRoll(1, 100);
     end)
 
     BiddingFrame:Show();

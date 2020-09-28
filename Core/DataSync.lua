@@ -138,11 +138,12 @@ local function CompareDataVersions()
     View:UpdateDataUpToDateFrame(dataStatusText)
 end
 
-function Core:CheckDataVersion()
-    C_Timer.After(1, function() 
+function Core:CheckDataVersion(timer)
+    C_Timer.After(timer, function() 
         local currentGuildName = GetGuildInfo("player");
         if currentGuildName == nil then
-            Core:Print("Found no guild to sync data with, server could be laggy.")
+            Core:Print("Found no guild to sync data with.")
+            Core:Print("Server could be laggy... click on data button in main window to retry!")
         else
             Core:Print("Attempting to sync DKP data with online guildies.")
             -- Request data versions from online members

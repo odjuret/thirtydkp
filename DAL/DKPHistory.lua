@@ -86,7 +86,7 @@ function DAL:DeleteHistoryEntry(entry)
         local results = nil;
 
         if entryExists == false then
-            return false 
+            return false;
         end
         
         -- Entries can have same index

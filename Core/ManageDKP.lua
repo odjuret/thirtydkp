@@ -119,7 +119,7 @@ local function DKPEvent(affectedPlayers, amount, reason, historyEntry)
 
     -- broadcast event
     if reason == "RevertHistory" and historyEntry ~= nil then
-        Core:SendRevertDKPEventMessage(deletedHistoryEntry, lastHistoryVersion)
+        Core:SendRevertDKPEventMessage(historyEntry, lastHistoryVersion)
     else
         Core:SendDKPEventMessage(newHistoryEntry, currentHistoryVersion)
     end

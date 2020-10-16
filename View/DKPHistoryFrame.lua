@@ -71,30 +71,31 @@ local function CreateDKPHistoryListEntry(parent, id, dkpHistory)
 
 	local sanitizedHeaderText = View:SanitizeTextForBlizzFunctions(headerText)
 
-	b:RegisterForClicks("AnyDown");
-	b:SetScript("OnClick", function (self, button, down)
-		if button == "RightButton" then
-			if Core:IsAddonAdmin() then
-				View:CreateRightClickMenu(self, headerText, "Delete Entry", function() 
-					StaticPopupDialogs["TDKP_REMOVE_HISTORY_ENTRY"] = {
-						text = "Are you sure you want to delete\n "..sanitizedHeaderText.." \nand refund/remove affected players DKP?",
-						button1 = "Yes",
-						button2 = "No",
-						OnAccept = function()
-							Core:RevertHistory(dkpHistory[id]);
-							DKPHistoryFrame:SetShown(true);
-						end,
-						timeout = 6,
-						whileDead = true,
-						hideOnEscape = true,
-						preferredIndex = 3,
-					};
-					StaticPopup_Show ("TDKP_REMOVE_HISTORY_ENTRY", "", "")
-				end)
+	if Core:IsAddonAdmin() then
+		b:RegisterForClicks("AnyDown");
+		b:SetScript("OnClick", function (self, button, down)
+			if button == "RightButton" then
+				if Core:IsAddonAdmin() then
+					View:CreateRightClickMenu(self, headerText, "Delete Entry", function() 
+						StaticPopupDialogs["TDKP_REMOVE_HISTORY_ENTRY"] = {
+							text = "Are you sure you want to delete\n "..sanitizedHeaderText.." \nand refund/remove affected players DKP?",
+							button1 = "Yes",
+							button2 = "No",
+							OnAccept = function()
+								Core:RevertHistory(dkpHistory[id]);
+								DKPHistoryFrame:SetShown(true);
+							end,
+							timeout = 6,
+							whileDead = true,
+							hideOnEscape = true,
+							preferredIndex = 3,
+						};
+						StaticPopup_Show ("TDKP_REMOVE_HISTORY_ENTRY", "", "")
+					end)
+				end
 			end
-		end
-	end);
-	
+		end);
+	end
 	return b
 end
 
@@ -184,10 +185,12 @@ end;
 function View:CreateDKPHistoryFrame(parentFrame)
 	DKPHistoryFrame = View:CreateContainerFrame("ThirtyDKP_HistoryFrame", parentFrame, DKPHISTORY_FRAME_TITLE, 432, 385)
 
-	DKPHistoryFrame.helpText = DKPHistoryFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
-	DKPHistoryFrame.helpText:SetFontObject("ThirtyDKPTiny");
-    DKPHistoryFrame.helpText:SetPoint(Const.TOP_RIGHT_POINT, DKPHistoryFrame, Const.TOP_RIGHT_POINT, -50, -20);
-	DKPHistoryFrame.helpText:SetText(Core:ColorizeGrey("Right click to delete entry."));
+	if Core:IsAddonAdmin() then 
+		DKPHistoryFrame.helpText = DKPHistoryFrame:CreateFontString(nil, Const.OVERLAY_LAYER);
+		DKPHistoryFrame.helpText:SetFontObject("ThirtyDKPTiny");
+		DKPHistoryFrame.helpText:SetPoint(Const.TOP_RIGHT_POINT, DKPHistoryFrame, Const.TOP_RIGHT_POINT, -50, -20);
+		DKPHistoryFrame.helpText:SetText(Core:ColorizeGrey("Right click to delete entry."));
+	end
 	
 	DKPHistoryFrame.numberOfEntriesDropdown = CreateNumberOfEntriesDropdown();
 	DKPHistoryFrame.numberOfEntriesDropdown:SetPoint(Const.TOP_LEFT_POINT, DKPHistoryFrame, Const.TOP_LEFT_POINT, 100, -4);

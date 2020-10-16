@@ -1,2 +1,0 @@
-
-1.1.0 - New Feature: Raid standby's list.

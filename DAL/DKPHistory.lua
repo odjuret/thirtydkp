@@ -81,7 +81,7 @@ function DAL:AddToHistory(affectedPlayers, amount, reason)
 end
 
 function DAL:DeleteHistoryEntry(entry)
-    if #ThirtyDKP_Database_DKPHistory > 0 then
+    if (#ThirtyDKP_Database_DKPHistory > 0) and (entry ~= nil) then
         local entryExists = DAL:Table_Search(ThirtyDKP_Database_DKPHistory, entry.index, 'index')
         local results = nil;
 

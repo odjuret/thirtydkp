@@ -164,17 +164,7 @@ local function CreateRightSideAdminPanel()
     adminPanel.adminHeader:SetText("Admin")
 
 
-    adminPanel.dkpHistoryBtn = CreateTdkpMainFrameButton("History", Const.BOTTOM_RIGHT_POINT, adminPanel.adminHeader, Const.TOP_RIGHT_POINT, 0, 10)
-    View:AttachHoverOverTooltipAndOnclick(adminPanel.dkpHistoryBtn, "DKP History", "Manage DKP history for your guild.", function()
-        View:HideOptionsFrame();
-        View:HideDKPAdjustFrame();
-        View:HideDKPAdminsFrame();
-        View:HideAddGuildFrame();
-        View:HideStandbysFrame();
-        View:ToggleDKPHistoryFrame();
-    end)
-
-    adminPanel.optionsButton = CreateTdkpMainFrameButton("Options", Const.BOTTOM_RIGHT_POINT, adminPanel.dkpHistoryBtn, Const.TOP_RIGHT_POINT, 0, 0)
+    adminPanel.optionsButton = CreateTdkpMainFrameButton("Options", Const.BOTTOM_RIGHT_POINT, adminPanel.adminHeader, Const.TOP_RIGHT_POINT, 0, 10)
     View:AttachHoverOverTooltipAndOnclick(adminPanel.optionsButton, "DKP Options", "Manage costs and gains", function()
         View:HideDKPAdjustFrame();
         View:HideDKPAdminsFrame();
@@ -258,6 +248,18 @@ local function CreateTdkpMainFrame(isAddonAdmin)
     
     View:UpdateDataUpToDateFrame()
 
+    f.dkpHistoryBtn = CreateTdkpMainFrameButton("History", Const.TOP_LEFT_POINT, ThirtyDKP_MainFrame, Const.TOP_LEFT_POINT, 225, -5)
+    View:AttachHoverOverTooltipAndOnclick(f.dkpHistoryBtn, "DKP History", "View DKP history for your guild.", function()
+        if isAddonAdmin then 
+            View:HideOptionsFrame();
+            View:HideDKPAdjustFrame();
+            View:HideDKPAdminsFrame();
+            View:HideAddGuildFrame();
+            View:HideStandbysFrame();    
+        end
+        View:ToggleDKPHistoryFrame();
+    end)
+
     if isAddonAdmin then
         CreateRightSideAdminPanel();
     end
@@ -284,11 +286,11 @@ function View:Initialize()
 	CreateTdkpMainFrame(isAddonAdmin);
     View:CreateDKPTable(TdkpMainFrame);
     View:CreateBidAnnounceFrame();
+    View:CreateDKPHistoryFrame(TdkpMainFrame);
     if isAddonAdmin then
         View:CreateOptionsFrame(TdkpMainFrame);
 		View:CreateDKPAdjustFrame(TdkpMainFrame);
         View:CreateDKPAdminsFrame(TdkpMainFrame);
-        View:CreateDKPHistoryFrame(TdkpMainFrame);
         View:CreateAddGuildFrame(TdkpMainFrame);
         View:CreateStandbysFrame(TdkpMainFrame);
     end

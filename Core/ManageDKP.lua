@@ -35,7 +35,7 @@ local bossEventIds = {
 local function GetRaidNameFromId(raidId)
     if raidId == 533 then
         return "naxxramas";
-	else if raidId == 531 then
+	elseif raidId == 531 then
 		return "aq40";
 	elseif raidId == 469 then
 		return "bwl";

@@ -162,7 +162,7 @@ function Core:AwardItem(dkpTableEntry, itemLink, itemDKPCost)
 end
 
 function Core:HandleBossKill(eventId, ...)
-    if not Core:IsPlayerMasterLooter() or not Core:IsRaidStarted() then return end
+    if not Core:IsRaidStarted() then return end
     local bossName = ...;
     C_Timer.After(2, function()
         

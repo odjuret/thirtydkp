@@ -51,18 +51,6 @@ function View:CreateDKPAdjustFrame(parentFrame)
 	startOrEndRaidBtn:SetNormalFontObject("GameFontNormal");
 	startOrEndRaidBtn:SetHighlightFontObject("GameFontHighlight");
 	View:AttachHoverOverTooltipAndOnclick(startOrEndRaidBtn, "Start or End raiding mode", "Will auto award boss kill dkp\nand announce loot in raid chat during raiding mode.", function(self, button, down)
-		if not Core:IsPlayerMasterLooter() then
-			StaticPopupDialogs["TDKP_STARTEND_RAID"] = {
-				text = "You must be master looter to start or end raids",
-				button1 = "OK",
-				timeout = 0,
-				whileDead = true,
-				hideOnEscape = true,
-				preferredIndex = 3,
-			}
-			StaticPopup_Show("TDKP_STARTEND_RAID");
-			return;
-		end
 		if self:GetText() == TDKP_RAID_BUTTON_START then
 			Core:StartRaid();
 			startOrEndRaidBtn:SetText(TDKP_RAID_BUTTON_END);

@@ -87,7 +87,6 @@ function View:CreateBiddingFrame(item)
     BiddingFrame.PassBtn:SetHighlightFontObject("GameFontHighlight");
     BiddingFrame.PassBtn:RegisterForClicks("AnyUp");
     BiddingFrame.PassBtn:SetScript("OnClick", function(self, button)
-        Core:SubmitBidPass()
         BiddingFrame:Hide()
     end)
 

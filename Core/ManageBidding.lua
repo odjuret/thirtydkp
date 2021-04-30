@@ -5,7 +5,6 @@ local DAL = ThirtyDKP.DAL
 local View = ThirtyDKP.View
 
 local biddingInProgress = false
-local passOnItemBidMessage = "PassOnItemForBid"
 
 function Core:IsBiddingInProgress()
     return biddingInProgress
@@ -13,12 +12,6 @@ end
 
 function Core:IncomingBidsHandler(message, sender)
     if biddingInProgress then
-        if message == passOnItemBidMessage then
-            Core:Print(sender.." passed. ");
-            SendChatMessage("ThirtyDKP: Pass accepted!", "WHISPER", nil, sender);
-            return;
-        end
-
         Core:Print("Incoming bid from "..sender.."");
         local player = DAL:GetFromDKPTable(sender)
 
@@ -86,10 +79,6 @@ function Core:SubmitBid()
     Core:CommunicateSubmitBids("nodcplz")
 end
 
-function Core:SubmitBidPass()
-    Core:CommunicateSubmitBids(passOnItemBidMessage)
-end
-
 function Core:HandleSubmitBidRaidMessage(text, ...)
     local name = ...;
     local message = "nodcplz";
@@ -97,10 +86,6 @@ function Core:HandleSubmitBidRaidMessage(text, ...)
     if string.find(name, "-") then          -- finds and removes server name from name if exists
         local dashPos = string.find(name, "-")
         name = strsub(name, 1, dashPos-1)
-    end
-
-    if string.find(text, "!pass") == 1 then
-        message = passOnItemBidMessage
     end
 
     Core:IncomingBidsHandler(message, name)
